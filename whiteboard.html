@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard</title>
+    <link rel="stylesheet" href="stylesheet1.css">
+    <style>
+        #canvas,
+        .scanlines {
+            pointer-events: none;
+            /* important: allows drawing on wb-canvas */
+            position: fixed;
+            /* ensure full-screen background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* behind everything else */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background -->
+    <canvas id="canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Navbar -->
+    <nav id="main-nav">
+        <!-- Logo should navigate to landing page -->
+        <a href="landing.html" class="nav-logo">
+            <div class="nav-logo-icon">🔗</div>
+            StudySphere 
+        </a>
+
+        <div class="nav-links" id="navLinks">
+            <a class="nav-link" href="landing.html">Intro</a>
+            <a class="nav-link" href="dashboard.html">Dashboard</a>
+            <a class="nav-link" href="match.html">Match</a>
+            <a class="nav-link" href="session.html">Session</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+            <a class="nav-link active" href="whiteboard.html">Whiteboard</a>
+            <a class="nav-link" href="resources.html">Resources</a>
+             <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+            <a class="nav-link" href="onboard.html">Onboard</a>
+        </div>
+
+        <!-- CTA should also navigate normally 
+        <a href="onboard.html" class="nav-cta">Get Started →</a>  -->
+    </nav>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <div id="page-whiteboard" class="page">
+            <div class="wb-page">
+                <div class="content">
+                    <div style="margin-bottom:20px;">
+                        <div class="section-tag">Collaborative Canvas</div>
+                        <h1 class="heading-lg" style="margin-bottom:6px;">🖊️ Live <span
+                                class="gradient-text">Whiteboard</span></h1>
+                        <p style="color:var(--muted);font-size:14px;">Draw, annotate, and collaborate in real-time</p>
+                    </div>
+
+                    <div class="wb-toolbar">
+                        <button class="wb-tool-btn active" id="tool-pen" onclick="setTool('pen',this)">✏️ Pen</button>
+                        <button class="wb-tool-btn" id="tool-eraser" onclick="setTool('eraser',this)">⬜ Eraser</button>
+                        <button class="wb-tool-btn" id="tool-line" onclick="setTool('line',this)">📏 Line</button>
+                        <button class="wb-tool-btn" id="tool-rect" onclick="setTool('rect',this)">⬛ Rect</button>
+                        <button class="wb-tool-btn" id="tool-circle" onclick="setTool('circle',this)">⭕ Circle</button>
+                        <button class="wb-tool-btn" id="tool-text" onclick="setTool('text',this)">T Text</button>
+                        <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <div class="wb-color selected" style="background:#8b5cf6;"
+                                onclick="setColor('#8b5cf6',this)">
+                            </div>
+                            <div class="wb-color" style="background:#22d3ee;" onclick="setColor('#22d3ee',this)"></div>
+                            <div class="wb-color" style="background:#10b981;" onclick="setColor('#10b981',this)"></div>
+                            <div class="wb-color" style="background:#f59e0b;" onclick="setColor('#f59e0b',this)"></div>
+                            <div class="wb-color" style="background:#ef4444;" onclick="setColor('#ef4444',this)"></div>
+                            <div class="wb-color" style="background:#f8fafc;" onclick="setColor('#f8fafc',this)"></div>
+                        </div>
+                        <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+                        <span style="font-size:12px;color:var(--muted);">Size:</span>
+                        <input type="range" id="brushSize" min="1" max="30" value="3"
+                            style="width:80px;accent-color:var(--glow);" oninput="brushSz=this.value">
+                        <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+                        <button class="wb-tool-btn" onclick="clearWB()" style="color:var(--red);">🗑️ Clear</button>
+                        <button class="wb-tool-btn" onclick="saveWB()" style="color:var(--green-glow);">💾 Save
+                            PNG</button>
+                    </div>
+
+                    <canvas id="wb-canvas" width="1200" height="600"
+                        style="background:#0b0b16;border-radius:14px;border:1px solid var(--border);cursor:crosshair;display:block;width:100%;max-height:580px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+      <div id="profile-container"
+        style="position: fixed; top: 0px; right: 20px; width: 250px; height: auto; z-index:1000;">
+        <script>
+            fetch('profile.html')
+                .then(response => response.text())
+                .then(html => {
+                    // Insert the HTML
+                    document.getElementById('profile-container').innerHTML = html;
+
+                    // Manually attach the logout listener
+                    const logoutBtn = document.getElementById('logout-btn');
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            alert('You have been logged out!');
+                            window.location.href = 'main.html'; // Full page redirect
+                        });
+                    }
+                    // Also attach profile toggle
+                    const profileBtn = document.getElementById('profile-btn');
+                    const profileMenu = document.getElementById('profile-menu');
+                    if (profileBtn && profileMenu) {
+                        profileBtn.addEventListener('click', () => {
+                            profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+                        });
+                        document.addEventListener('click', (e) => {
+                            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                                profileMenu.style.display = 'none';
+                            }
+                        });
+                    }
+
+                });
+        </script>
+    </div>
+    <script>
+        let wbCtx, wbDrawing = false, wbTool = 'pen', wbColor = '#8b5cf6', brushSz = 3;
+        let startX, startY, snapshot;
+
+        function initWB() {
+            const canvas = document.getElementById('wb-canvas');
+            if (!canvas || canvas.dataset.init) return;
+            canvas.dataset.init = '1';
+            wbCtx = canvas.getContext('2d');
+            wbCtx.fillStyle = '#0b0b16';
+            wbCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas.addEventListener('mousedown', e => {
+                wbDrawing = true;
+                const r = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / r.width;
+                const scaleY = canvas.height / r.height;
+                startX = (e.clientX - r.left) * scaleX;
+                startY = (e.clientY - r.top) * scaleY;
+                snapshot = wbCtx.getImageData(0, 0, canvas.width, canvas.height);
+                wbCtx.beginPath();
+                wbCtx.moveTo(startX, startY);
+            });
+
+            canvas.addEventListener('mousemove', e => {
+                if (!wbDrawing) return;
+                const r = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / r.width;
+                const scaleY = canvas.height / r.height;
+                const x = (e.clientX - r.left) * scaleX;
+                const y = (e.clientY - r.top) * scaleY;
+
+                if (wbTool === 'pen' || wbTool === 'eraser') {
+                    wbCtx.strokeStyle = wbTool === 'eraser' ? '#0b0b16' : wbColor;
+                    wbCtx.lineWidth = wbTool === 'eraser' ? 24 : brushSz;
+                    wbCtx.lineCap = 'round';
+                    wbCtx.lineTo(x, y);
+                    wbCtx.stroke();
+                } else {
+                    wbCtx.putImageData(snapshot, 0, 0);
+                    wbCtx.strokeStyle = wbColor;
+                    wbCtx.lineWidth = brushSz;
+                    wbCtx.beginPath();
+                    if (wbTool === 'line') { wbCtx.moveTo(startX, startY); wbCtx.lineTo(x, y); wbCtx.stroke(); }
+                    if (wbTool === 'rect') { wbCtx.strokeRect(startX, startY, x - startX, y - startY); }
+                    if (wbTool === 'circle') {
+                        const r2 = Math.sqrt((x - startX) ** 2 + (y - startY) ** 2);
+                        wbCtx.arc(startX, startY, r2, 0, Math.PI * 2);
+                        wbCtx.stroke();
+                    }
+                }
+            });
+
+            canvas.addEventListener('mouseup', e => {
+                if (wbTool === 'text') {
+                    const r = canvas.getBoundingClientRect();
+                    const x = (e.clientX - r.left) * (canvas.width / r.width);
+                    const y = (e.clientY - r.top) * (canvas.height / r.height);
+                    const txt = prompt('Enter text:');
+                    if (txt) {
+                        wbCtx.fillStyle = wbColor;
+                        wbCtx.font = `${14 + brushSz * 2}px DM Sans`;
+                        wbCtx.fillText(txt, x, y);
+                    }
+                }
+                wbDrawing = false;
+                wbCtx.beginPath();
+            });
+
+            canvas.addEventListener('mouseleave', () => { wbDrawing = false; wbCtx.beginPath(); });
+        }
+
+        function setTool(t, el) {
+            wbTool = t;
+            document.querySelectorAll('.wb-tool-btn').forEach(b => b.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const canvas = document.getElementById('wb-canvas');
+            if (canvas) canvas.style.cursor = t === 'eraser' ? 'cell' : t === 'text' ? 'text' : 'crosshair';
+        }
+
+        function setColor(c, el) {
+            wbColor = c;
+            document.querySelectorAll('.wb-color').forEach(b => b.classList.remove('selected'));
+            if (el) el.classList.add('selected');
+        }
+
+        function clearWB() {
+            if (!wbCtx) return;
+            const canvas = document.getElementById('wb-canvas');
+            wbCtx.fillStyle = '#0b0b16';
+            wbCtx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveWB() {
+            const canvas = document.getElementById('wb-canvas');
+            if (!canvas) return;
+            const a = document.createElement('a');
+            a.download = 'collabsync-whiteboard.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+        initWB();
+    </script>
+</body>
+
+</html>

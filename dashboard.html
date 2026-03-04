@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - StudySphere</title>
+    <link rel="stylesheet" href="stylesheet1.css">
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="scanlines"></div>
+
+<nav id="main-nav">
+    <a href="landing.html" class="nav-logo"><div class="nav-logo-icon">🔗</div>StudySphere</a>
+    <div class="nav-links">
+        <a class="nav-link" href="landing.html">Intro</a>
+        <a class="nav-link active" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="match.html">Match</a>
+        <a class="nav-link" href="session.html">Session</a>
+        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+        <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="onboard.html">Onboard</a>
+    </div>
+</nav>
+<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
+
+<!-- ════════════════════════════════════════════════════
+     VIDEO CALL MODAL  (WebRTC + Firebase Signaling)
+════════════════════════════════════════════════════ -->
+<div id="videoOverlay" onclick="hangUp()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;backdrop-filter:blur(16px);"></div>
+
+<div id="videoModal" style="
+    display:none;position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0.92);
+    width:min(960px,97vw);height:min(620px,94vh);
+    border-radius:28px;z-index:10001;
+    background:linear-gradient(160deg,#0d0d1f 0%,#111128 100%);
+    border:1px solid rgba(109,40,217,0.25);
+    box-shadow:0 60px 180px rgba(0,0,0,0.98),0 0 0 1px rgba(77,148,255,0.1),0 0 80px rgba(109,40,217,0.08);
+    opacity:0;transition:all 0.35s cubic-bezier(.34,1.56,.64,1);
+    overflow:hidden;flex-direction:column;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(255,255,255,0.025);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;animation:vPulse 1.2s infinite;"></div>
+      <div>
+        <div id="vcTitle" style="font-size:15px;font-weight:700;color:white;">Video Call</div>
+        <div id="vcTimer" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:1px;">Connecting…</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="vcStatus" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;padding:4px 12px;font-size:11px;color:#22c55e;font-weight:600;">🔴 WebRTC Live</div>
+      <button onclick="hangUp()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);border-radius:12px;padding:6px 14px;font-size:12px;cursor:pointer;">✕ Close</button>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;position:relative;overflow:hidden;background:#080810;">
+    <video id="remoteVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;background:#080810;"></video>
+    <div id="vcWaiting" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,16,0.97);">
+      <div id="vcPeerAvatar" style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:30px;color:white;margin-bottom:16px;background:#6a4dff;border:3px solid rgba(109,40,217,0.5);box-shadow:0 0 40px rgba(109,40,217,0.3);"></div>
+      <div id="vcPeerName" style="font-size:18px;font-weight:700;color:white;margin-bottom:8px;"></div>
+      <div id="vcWaitText" style="font-size:13px;color:rgba(255,255,255,0.4);">Waiting for them to join…</div>
+      <div style="display:flex;gap:6px;margin-top:20px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#6a4dff;animation:vcDot 1.2s infinite 0s;"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#4d94ff;animation:vcDot 1.2s infinite 0.2s;"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#00c9a7;animation:vcDot 1.2s infinite 0.4s;"></div>
+      </div>
+    </div>
+    <video id="localVideo" autoplay playsinline muted
+      style="position:absolute;bottom:20px;right:20px;width:200px;height:140px;border-radius:16px;object-fit:cover;border:2px solid rgba(109,40,217,0.6);box-shadow:0 8px 32px rgba(0,0,0,0.8);background:#111;z-index:2;transition:all 0.3s;cursor:pointer;"
+      onclick="swapVideos()"></video>
+    <div id="localVideoOff" style="display:none;position:absolute;bottom:20px;right:20px;width:200px;height:140px;border-radius:16px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);align-items:center;justify-content:center;z-index:2;">
+      <div style="text-align:center;"><div style="font-size:28px;">📷</div><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">Camera off</div></div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 24px;background:rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+    <button id="btnMic" onclick="toggleMic()" title="Toggle Mic"
+      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🎤</button>
+    <button id="btnCam" onclick="toggleCamera()" title="Toggle Camera"
+      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">📹</button>
+    <button id="btnScreen" onclick="toggleScreen()" title="Screen Share"
+      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🖥️</button>
+    <button onclick="hangUp()" title="End Call"
+      style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.45);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;"
+      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📵</button>
+    <button id="btnInCallChat" onclick="toggleInCallChat()" title="In-Call Chat"
+      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">💬</button>
+    <button onclick="toggleFullscreen()" title="Fullscreen"
+      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">⛶</button>
+  </div>
+
+  <div id="inCallChat" style="display:none;position:absolute;top:62px;right:0;bottom:0;width:280px;background:rgba(8,8,20,0.95);border-left:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(10px);flex-direction:column;z-index:5;">
+    <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;font-weight:700;color:white;">💬 In-Call Chat</div>
+    <div id="inCallMsgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div style="padding:10px 12px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;">
+      <input id="inCallInput" type="text" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendInCallMsg()"
+        style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:8px 12px;font-size:12px;outline:none;">
+      <button onclick="sendInCallMsg()" style="background:#6a4dff;border:none;color:white;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Incoming call notification -->
+<div id="incomingCallToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#0d0d1f,#1a1a35);border:1px solid rgba(109,40,217,0.4);border-radius:20px;padding:16px 24px;z-index:11000;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(109,40,217,0.15);transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);min-width:300px;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div id="incomingAvatar" style="width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white;flex-shrink:0;animation:vPulse 1s infinite;"></div>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:white;margin-bottom:3px;">📞 Incoming Video Call</div>
+      <div id="incomingName" style="font-size:12px;color:rgba(255,255,255,0.5);"></div>
+    </div>
+    <button id="btnAccept" onclick="acceptCall()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:white;border-radius:12px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(34,197,94,0.4);">Accept</button>
+    <button onclick="declineCall()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;">Decline</button>
+  </div>
+</div>
+
+<!-- ════ ROOM CHAT MODAL ════ -->
+<div id="roomChatOverlay" onclick="closeRoomChat()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9500;backdrop-filter:blur(10px);"></div>
+<div id="roomChatModal" style="
+    display:none;position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0.95);
+    width:min(860px,96vw);height:min(620px,92vh);
+    border-radius:24px;z-index:9600;
+    background:#0b0b18;
+    border:1px solid rgba(255,255,255,0.07);
+    box-shadow:0 50px 150px rgba(0,0,0,0.95),0 0 0 1px rgba(109,40,217,0.2);
+    opacity:0;transition:all 0.32s cubic-bezier(.34,1.56,.64,1);
+    flex-direction:row;overflow:hidden;">
+  <div style="width:210px;flex-shrink:0;background:rgba(255,255,255,0.025);border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;padding:20px 14px;">
+    <div style="margin-bottom:18px;">
+      <div id="rmEmoji" style="font-size:34px;margin-bottom:10px;">📚</div>
+      <div id="rmSubject" style="font-size:15px;font-weight:700;color:white;line-height:1.3;margin-bottom:6px;">Room</div>
+      <div id="rmCode" style="font-size:10px;color:#00c9a7;letter-spacing:2px;font-weight:700;background:rgba(0,201,167,0.1);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;"></div>
+
+      <!-- HOST BADGE — shown only for host -->
+      <div id="rmHostBadge" style="display:none;font-size:10px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:3px 10px;display:none;margin-bottom:8px;">👑 You are the host</div>
+
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;"></div>
+        <span style="font-size:11px;color:#22c55e;font-weight:600;">Live Room</span>
+      </div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.28);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Members</div>
+    <div id="rmMembersList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+        <span style="color:rgba(255,255,255,0.4);">Room Mood</span>
+        <span id="rmMoodPct" style="color:#22c55e;font-weight:700;">—</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:2px;margin-bottom:10px;">
+        <div id="rmMoodBar" style="height:100%;width:0%;background:linear-gradient(90deg,#6a4dff,#00c9a7);border-radius:2px;transition:width 0.8s;"></div>
+      </div>
+      <div style="display:flex;gap:5px;">
+        <button onclick="voteMood(85)" style="flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:8px;color:#22c55e;font-size:11px;padding:5px 0;cursor:pointer;">😊</button>
+        <button onclick="voteMood(55)" style="flex:1;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:8px;color:#f59e0b;font-size:11px;padding:5px 0;cursor:pointer;">😐</button>
+        <button onclick="voteMood(25)" style="flex:1;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);border-radius:8px;color:#f87171;font-size:11px;padding:5px 0;cursor:pointer;">😴</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+      <a id="rmSessionLink" href="session.html" style="display:block;text-align:center;padding:8px;border-radius:10px;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;font-size:12px;font-weight:700;text-decoration:none;">🚀 Full Session →</a>
+
+      <!-- END SESSION — host only, hidden by default -->
+      <button id="rmEndSessionBtn" onclick="endSession()" style="
+          display:none;
+          width:100%;padding:8px;border-radius:10px;
+          background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));
+          border:1px solid rgba(239,68,68,0.35);
+          color:#f87171;font-size:12px;font-weight:700;
+          cursor:pointer;transition:all 0.2s;"
+        onmouseover="this.style.background='linear-gradient(135deg,rgba(239,68,68,0.35),rgba(220,38,38,0.22))';this.style.color='white';"
+        onmouseout="this.style.background='linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08))';this.style.color='#f87171';">
+        🛑 End Session
+      </button>
+
+      <button onclick="closeRoomChat()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.35);font-size:12px;padding:7px;cursor:pointer;">✕ Close</button>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(255,255,255,0.015);">
+      <div>
+        <div id="rmChatTitle" style="font-size:15px;font-weight:700;color:white;">Room Chat</div>
+        <div id="rmChatSub" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:1px;">Connecting…</div>
+      </div>
+      <div style="background:rgba(0,201,167,0.08);border:1px solid rgba(0,201,167,0.2);border-radius:20px;padding:4px 12px;font-size:11px;color:#00c9a7;font-weight:600;">🔴 Firebase Live</div>
+    </div>
+    <div id="rmMessages" style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px;">Loading messages…</div>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;background:rgba(0,0,0,0.2);">
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div id="rmSenderAvatar" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:white;background:#6a4dff;"></div>
+        <div style="flex:1;position:relative;">
+          <textarea id="rmInput" placeholder="Message the room… (Enter to send)" rows="1"
+            onkeydown="handleRoomKey(event)" oninput="autoResizeRm(this)"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:10px 50px 10px 16px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:100px;font-family:inherit;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='rgba(109,40,217,0.5)'"
+            onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          <button onclick="sendRoomMessage()" title="Send" style="position:absolute;right:8px;bottom:8px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;"
+            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DM CHAT WINDOW ════ -->
+<div id="chatWindow" style="display:none;position:fixed;bottom:24px;right:24px;width:min(370px,95vw);height:520px;border-radius:20px;z-index:9000;flex-direction:column;background:#0f0f1a;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.8);transform:translateY(30px);opacity:0;transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),opacity 0.2s ease;overflow:hidden;">
+    <div id="chatHeader" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(77,148,255,0.12),rgba(106,77,255,0.12));border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div id="chatAvatar" style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:white;flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+            <div id="chatName" style="font-weight:700;font-size:14px;color:white;"></div>
+            <div id="chatSub" style="font-size:11px;color:rgba(255,255,255,0.4);"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
+            <span style="font-size:11px;color:#22c55e;">Live</span>
+        </div>
+        <button id="btnVideoCall" onclick="startVideoCall()" title="Start Video Call"
+          style="background:linear-gradient(135deg,rgba(109,40,217,0.25),rgba(77,148,255,0.2));border:1px solid rgba(109,40,217,0.45);color:white;border-radius:12px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:700;transition:all 0.2s;display:flex;align-items:center;gap:6px;"
+          onmouseover="this.style.background='linear-gradient(135deg,rgba(109,40,217,0.5),rgba(77,148,255,0.35))'"
+          onmouseout="this.style.background='linear-gradient(135deg,rgba(109,40,217,0.25),rgba(77,148,255,0.2))'">
+          📹 <span style="font-size:11px;">Call</span>
+        </button>
+        <button onclick="closeChatWindow()" style="background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px;">Loading messages…</div>
+    </div>
+    <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#0f0f1a;">
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+            <textarea id="chatInput" placeholder="Message… (Enter to send)" rows="1"
+                onkeydown="handleChatKey(event)" oninput="autoResizeInput(this)"
+                style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:9px 14px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:90px;font-family:inherit;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='rgba(109,40,217,0.5)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+            <button onclick="sendDM()" style="background:linear-gradient(135deg,#4d94ff,#6a4dff);border:none;color:white;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">➤</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════ MAIN CONTENT ════ -->
+<div class="content-wrapper">
+ <div id="page-dashboard" class="page">
+  <div class="dash-page">
+   <div class="content">
+
+    <div style="margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="section-tag">Live Overview</div>
+        <h1 class="heading-lg" style="margin-bottom:6px;"><span class="gradient-text" id="dashGreeting">Your Dashboard</span></h1>
+        <p style="color:var(--muted);font-size:14px;">Real-time group metrics, live rooms, and performance tracking</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);">
+        <div style="width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 1.5s infinite;"></div>
+        <span style="font-size:12px;color:#10b981;font-weight:600;">Live Sync</span>
+      </div>
+    </div>
+
+    <!-- KPI GRID -->
+    <div class="kpi-grid">
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div><div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Group Mood Score</span><span style="font-size:22px;">🧠</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMood">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMoodSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Match Compatibility</span><span style="font-size:22px;">🎯</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMatch">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMatchSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">People Matched</span><span style="font-size:22px;">👥</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div></div>
+      <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Followers</span><span style="font-size:22px;">👤</span></div>
+        <div class="kpi-value" style="color:var(--teal-glow);" id="kpiFollowers">—</div>
+        <div style="font-size:11px;color:var(--green-glow);" id="kpiFollowersSub">Loading…</div>
+      </div>
+      <div class="kpi-card" onclick="openSocialModal('following')" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Following</span><span style="font-size:22px;">🔄</span></div>
+        <div class="kpi-value" style="color:var(--orange-glow);" id="kpiFollowing">—</div>
+        <div style="font-size:11px;color:var(--muted);" id="kpiFollowingSub">Active connections</div>
+      </div>
+    </div>
+
+    <!-- Study Partners Banner -->
+    <div id="studyPartnersBanner" style="display:none;margin-bottom:20px;">
+      <div class="card" style="padding:20px;border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.04);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="font-family:var(--syne);font-weight:700;font-size:15px;margin-bottom:3px;">✅ Study Partners</h3>
+            <p style="font-size:12px;color:var(--muted);">Matched via SmartMatch — now following each other</p>
+          </div>
+          <a href="match.html" style="font-size:12px;color:var(--teal-glow);">Find more →</a>
+        </div>
+        <div id="studyPartnersGrid" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- SKILL BANNER -->
+    <div id="skillBanner" class="card" style="padding:20px;margin-bottom:20px;display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-family:var(--syne);font-weight:700;font-size:15px;">🧬 Your Skill Profile <span style="font-size:11px;font-weight:400;color:var(--muted);">from onboarding</span></h3>
+        <a href="onboard.html" style="font-size:11px;color:var(--teal-glow);">Edit →</a>
+      </div>
+      <div id="skillBars" style="display:flex;flex-wrap:wrap;gap:16px;"></div>
+    </div>
+    <div id="onboardBanner" class="card" style="padding:20px;margin-bottom:20px;display:none;border:1px solid rgba(109,40,217,0.3);background:rgba(109,40,217,0.06);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">🚀 Complete your onboarding</div><div style="font-size:12px;color:var(--muted);">Set up your skill profile to personalise your experience</div></div>
+        <a href="onboard.html" class="btn btn-primary" style="padding:8px 20px;font-size:13px;">Start Onboarding →</a>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- LIVE STUDY ROOMS -->
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">🏠 Live Study Rooms</h3>
+          <button class="btn btn-outline" style="padding:5px 14px;font-size:12px;" onclick="openCreateRoom()">+ Create</button>
+        </div>
+        <div id="createRoomPanel" style="display:none;background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Room Code (auto)</div>
+          <input id="roomCode" type="text" readonly style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#00c9a7;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;letter-spacing:2px;font-weight:700;">
+          <input id="roomSubject" type="text" placeholder="Subject (e.g. Calculus, Biology…)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
+          <select id="roomMaxMembers" style="width:100%;box-sizing:border-box;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:12px;">
+            <option value="4">Max 4 members</option><option value="6">Max 6 members</option><option value="10">Max 10 members</option>
+          </select>
+          <div style="display:flex;gap:8px;">
+            <button id="createRoomBtn" onclick="submitCreateRoom()" class="btn btn-primary" style="padding:8px 20px;font-size:12px;flex:1;">💬 Create & Open Chat</button>
+            <button onclick="closeCreateRoom()" class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Cancel</button>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
+          <input id="joinRoomCode" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
+          <button onclick="joinRoom()" class="btn btn-primary" style="padding:7px 18px;font-size:12px;">Join Room →</button>
+        </div>
+        <div id="liveRoomsList"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Loading rooms…</div></div>
+      </div>
+
+      <!-- STREAKS + GOALS -->
+      <div class="card" style="padding:24px;">
+        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:18px;">🔥 Streaks & Weekly Goals</h3>
+        <div id="streakGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1;">Loading streaks…</div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Study Hours Goal</span><span id="goalHoursPct">—</span></div>
+        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalHoursBar" style="width:0%;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Peer Teachings</span><span id="goalTeachPct">—</span></div>
+        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalTeachBar" style="width:0%;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Quiz Score Avg</span><span id="goalQuizPct">—</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="goalQuizBar" style="width:0%;transition:width 1s;"></div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY FEED -->
+    <div class="card" style="padding:24px;margin-top:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">📡 Live Activity Feed</h3>
+        <span style="font-size:11px;color:var(--muted);">Updates in real-time</span>
+      </div>
+      <div id="activityFeed" style="display:flex;flex-direction:column;gap:10px;"><div style="color:var(--muted);font-size:13px;">Loading activity…</div></div>
+    </div>
+
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- SOCIAL MODAL -->
+<div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
+<div id="socialModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(430px,93vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;">
+            <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
+            <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
+        </div>
+        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
+    </div>
+    <div style="padding:14px 18px 10px;">
+        <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:9px 14px;font-size:13px;outline:none;">
+    </div>
+    <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
+    <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
+</div>
+
+<style>
+@keyframes vPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4);}50%{opacity:0.7;box-shadow:0 0 0 8px rgba(34,197,94,0);}}
+@keyframes vcDot{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
+
+#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar{width:4px;}
+#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
+
+.rm-out{align-self:flex-end;max-width:72%;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:18px 18px 4px 18px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;box-shadow:0 4px 16px rgba(109,40,217,0.3);}
+.rm-in{align-self:flex-start;max-width:72%;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;}
+.rm-sys{align-self:center;font-size:11px;color:rgba(255,255,255,0.28);padding:4px 14px;background:rgba(255,255,255,0.05);border-radius:20px;margin:4px 0;}
+.rm-meta{font-size:10px;color:rgba(255,255,255,0.22);margin-top:3px;padding:0 2px;}
+.rm-meta.r{text-align:right;}
+.rm-name{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px;padding-left:2px;font-weight:600;}
+.rm-member{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,0.04);}
+.rm-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:white;}
+
+.bubble-out{align-self:flex-end;max-width:78%;background:linear-gradient(135deg,#4d94ff,#6a4dff);color:white;border-radius:18px 18px 4px 18px;padding:9px 14px;font-size:13px;line-height:1.45;word-break:break-word;}
+.bubble-in{align-self:flex-start;max-width:78%;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:9px 14px;font-size:13px;line-height:1.45;word-break:break-word;}
+.bubble-name{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px;padding-left:2px;font-weight:600;}
+.bubble-time{font-size:10px;color:rgba(255,255,255,0.25);margin-top:3px;padding:0 2px;}
+.bubble-time.right{text-align:right;}
+
+.ic-out{align-self:flex-end;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:12px 12px 2px 12px;padding:7px 11px;font-size:12px;max-width:85%;word-break:break-word;}
+.ic-in{align-self:flex-start;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);border-radius:12px 12px 12px 2px;padding:7px 11px;font-size:12px;max-width:85%;word-break:break-word;}
+
+.s-row{display:flex;align-items:center;gap:13px;padding:10px 20px;transition:background 0.15s;}
+.s-row:hover{background:rgba(255,255,255,0.04);}
+.s-row+.s-row{border-top:1px solid rgba(255,255,255,0.04);}
+.s-av{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:white;}
+.s-name{font-weight:700;font-size:14px;color:white;}
+.s-meta{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.s-match{display:inline-block;font-size:10px;font-weight:700;background:rgba(77,148,255,0.15);color:#80b3ff;border-radius:20px;padding:2px 8px;margin-left:5px;}
+.s-partner{display:inline-block;font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:#34d399;border-radius:20px;padding:2px 8px;margin-left:5px;}
+.btn-msg{background:rgba(77,148,255,0.15);border:1px solid rgba(77,148,255,0.35);color:#80b3ff;border-radius:9px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.btn-msg:hover{background:rgba(77,148,255,0.3);color:white;}
+.btn-vid{background:rgba(109,40,217,0.15);border:1px solid rgba(109,40,217,0.4);color:#b48dff;border-radius:9px;padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.btn-vid:hover{background:rgba(109,40,217,0.35);color:white;}
+.btn-unfollow{background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);border-radius:9px;padding:6px 12px;font-size:12px;cursor:pointer;}
+
+.room-live-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);margin-bottom:10px;transition:all 0.2s;}
+.room-live-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(109,40,217,0.3);}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);}
+.kpi-card[onclick]:hover{outline:1px solid rgba(77,148,255,0.3);}
+
+.partner-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);}
+.partner-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white;flex-shrink:0;}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.msg-new{animation:fadeUp 0.2s ease;}
+.vc-btn-off{background:rgba(239,68,68,0.2)!important;border-color:rgba(239,68,68,0.5)!important;color:#f87171!important;}
+</style>
+
+<!-- ═══ FIREBASE MODULE ═══ -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import {
+    getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc,
+    collection, query, where, orderBy, limit,
+    onSnapshot, serverTimestamp, increment, arrayUnion, getDocs
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const FB = {
+    apiKey:"AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+    authDomain:"collabsyncai.firebaseapp.com",
+    projectId:"collabsyncai",
+    storageBucket:"collabsyncai.firebasestorage.app",
+    messagingSenderId:"862378374401",
+    appId:"1:862378374401:web:4438203269261b15011700"
+};
+const app  = initializeApp(FB);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let CU = null;
+let activeRoomId = null;
+let unsubRoomMsgs = null, unsubRoom = null;
+let unsubDM = null;
+let activeDMSessionId = null;
+let activeDMPeer = null;
+
+// WebRTC state
+let localStream = null, remoteStream = null, peerConnection = null;
+let activeCallId = null, unsubCallSignal = null;
+let vcTimerInterval = null, vcSeconds = 0;
+let micOn = true, camOn = true, screenSharing = false, screenTrack = null;
+let inCallChatOpen = false, pendingCallData = null;
+
+const ICE_SERVERS = {
+    iceServers:[
+        {urls:'stun:stun.l.google.com:19302'},
+        {urls:'stun:stun1.l.google.com:19302'},
+        {urls:'stun:stun2.l.google.com:19302'}
+    ]
+};
+
+const EMOJIS = ['📚','⚡','⚗️','🧬','🔬','🖥️','📐','🎨','🎯','🔭'];
+
+const $   = id => document.getElementById(id);
+const st  = (id,v)  => { const e=$(id); if(e) e.textContent=v; };
+const sb  = (id,p)  => { const e=$(id); if(e) e.style.width=Math.min(100,p)+'%'; };
+const sh  = id => { const e=$(id); if(e) e.style.display='block'; };
+const hd  = id => { const e=$(id); if(e) e.style.display='none'; };
+const esc = t  => { const d=document.createElement('div'); d.appendChild(document.createTextNode(t||'')); return d.innerHTML; };
+const pc  = uid => { const c=['#6a4dff','#4d94ff','#00c9a7','#f59e0b','#10b981','#ef4444','#8b5cf6','#0ea5e9']; return c[(uid?.charCodeAt(0)||0)%c.length]; };
+const isToday = ts => { if(!ts?.toDate) return false; const d=ts.toDate(),n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); };
+const fmt = ts => ts?.toDate?.()?.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) || '';
+const dmSessionId = (uidA, uidB) => [uidA, uidB].sort().join('__DM__');
+
+window._log = async (type, detail) => {
+    if (!CU) return;
+    try { await addDoc(collection(db,'activity'),{uid:CU.uid,name:CU.displayName||CU.email?.split('@')[0]||'User',type,detail,createdAt:serverTimestamp()}); } catch(e){}
+};
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+onAuthStateChanged(auth, async user => {
+    if (!user) {
+        st('dashGreeting','Your Dashboard');
+        loadPubRooms(); watchStreaks(); watchFeed();
+        return;
+    }
+    CU = user;
+    const name = user.displayName || user.email?.split('@')[0] || 'Scholar';
+    const h = new Date().getHours();
+    st('dashGreeting', (h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', '+name+' 👋');
+    const sav = $('rmSenderAvatar');
+    if(sav){ sav.textContent=name[0].toUpperCase(); sav.style.background=pc(user.uid); }
+    await ensureUser(user);
+    window._log('join','opened the dashboard');
+    watchProfile(user.uid);
+    watchRoomsKPI();
+    watchRooms(user.uid);
+    watchStreaks();
+    watchFeed();
+    watchSocial(user.uid);
+    listenForIncomingCalls(user.uid);
+});
+
+async function ensureUser(u) {
+    const r = doc(db,'users/'+u.uid);
+    if(!(await getDoc(r)).exists()) {
+        await setDoc(r,{
+            displayName:u.displayName||u.email?.split('@')[0]||'User',
+            email:u.email||'', color:pc(u.uid), photoURL:u.photoURL||'',
+            xp:0, xpToday:0, streak:0, matchScore:0, matchRank:'—',
+            matchedCount:0, matchedThisWeek:0, skills:[],
+            goals:{studyHours:0,studyHoursTarget:10,peerTeachings:0,quizAvg:0},
+            createdAt:serverTimestamp()
+        });
+    }
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD WATCHERS
+// ══════════════════════════════════════════
+function watchProfile(uid) {
+    onSnapshot(doc(db,'users/'+uid), snap => {
+        if(!snap.exists()) return;
+        const d = snap.data();
+        st('kpiXP',(d.xp||0).toLocaleString());
+        st('kpiXPSub','+'+(d.xpToday||0)+' today');
+        st('kpiMatch',(d.matchScore||0)+'%');
+        st('kpiMatchSub',d.matchRank?'Top '+d.matchRank+'% match':'No matches yet');
+        st('kpiMatched',d.matchedCount||0);
+        st('kpiMatchedSub','+'+(d.matchedThisWeek||0)+' this week');
+        const g=d.goals||{};
+        const hp=Math.min(100,Math.round((g.studyHours||0)/(g.studyHoursTarget||10)*100));
+        sb('goalHoursBar',hp); st('goalHoursPct',hp+'%');
+        sb('goalTeachBar',Math.min(100,g.peerTeachings||0));
+        st('goalTeachPct',Math.min(100,g.peerTeachings||0)+'%');
+        sb('goalQuizBar',Math.min(100,g.quizAvg||0));
+        st('goalQuizPct',Math.min(100,g.quizAvg||0)+'%');
+        if(d.skills?.length){
+            sh('skillBanner'); hd('onboardBanner');
+            $('skillBars').innerHTML = [...d.skills].sort((a,b)=>a.confidence-b.confidence).map(s=>{
+                const p=(s.confidence/5)*100;
+                const c=p<40?'#f87171':p<70?'var(--orange-glow)':'var(--green-glow)';
+                return `<div style="flex:1;min-width:140px;">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+                        <span>${esc(s.name)}</span><span style="color:${c};">${s.confidence}/5</span>
+                    </div>
+                    <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;">
+                        <div style="width:${p}%;height:100%;background:${c};border-radius:3px;transition:width .8s;"></div>
+                    </div></div>`;
+            }).join('');
+        } else { hd('skillBanner'); sh('onboardBanner'); }
+    });
+}
+
+function watchRoomsKPI() {
+    onSnapshot(collection(db,'rooms'), snap=>{
+        st('kpiRooms',snap.size||0);
+        const t=snap.docs.filter(d=>d.data().createdToday===true).length;
+        st('kpiRoomsSub',t>0?'+'+t+' created today':'No new rooms today');
+        const moods=snap.docs.map(d=>d.data().mood).filter(m=>typeof m==='number');
+        const avg=moods.length?Math.round(moods.reduce((a,b)=>a+b,0)/moods.length):0;
+        st('kpiMood',avg>0?avg+'%':'—');
+        st('kpiMoodSub',avg>=80?'Focused 🎯':avg>=60?'Steady 📖':avg>0?'Tired 😴':'No data');
+    });
+}
+
+function watchRooms(uid){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,uid)); }
+function loadPubRooms(){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,null)); }
+
+function renderRooms(snap,uid){
+    const list=$('liveRoomsList');
+    if(snap.empty){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">No rooms yet — create one!</div>';return;}
+    list.innerHTML=snap.docs.map((d,i)=>{
+        const r=d.data(),mood=typeof r.mood==='number'?r.mood:74;
+        const mc=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
+        const im=uid&&(r.members||[]).includes(uid), mb=(r.members||[]).length;
+        const isEnded = r.status === 'ended';
+        return `<div class="room-live-card" style="${isEnded?'opacity:0.45;':''}">
+            <div style="font-size:22px;">${EMOJIS[i%EMOJIS.length]}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:14px;">${esc(r.subject||'Study Room')}${isEnded?' <span style="font-size:10px;color:#f87171;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:20px;padding:2px 7px;margin-left:5px;">Ended</span>':''}</div>
+                <div style="font-size:11px;color:var(--muted);">${esc(r.topic||'General')} · ${mb} member${mb!==1?'s':''}</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px;">Code: <span style="color:#00c9a7;letter-spacing:1px;font-weight:700;">${esc(r.code||d.id)}</span></div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:11px;color:${mc};margin-bottom:4px;">Mood ${mood}%</div>
+                <div class="progress-bar" style="width:70px;height:4px;"><div class="progress-fill" style="width:${mood}%;background:${mc};"></div></div>
+            </div>
+            ${!isEnded?`<button onclick="window.openRoomChat('${d.id}','${esc(r.subject||'Room')}','${esc(r.code||d.id)}',${i})"
+                class="btn ${im?'btn-primary':'btn-outline'}" style="padding:6px 14px;font-size:12px;white-space:nowrap;flex-shrink:0;">
+                ${im?'▶ Resume':'💬 Chat'}
+            </button>`:'<div style="font-size:11px;color:rgba(255,255,255,0.25);white-space:nowrap;">Session ended</div>'}
+        </div>`;
+    }).join('');
+}
+
+function watchStreaks(){
+    onSnapshot(query(collection(db,'users'),orderBy('streak','desc'),limit(6)),snap=>{
+        const g=$('streakGrid'); if(!g)return;
+        if(snap.empty){g.innerHTML='<div style="grid-column:1/-1;color:var(--muted);font-size:13px;text-align:center;padding:16px;">No streaks yet 🔥</div>';return;}
+        const cols=['linear-gradient(135deg,var(--accent),var(--pink))','linear-gradient(135deg,var(--teal),var(--accent))','linear-gradient(135deg,var(--green),var(--teal))','linear-gradient(135deg,var(--orange),var(--pink))'];
+        g.innerHTML=snap.docs.map((d,i)=>{
+            const u=d.data();
+            return `<div style="background:var(--surface);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:${cols[i%cols.length]};display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">${(u.displayName||u.email||'U')[0].toUpperCase()}</div>
+                <div><div style="font-size:12px;font-weight:600;">${esc(u.displayName||u.email?.split('@')[0]||'User')}</div>
+                <div style="font-size:11px;color:var(--orange-glow);">🔥 ${u.streak||0} day streak</div></div>
+            </div>`;
+        }).join('');
+    });
+}
+
+function watchFeed(){
+    onSnapshot(query(collection(db,'activity'),orderBy('createdAt','desc'),limit(12)),snap=>{
+        const feed=$('activityFeed'); if(!feed)return;
+        if(snap.empty){feed.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">No activity yet.</div>';return;}
+        const icons={join:'🚪',message:'💬',create:'🏠',match:'🎯',quiz:'📝',xp:'⚡',leave:'👋',videocall:'📹'};
+        feed.innerHTML=snap.docs.map(d=>{
+            const a=d.data();
+            const t=a.createdAt?.toDate?.()?.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})||'just now';
+            return `<div class="activity-item">
+                <div style="font-size:20px;flex-shrink:0;">${icons[a.type]||'📡'}</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;color:white;"><strong>${esc(a.name||'Someone')}</strong> <span style="color:var(--muted);font-weight:400;">${esc(a.detail||'')}</span></div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t}</div>
+                </div>
+            </div>`;
+        }).join('');
+    });
+}
+
+function watchSocial(uid){
+    onSnapshot(collection(db,'social/'+uid+'/followers'),snap=>{
+        st('kpiFollowers',snap.size);
+        const n=snap.docs.filter(d=>isToday(d.data().followedAt)).length;
+        st('kpiFollowersSub',n>0?'+'+n+' today':'Total followers');
+        window._sf=snap.docs.map(mapSD);
+        if(window._cst==='followers') window.renderUsers(window._sf);
+    });
+    onSnapshot(collection(db,'social/'+uid+'/following'),snap=>{
+        st('kpiFollowing',snap.size);
+        const followingSubEl=$('kpiFollowingSub');
+        if(followingSubEl) followingSubEl.textContent=snap.size>0?snap.size+' active':'Active connections';
+        window._sw=snap.docs.map(mapSD);
+        if(window._cst==='following') window.renderUsers(window._sw);
+        const partners=snap.docs.filter(d=>d.data().matched===true);
+        renderStudyPartnersBanner(partners.map(mapSD));
+    });
+}
+
+function renderStudyPartnersBanner(partners) {
+    const banner=$('studyPartnersBanner'), grid=$('studyPartnersGrid');
+    if(!partners.length){ banner.style.display='none'; return; }
+    banner.style.display='block';
+    grid.innerHTML=partners.map(u=>`
+        <div class="partner-chip" style="cursor:pointer;" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">
+            <div class="partner-av" style="background:${u.col};">${u.av}</div>
+            <div>
+                <div style="font-size:12px;font-weight:700;color:white;">${esc(u.name)}</div>
+                <div style="font-size:10px;color:var(--green-glow);">✅ ${u.match}% match · Partner</div>
+                <div style="font-size:10px;color:var(--muted);">💬 Click to message</div>
+            </div>
+        </div>`).join('');
+}
+
+function mapSD(d){
+    const u=d.data();
+    return {uid:d.id,name:u.displayName||u.name||u.email||'User',sub:u.subject||u.subjects?.[0]||'Studying',match:u.matchScore||0,av:(u.displayName||u.name||'U')[0].toUpperCase(),col:u.color||'#4d94ff',matched:u.matched||false};
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ROOM CHAT
+// ══════════════════════════════════════════════════════════════════════
+window.openRoomChat = async function(roomId, subject, code, emojiIdx){
+    if(!CU){ alert('Please log in to chat.'); return; }
+    activeRoomId = roomId;
+    st('rmSubject',subject); st('rmChatTitle',subject+' — Room Chat');
+    $('rmCode').textContent=code;
+    $('rmEmoji').textContent=EMOJIS[emojiIdx%EMOJIS.length];
+    $('rmSessionLink').href='session.html?room='+roomId;
+
+    // ── HOST CHECK: show End Session btn + host badge only for creator ──
+    try {
+        const roomSnap = await getDoc(doc(db,'rooms',roomId));
+        const isHost = roomSnap.exists() && roomSnap.data().hostUid === CU.uid;
+        const endBtn  = $('rmEndSessionBtn');
+        const badge   = $('rmHostBadge');
+        if(endBtn) endBtn.style.display = isHost ? 'block' : 'none';
+        if(badge)  badge.style.display  = isHost ? 'inline-block' : 'none';
+    } catch(e){ console.warn('Host check failed:', e); }
+
+    try { await updateDoc(doc(db,'rooms',roomId),{members:arrayUnion(CU.uid)}); } catch(e){}
+
+    const overlay=$('roomChatOverlay'), modal=$('roomChatModal');
+    overlay.style.display='block'; modal.style.display='flex';
+    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
+
+    if(unsubRoomMsgs){ unsubRoomMsgs(); unsubRoomMsgs=null; }
+    if(unsubRoom){ unsubRoom(); unsubRoom=null; }
+
+    unsubRoom=onSnapshot(doc(db,'rooms',roomId),async snap=>{
+        if(!snap.exists()) return;
+        const r=snap.data(), members=r.members||[];
+        const ml=$('rmMembersList'); ml.innerHTML='';
+        for(const uid of members){
+            let name=uid.substring(0,8)+'…', color='#6a4dff';
+            try{ const s=await getDoc(doc(db,'users/'+uid)); if(s.exists()){const u=s.data();name=u.displayName||u.email?.split('@')[0]||uid;color=u.color||'#6a4dff';} }catch(e){}
+            const chip=document.createElement('div'); chip.className='rm-member';
+            const isMe=uid===CU.uid;
+            chip.innerHTML=`<div class="rm-av" style="background:${color};">${name[0].toUpperCase()}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(name)}${isMe?' <span style="color:rgba(255,255,255,0.3);font-size:10px;">(you)</span>':''}</div>
+                    <div style="display:flex;align-items:center;gap:4px;margin-top:2px;"><div style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></div><span style="font-size:10px;color:rgba(255,255,255,0.3);">online</span></div>
+                </div>`;
+            ml.appendChild(chip);
+        }
+        const mood=typeof r.mood==='number'?r.mood:74;
+        st('rmMoodPct',mood+'%'); $('rmMoodBar').style.width=mood+'%';
+        $('rmMoodPct').style.color=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
+
+        // ── AUTO-CLOSE FOR ALL MEMBERS when host ends the session ──────
+        if(r.status === 'ended'){
+            // Show final notice in chat before closing
+            const msgs = $('rmMessages');
+            if(msgs){
+                const notice = document.createElement('div');
+                notice.className = 'rm-sys';
+                notice.style.cssText = 'color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);';
+                notice.textContent  = '🛑 The host has ended this session.';
+                msgs.appendChild(notice);
+                msgs.scrollTop = msgs.scrollHeight;
+            }
+            // Non-hosts see the message then get closed after a short delay
+            if(CU && r.hostUid !== CU.uid){
+                setTimeout(()=>{
+                    window.closeRoomChat();
+                    showSessionEndedToast(false);
+                }, 2500);
+            }
+        }
+    });
+
+    st('rmChatSub','Connecting…');
+    const msgsQ=query(collection(db,'rooms/'+roomId+'/messages'),orderBy('createdAt','asc'),limit(150));
+    unsubRoomMsgs=onSnapshot(msgsQ,snap=>{
+        st('rmChatSub',snap.size+' message'+(snap.size!==1?'s':'')+' · Live');
+        const c=$('rmMessages'); c.innerHTML='';
+        if(snap.empty){ const el=document.createElement('div'); el.className='rm-sys'; el.textContent='No messages yet — say hello! 👋'; c.appendChild(el); return; }
+        snap.docs.forEach(d=>{
+            const m=d.data(), isMe=m.senderUid===CU.uid;
+            const ts=fmt(m.createdAt);
+            if(m.type==='system'){ const el=document.createElement('div'); el.className='rm-sys msg-new'; el.textContent=m.text; c.appendChild(el); return; }
+            const wrap=document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;'; wrap.className='msg-new';
+            if(!isMe){ const nm=document.createElement('div'); nm.className='rm-name'; nm.textContent=m.senderName||'User'; wrap.appendChild(nm); }
+            const bub=document.createElement('div'); bub.className=isMe?'rm-out':'rm-in'; bub.textContent=m.text; wrap.appendChild(bub);
+            const meta=document.createElement('div'); meta.className='rm-meta'+(isMe?' r':''); meta.textContent=ts; wrap.appendChild(meta);
+            c.appendChild(wrap);
+        });
+        c.scrollTop=c.scrollHeight;
+    });
+    window._log('join','joined room chat "'+subject+'"');
+};
+
+window.sendRoomMessage = async function(){
+    const input=$('rmInput'); const text=input.value.trim();
+    if(!text||!activeRoomId||!CU) return;
+    input.value=''; input.style.height='auto';
+    try {
+        await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{
+            text, senderUid:CU.uid,
+            senderName:CU.displayName||CU.email?.split('@')[0]||'User',
+            createdAt:serverTimestamp(), type:'message'
+        });
+    } catch(e){ console.error('Room send failed:',e); }
+};
+
+window.handleRoomKey = e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendRoomMessage();} };
+window.autoResizeRm  = el=>{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; };
+
+window.voteMood = async val=>{
+    if(!activeRoomId) return;
+    try{ await updateDoc(doc(db,'rooms',activeRoomId),{mood:val}); }catch(e){}
+};
+
+window.closeRoomChat = function(){
+    const modal=$('roomChatModal'), overlay=$('roomChatOverlay');
+    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
+    setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; },280);
+    if(unsubRoomMsgs){ unsubRoomMsgs(); unsubRoomMsgs=null; }
+    if(unsubRoom){ unsubRoom(); unsubRoom=null; }
+    activeRoomId=null;
+    // Reset host-only UI for next open
+    const endBtn=$('rmEndSessionBtn'); if(endBtn) endBtn.style.display='none';
+    const badge=$('rmHostBadge');      if(badge)  badge.style.display='none';
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// END SESSION — HOST ONLY
+// Sets status:'ended' on the room doc.
+// All open onSnapshot listeners detect it and auto-close for every member.
+// ══════════════════════════════════════════════════════════════════════
+window.endSession = async function(){
+    if(!activeRoomId || !CU){ return; }
+
+    // Re-verify host server-side (not just UI check)
+    let roomData;
+    try {
+        const snap = await getDoc(doc(db,'rooms',activeRoomId));
+        if(!snap.exists()){ window.closeRoomChat(); return; }
+        roomData = snap.data();
+    } catch(e){ console.error('Host verify failed:',e); return; }
+
+    if(roomData.hostUid !== CU.uid){
+        alert('⛔ Only the session host can end this session.');
+        return;
+    }
+    if(roomData.status === 'ended'){
+        alert('This session has already been ended.');
+        window.closeRoomChat(); return;
+    }
+
+    const ok = confirm(
+        '🛑 End session for everyone?\n\n' +
+        'This will close the room for all members immediately.\n' +
+        'This cannot be undone.'
+    );
+    if(!ok) return;
+
+    try {
+        // 1. Post a farewell system message so everyone sees it in chat
+        await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{
+            text: '🛑 The host ended this session. Thanks for studying together! 👋',
+            senderUid: CU.uid, senderName: 'System',
+            createdAt: serverTimestamp(), type: 'system'
+        });
+        // 2. Mark room as ended — triggers onSnapshot for ALL open members
+        await updateDoc(doc(db,'rooms',activeRoomId),{
+            status:   'ended',
+            endedAt:  serverTimestamp(),
+            endedBy:  CU.uid
+        });
+        await window._log('leave', 'ended session "' + (roomData.subject||'Room') + '" (host)');
+    } catch(e){
+        console.error('endSession failed:', e);
+        alert('Could not end session: ' + e.message);
+        return;
+    }
+
+    // Host closes immediately (their own listener fires too, but this is instant)
+    window.closeRoomChat();
+    showSessionEndedToast(true);
+};
+
+// Toast shown to host (isHost=true) and members (isHost=false)
+function showSessionEndedToast(isHost){
+    const existing=document.getElementById('_sessionEndToast');
+    if(existing) existing.remove();
+    const t=document.createElement('div');
+    t.id='_sessionEndToast';
+    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(0);'+
+        'background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(17,17,24,0.98));'+
+        'border:1px solid rgba(239,68,68,0.4);color:#f87171;'+
+        'padding:13px 28px;border-radius:14px;font-size:13px;font-weight:600;'+
+        'z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.8);pointer-events:none;';
+    t.textContent = isHost ? '🛑 You ended the session.' : '🛑 Host ended the session.';
+    document.body.appendChild(t);
+    setTimeout(()=>{
+        t.style.transition='opacity 0.4s,transform 0.4s';
+        t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(30px)';
+        setTimeout(()=>t.remove(), 450);
+    }, 3500);
+}
+
+window.submitCreateRoom = async function(){
+    if(!CU){ alert('Please log in first.'); return; }
+    const subject=$('roomSubject').value.trim(), code=$('roomCode').value.trim(), max=parseInt($('roomMaxMembers').value)||4;
+    if(!subject){ alert('Enter a subject name.'); return; }
+    const btn=$('createRoomBtn'); btn.textContent='Creating…'; btn.disabled=true;
+    try{
+        const ref=doc(collection(db,'rooms'));
+        await setDoc(ref,{subject,code,hostUid:CU.uid,hostName:CU.displayName||CU.email,members:[CU.uid],maxMembers:max,mood:74,topic:'',status:'active',createdAt:serverTimestamp(),createdToday:true});
+        await addDoc(collection(db,'rooms/'+ref.id+'/messages'),{text:'🏠 Room "'+subject+'" created! Welcome, say hello 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+        await window._log('create','created room "'+subject+'" ('+code+')');
+        await updateDoc(doc(db,'users/'+CU.uid),{streak:increment(1)}).catch(()=>{});
+        closeCreateRoom();
+        window.openRoomChat(ref.id,subject,code,0);
+    }catch(e){ alert('Could not create room: '+e.message); }
+    finally{ btn.textContent='💬 Create & Open Chat'; btn.disabled=false; }
+};
+
+window.joinRoom = async function(){
+    const code=$('joinRoomCode').value.trim().toUpperCase();
+    if(!code) return;
+    try{
+        const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code)));
+        if(snap.empty){
+            const inp=$('joinRoomCode'); inp.style.borderColor='rgba(255,80,80,0.6)'; inp.placeholder='❌ Not found';
+            setTimeout(()=>{ inp.style.borderColor='rgba(255,255,255,0.1)'; inp.placeholder='Enter Room Code (e.g. ROOM-X7K2P)'; },2000); return;
+        }
+        const d=snap.docs[0], rid=d.id, r=d.data();
+        if(r.status==='ended'){
+            alert('⛔ This session has been ended by the host and is no longer available.');
+            return;
+        }
+        if(CU){
+            await updateDoc(doc(db,'rooms',rid),{members:arrayUnion(CU.uid)});
+            await addDoc(collection(db,'rooms/'+rid+'/messages'),{text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+            await window._log('join','joined room "'+r.subject+'"');
+        }
+        $('joinRoomCode').value='';
+        window.openRoomChat(rid,r.subject||'Study Room',r.code||code,0);
+    }catch(e){ alert('Join failed: '+e.message); }
+};
+
+// ══════════════════════════════════════════
+// DM CHAT
+// ══════════════════════════════════════════
+window.openChat = async function(peerUid, peerName, peerAv, peerCol, peerSub){
+    if(!CU){ alert('Please log in to message.'); return; }
+    if(peerUid===CU.uid){ return; }
+    if(unsubDM){ unsubDM(); unsubDM=null; }
+    activeDMPeer = { uid:peerUid, name:peerName, av:peerAv, col:peerCol, sub:peerSub||'Studying' };
+    activeDMSessionId = dmSessionId(CU.uid, peerUid);
+    const avatar=$('chatAvatar');
+    avatar.textContent=peerAv; avatar.style.background=peerCol;
+    st('chatName',peerName); st('chatSub',peerSub||'Studying');
+    const w=$('chatWindow');
+    w.style.display='flex';
+    requestAnimationFrame(()=>{ w.style.opacity='1'; w.style.transform='translateY(0)'; });
+    $('chatInput').value='';
+    $('chatMessages').innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:30px;">Loading…</div>';
+    const sessionRef=doc(db,'sessions',activeDMSessionId);
+    try{
+        const snap=await getDoc(sessionRef);
+        if(!snap.exists()){ await setDoc(sessionRef,{participants:[CU.uid,peerUid],type:'dm',createdAt:serverTimestamp()}); }
+    }catch(e){ console.error('Session create failed:',e); }
+    const msgsQ=query(collection(db,'sessions',activeDMSessionId,'messages'),orderBy('createdAt','asc'),limit(100));
+    unsubDM=onSnapshot(msgsQ,snap=>{
+        const c=$('chatMessages');
+        if(snap.empty){ c.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:30px;">No messages yet — say hi! 👋</div>'; return; }
+        c.innerHTML='';
+        snap.docs.forEach(d=>{
+            const m=d.data(); const isMe=m.senderUid===CU.uid; const ts=fmt(m.createdAt);
+            const wrap=document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;'; wrap.className='msg-new';
+            if(!isMe){ const nm=document.createElement('div'); nm.className='bubble-name'; nm.textContent=m.senderName||peerName; wrap.appendChild(nm); }
+            const bub=document.createElement('div'); bub.className=isMe?'bubble-out':'bubble-in'; bub.textContent=m.text; wrap.appendChild(bub);
+            if(ts){ const t=document.createElement('div'); t.className='bubble-time'+(isMe?' right':''); t.textContent=ts; wrap.appendChild(t); }
+            c.appendChild(wrap);
+        });
+        c.scrollTop=c.scrollHeight;
+    }, err=>{ console.error('DM listen error:',err); });
+    closeSocialModal();
+    window._log('message','opened DM with '+peerName);
+};
+
+window.sendDM = async function(){
+    const input=$('chatInput'); const text=input.value.trim();
+    if(!text||!activeDMSessionId||!CU) return;
+    input.value=''; input.style.height='auto';
+    try{
+        await addDoc(collection(db,'sessions',activeDMSessionId,'messages'),{
+            text, senderUid:CU.uid,
+            senderName:CU.displayName||CU.email?.split('@')[0]||'User',
+            createdAt:serverTimestamp()
+        });
+    }catch(e){ console.error('DM send failed:',e); }
+};
+
+window.closeChatWindow = function(){
+    const w=$('chatWindow');
+    w.style.opacity='0'; w.style.transform='translateY(30px)';
+    setTimeout(()=>{ w.style.display='none'; },220);
+    if(unsubDM){ unsubDM(); unsubDM=null; }
+    activeDMSessionId=null; activeDMPeer=null;
+};
+
+// ══════════════════════════════════════════
+// WEBRTC VIDEO CALL
+// ══════════════════════════════════════════
+function showVideoModal(peerName, peerAv, peerCol){
+    st('vcTitle','📹 Video Call with '+peerName);
+    st('vcTimer','Connecting…');
+    st('vcPeerName',peerName);
+    st('vcWaitText','Waiting for camera…');
+    $('vcPeerAvatar').textContent=peerAv;
+    $('vcPeerAvatar').style.background=peerCol;
+    $('vcWaiting').style.display='flex';
+    $('remoteVideo').style.display='block';
+    $('localVideo').style.display='block';
+    $('localVideoOff').style.display='none';
+    $('btnMic').classList.remove('vc-btn-off');
+    $('btnCam').classList.remove('vc-btn-off');
+    $('btnScreen').classList.remove('vc-btn-off');
+    const overlay=$('videoOverlay'), modal=$('videoModal');
+    overlay.style.display='block'; modal.style.display='flex';
+    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
+}
+
+window.startVideoCall = async function(){
+    if(!CU){ alert('Please log in first.'); return; }
+    if(!activeDMPeer){ alert('Open a DM chat first.'); return; }
+    const peer=activeDMPeer;
+    try { localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }
+    catch(e){ alert('Camera/microphone permission denied.\n\n'+e.message); return; }
+    showVideoModal(peer.name,peer.av,peer.col);
+    $('localVideo').srcObject=localStream;
+    const callRef=doc(collection(db,'videoCalls'));
+    activeCallId=callRef.id;
+    peerConnection=new RTCPeerConnection(ICE_SERVERS);
+    localStream.getTracks().forEach(track=>peerConnection.addTrack(track,localStream));
+    remoteStream=new MediaStream();
+    $('remoteVideo').srcObject=remoteStream;
+    peerConnection.ontrack=e=>{ e.streams[0].getTracks().forEach(track=>remoteStream.addTrack(track)); $('vcWaiting').style.display='none'; startCallTimer(); };
+    peerConnection.onicecandidate=async e=>{ if(!e.candidate)return; try{await addDoc(collection(db,'videoCalls',activeCallId,'callerCandidates'),e.candidate.toJSON());}catch(err){} };
+    const offer=await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    await setDoc(callRef,{callerUid:CU.uid,calleeUid:peer.uid,callerName:CU.displayName||CU.email?.split('@')[0]||'User',callerAv:(CU.displayName||'U')[0].toUpperCase(),callerCol:pc(CU.uid),status:'ringing',offer:{type:offer.type,sdp:offer.sdp},createdAt:serverTimestamp()});
+    unsubCallSignal=onSnapshot(doc(db,'videoCalls',activeCallId),async snap=>{
+        if(!snap.exists())return;
+        const data=snap.data();
+        if(data.answer&&peerConnection.signalingState==='have-local-offer'){ try{await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));}catch(e){} }
+        if(data.status==='ended'||data.status==='declined') hangUp(false);
+    });
+    onSnapshot(collection(db,'videoCalls',activeCallId,'calleeCandidates'),snap=>{
+        snap.docChanges().forEach(async change=>{ if(change.type==='added') try{await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));}catch(e){} });
+    });
+    window._log('videocall','started a video call with '+peer.name);
+    st('vcWaitText','Ringing '+peer.name+'…');
+};
+
+function listenForIncomingCalls(uid){
+    onSnapshot(query(collection(db,'videoCalls'),where('calleeUid','==',uid),where('status','==','ringing')),snap=>{
+        snap.docChanges().forEach(change=>{ if(change.type==='added') showIncomingCall(change.doc.id,change.doc.data()); });
+    });
+}
+
+function showIncomingCall(callId,data){
+    pendingCallData={callId,data};
+    const av=$('incomingAvatar');
+    av.textContent=data.callerAv||'?'; av.style.background=data.callerCol||'#6a4dff';
+    st('incomingName',data.callerName||'Someone');
+    const toast=$('incomingCallToast');
+    toast.style.display='block';
+    requestAnimationFrame(()=>{ toast.style.transform='translateX(-50%) translateY(0)'; });
+    setTimeout(()=>{ if(pendingCallData?.callId===callId) declineCall(); },30000);
+}
+
+function hideIncomingToast(){
+    const toast=$('incomingCallToast');
+    toast.style.transform='translateX(-50%) translateY(80px)';
+    setTimeout(()=>{ toast.style.display='none'; },400);
+    pendingCallData=null;
+}
+
+window.acceptCall=async function(){
+    if(!pendingCallData)return;
+    const{callId,data}=pendingCallData; hideIncomingToast(); activeCallId=callId;
+    try{ localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }
+    catch(e){ alert('Camera/microphone permission denied.\n\n'+e.message); await updateDoc(doc(db,'videoCalls',callId),{status:'declined'}); return; }
+    showVideoModal(data.callerName,data.callerAv,data.callerCol);
+    $('localVideo').srcObject=localStream; st('vcWaitText','Connecting…');
+    peerConnection=new RTCPeerConnection(ICE_SERVERS);
+    localStream.getTracks().forEach(track=>peerConnection.addTrack(track,localStream));
+    remoteStream=new MediaStream(); $('remoteVideo').srcObject=remoteStream;
+    peerConnection.ontrack=e=>{ e.streams[0].getTracks().forEach(track=>remoteStream.addTrack(track)); $('vcWaiting').style.display='none'; startCallTimer(); };
+    peerConnection.onicecandidate=async e=>{ if(!e.candidate)return; try{await addDoc(collection(db,'videoCalls',callId,'calleeCandidates'),e.candidate.toJSON());}catch(err){} };
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+    const answer=await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    await updateDoc(doc(db,'videoCalls',callId),{answer:{type:answer.type,sdp:answer.sdp},status:'active'});
+    onSnapshot(collection(db,'videoCalls',callId,'callerCandidates'),snap=>{ snap.docChanges().forEach(async change=>{ if(change.type==='added') try{await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));}catch(e){} }); });
+    unsubCallSignal=onSnapshot(doc(db,'videoCalls',callId),snap=>{ if(!snap.exists())return; if(snap.data().status==='ended') hangUp(false); });
+    window._log('videocall','accepted a video call from '+data.callerName);
+};
+
+window.declineCall=async function(){
+    if(!pendingCallData)return;
+    const{callId}=pendingCallData; hideIncomingToast();
+    try{await updateDoc(doc(db,'videoCalls',callId),{status:'declined'});}catch(e){}
+};
+
+window.hangUp=async function(updateFirestore=true){
+    if(vcTimerInterval){clearInterval(vcTimerInterval);vcTimerInterval=null;vcSeconds=0;}
+    if(updateFirestore&&activeCallId){ try{await updateDoc(doc(db,'videoCalls',activeCallId),{status:'ended'});}catch(e){} }
+    if(unsubCallSignal){unsubCallSignal();unsubCallSignal=null;}
+    if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
+    if(screenTrack){screenTrack.stop();screenTrack=null;}
+    if(peerConnection){peerConnection.close();peerConnection=null;}
+    const lv=$('localVideo'),rv=$('remoteVideo');
+    if(lv)lv.srcObject=null; if(rv)rv.srcObject=null;
+    remoteStream=null;activeCallId=null;micOn=true;camOn=true;screenSharing=false;
+    const modal=$('videoModal'),overlay=$('videoOverlay');
+    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.92)';
+    overlay.style.display='none';
+    setTimeout(()=>{ modal.style.display='none'; },300);
+    $('inCallChat').style.display='none'; inCallChatOpen=false;
+};
+
+function startCallTimer(){
+    vcSeconds=0;
+    vcTimerInterval=setInterval(()=>{ vcSeconds++; const m=Math.floor(vcSeconds/60),s=vcSeconds%60; st('vcTimer',(m<10?'0':'')+m+':'+(s<10?'0':'')+s+' · Live'); },1000);
+}
+
+window.toggleMic=function(){ if(!localStream)return; micOn=!micOn; localStream.getAudioTracks().forEach(t=>t.enabled=micOn); $('btnMic').textContent=micOn?'🎤':'🔇'; $('btnMic').classList.toggle('vc-btn-off',!micOn); };
+window.toggleCamera=function(){ if(!localStream)return; camOn=!camOn; localStream.getVideoTracks().forEach(t=>t.enabled=camOn); $('btnCam').textContent=camOn?'📹':'📷'; $('btnCam').classList.toggle('vc-btn-off',!camOn); $('localVideo').style.display=camOn?'block':'none'; $('localVideoOff').style.display=camOn?'none':'flex'; };
+window.toggleScreen=async function(){
+    if(!peerConnection){alert('No active call.');return;}
+    if(!screenSharing){
+        try{
+            const ss=await navigator.mediaDevices.getDisplayMedia({video:true});
+            screenTrack=ss.getVideoTracks()[0];
+            const sender=peerConnection.getSenders().find(s=>s.track?.kind==='video');
+            if(sender)await sender.replaceTrack(screenTrack);
+            $('localVideo').srcObject=ss; $('btnScreen').classList.add('vc-btn-off'); $('btnScreen').textContent='🖥️✓'; screenSharing=true;
+            screenTrack.onended=()=>{ stopScreenShare(); };
+        }catch(e){console.log('Screen share cancelled:',e.message);}
+    } else { stopScreenShare(); }
+};
+async function stopScreenShare(){
+    if(!screenTrack)return; screenTrack.stop(); screenTrack=null;
+    try{
+        const cs=await navigator.mediaDevices.getUserMedia({video:true});
+        const ct=cs.getVideoTracks()[0];
+        const sender=peerConnection?.getSenders().find(s=>s.track?.kind==='video');
+        if(sender)await sender.replaceTrack(ct);
+        if(localStream){localStream.getVideoTracks().forEach(t=>t.stop());localStream.addTrack(ct);}
+        $('localVideo').srcObject=localStream;
+    }catch(e){}
+    $('btnScreen').classList.remove('vc-btn-off'); $('btnScreen').textContent='🖥️'; screenSharing=false;
+}
+window.swapVideos=function(){ const lv=$('localVideo'),rv=$('remoteVideo'); const t=lv.srcObject; lv.srcObject=rv.srcObject; rv.srcObject=t; };
+window.toggleFullscreen=function(){ const m=$('videoModal'); if(!document.fullscreenElement){m.requestFullscreen?.();}else{document.exitFullscreen?.();} };
+window.toggleInCallChat=function(){ inCallChatOpen=!inCallChatOpen; $('inCallChat').style.display=inCallChatOpen?'flex':'none'; $('btnInCallChat').classList.toggle('vc-btn-off',inCallChatOpen); };
+window.sendInCallMsg=async function(){
+    if(!activeCallId||!CU)return;
+    const input=$('inCallInput'),text=input.value.trim(); if(!text)return; input.value='';
+    const c=$('inCallMsgs'); const b=document.createElement('div'); b.className='ic-out msg-new'; b.textContent=text; c.appendChild(b); c.scrollTop=c.scrollHeight;
+    try{await addDoc(collection(db,'videoCalls',activeCallId,'chat'),{text,senderUid:CU.uid,senderName:CU.displayName||CU.email?.split('@')[0]||'User',createdAt:serverTimestamp()});}catch(e){}
+};
+
+// ══════════════════════════════════════════
+// SOCIAL MODAL
+// ══════════════════════════════════════════
+window._sf=[]; window._sw=[]; window._cst='followers';
+
+window.renderUsers = function(users){
+    const list=$('socialUserList'), count=$('socialCount'), tab=window._cst;
+    count.textContent=users.length?users.length+' '+(tab==='followers'?'follower'+(users.length>1?'s':''):'following'):'';
+    if(!users.length){ list.innerHTML='<div style="text-align:center;padding:44px 20px;color:rgba(255,255,255,0.25);font-size:13px;">😶 No users found</div>'; return; }
+    list.innerHTML=users.map(u=>{
+        const isSelf=CU&&u.uid===CU.uid;
+        const partnerBadge=u.matched?'<span class="s-partner">⚡ Study Partner</span>':'<span class="s-match">⚡ Matched</span>';
+        return `<div class="s-row">
+            <div class="s-av" style="background:${u.col};">${u.av}</div>
+            <div style="flex:1;min-width:0;">
+                <div class="s-name">${esc(u.name)}${u.matched?partnerBadge:''}</div>
+                <div class="s-meta">${esc(u.sub)} &nbsp;·&nbsp; <span style="color:rgba(128,179,255,0.7);">${u.match}% match</span></div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+                ${isSelf
+                    ?'<span style="font-size:11px;color:var(--muted);padding:6px 10px;">You</span>'
+                    :`<button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">💬 Chat</button>
+                      <button class="btn-vid" title="Start video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
+                }
+            </div>
+        </div>`;
+    }).join('');
+};
+</script>
+
+<!-- NON-MODULE: UI helpers -->
+<script>
+function openSocialModal(tab){
+    window._cst=tab;
+    document.getElementById('socialModalOverlay').style.display='block';
+    const m=document.getElementById('socialModal');
+    m.style.display='flex';
+    requestAnimationFrame(()=>{ m.style.opacity='1'; m.style.transform='translate(-50%,-50%) scale(1)'; });
+    document.getElementById('socialSearch').value='';
+    setATab();
+    window.renderUsers(tab==='followers'?(window._sf||[]):(window._sw||[]));
+}
+function closeSocialModal(){
+    const m=document.getElementById('socialModal');
+    m.style.opacity='0'; m.style.transform='translate(-50%,-50%) scale(0.95)';
+    setTimeout(()=>{ m.style.display='none'; document.getElementById('socialModalOverlay').style.display='none'; },200);
+}
+function switchTab(tab){
+    window._cst=tab;
+    document.getElementById('socialSearch').value='';
+    setATab();
+    window.renderUsers(tab==='followers'?(window._sf||[]):(window._sw||[]));
+}
+function setATab(){
+    ['followers','following'].forEach(t=>{
+        const b=document.getElementById('tab'+t[0].toUpperCase()+t.slice(1));
+        b.style.borderBottomColor=t===window._cst?'#4d94ff':'transparent';
+        b.style.color=t===window._cst?'white':'rgba(255,255,255,0.45)';
+    });
+}
+function filterUsers(){
+    const q=document.getElementById('socialSearch').value.toLowerCase();
+    const src=window._cst==='followers'?(window._sf||[]):(window._sw||[]);
+    window.renderUsers(src.filter(u=>u.name.toLowerCase().includes(q)||u.sub.toLowerCase().includes(q)));
+}
+function openCreateRoom(){
+    const p=document.getElementById('createRoomPanel');
+    document.getElementById('roomCode').value='ROOM-'+Math.random().toString(36).substring(2,7).toUpperCase();
+    p.style.display=p.style.display==='none'?'block':'none';
+}
+function closeCreateRoom(){
+    document.getElementById('createRoomPanel').style.display='none';
+    document.getElementById('roomSubject').value='';
+}
+function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendDM();} }
+function autoResizeInput(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+        closeSocialModal();
+        if(typeof window.closeChatWindow==='function') window.closeChatWindow();
+        if(typeof window.closeRoomChat==='function') window.closeRoomChat();
+    }
+});
+</script>
+
+<script>
+fetch('profile.html').then(r=>r.text()).then(html=>{
+    document.getElementById('profile-container').innerHTML=html;
+    const lb=document.getElementById('logout-btn');
+    if(lb) lb.addEventListener('click',e=>{
+        e.preventDefault();
+        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
+            .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
+    });
+    const pb=document.getElementById('profile-btn'),pm=document.getElementById('profile-menu');
+    if(pb&&pm){
+        pb.addEventListener('click',()=>{ pm.style.display=pm.style.display==='block'?'none':'block'; });
+        document.addEventListener('click',e=>{ if(!pb.contains(e.target)&&!pm.contains(e.target))pm.style.display='none'; });
+    }
+}).catch(e=>console.error('Profile load failed:',e));
+</script>
+</body>
+</html>

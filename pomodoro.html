@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro | StudySphere </title>
+    <link rel="stylesheet" href="stylesheet1.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- silences favicon 404 -->
+    <style>
+        /* Your original styles unchanged */
+        .pomo-page { padding: 36px 0 60px; }
+        .pomo-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+        .pomo-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+        .pomo-tab { padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border: 1px solid transparent; background: transparent; font-family: var(--dm); transition: all 0.2s; }
+        .pomo-tab:hover { color: var(--text); background: rgba(109,40,217,0.12); border-color: rgba(109,40,217,0.3); }
+        .pomo-tab.active { color: var(--text); background: rgba(109,40,217,0.2); border-color: rgba(109,40,217,0.4); }
+        .pomo-tab.active.short { background: rgba(5,150,105,0.2); border-color: rgba(5,150,105,0.4); color: var(--green-glow); }
+        .pomo-tab.active.long  { background: rgba(8,145,178,0.2); border-color: rgba(8,145,178,0.4); color: var(--teal-glow); }
+
+        .timer-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 36px; text-align: center; position: relative; overflow: hidden; }
+        .timer-card::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 320px; height: 320px; border-radius: 50%; pointer-events: none; transition: background 0.5s; }
+        .timer-card.focus::before { background: radial-gradient(circle, rgba(109,40,217,0.1), transparent 65%); }
+        .timer-card.short::before { background: radial-gradient(circle, rgba(5,150,105,0.1), transparent 65%); }
+        .timer-card.long::before  { background: radial-gradient(circle, rgba(8,145,178,0.1), transparent 65%); }
+
+        .ring-timer-wrap { position: relative; width: 220px; height: 220px; margin: 0 auto 28px; }
+        .ring-timer-wrap svg { transform: rotate(-90deg); overflow: visible; }
+        .ring-bg   { fill: none; stroke: var(--dim); stroke-width: 10; }
+        .ring-prog { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+
+        .timer-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .timer-display { font-family: var(--syne); font-size: 50px; font-weight: 900; letter-spacing: 2px; line-height: 1; }
+        .timer-mode-label { font-size: 11px; color: var(--muted); letter-spacing: 0.25em; text-transform: uppercase; margin-top: 6px; }
+
+        .round-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+        .round-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dim); transition: background 0.3s, box-shadow 0.3s; }
+        .round-dot.done   { background: var(--glow); box-shadow: 0 0 6px var(--glow); }
+        .round-dot.active { background: var(--teal-glow); box-shadow: 0 0 8px var(--teal-glow); }
+
+        .pomo-controls { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+        .ctrl-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-family: var(--dm); }
+        .ctrl-btn:hover { border-color: var(--glow); background: rgba(109,40,217,0.15); }
+        .ctrl-btn.play { width: 64px; height: 64px; font-size: 24px; background: linear-gradient(135deg, var(--accent), var(--teal)); border: none; color: white; box-shadow: 0 0 20px rgba(109,40,217,0.4); }
+        .ctrl-btn.play:hover { transform: scale(1.07); box-shadow: 0 0 32px rgba(109,40,217,0.6); }
+
+        @keyframes play-pulse { 0%,100% { box-shadow: 0 0 20px rgba(109,40,217,0.4); } 50% { box-shadow: 0 0 40px rgba(109,40,217,0.8); } }
+        .ctrl-btn.play.running { animation: play-pulse 2s infinite; }
+
+        .task-input-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .task-input-row input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: var(--dm); outline: none; transition: border-color 0.2s; }
+        .task-input-row input:focus { border-color: var(--accent); }
+        .task-input-row input::placeholder { color: var(--muted); }
+
+        .pomo-sidebar { display: flex; flex-direction: column; gap: 16px; }
+        .sidebar-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; }
+        .sidebar-title { font-family: var(--syne); font-weight: 800; font-size: 14px; margin-bottom: 14px; }
+
+        .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .setting-row:last-child { margin-bottom: 0; }
+        .setting-label { font-size: 13px; color: var(--muted); }
+        .dur-ctrl { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+        .dur-btn { width: 24px; height: 24px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 15px; cursor: pointer; transition: border-color 0.2s; line-height: 1; display: flex; align-items: center; justify-content: center; font-family: var(--dm); }
+        .dur-btn:hover { border-color: var(--accent); }
+
+        .toggle-wrap { position: relative; width: 36px; height: 20px; }
+        .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent); border-radius: 20px; transition: .3s; }
+        .toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; left: 3px; top: 3px; transition: .3s; }
+        .toggle-wrap input:checked + .toggle-slider::before { transform: translateX(16px); }
+        .toggle-wrap input:not(:checked) + .toggle-slider { background: var(--dim); }
+
+        .task-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .task-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .task-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; transition: all 0.2s; }
+        .task-check.done { background: var(--green); border-color: var(--green); color: white; }
+        .task-text { flex: 1; }
+        .task-text.done { color: var(--muted); text-decoration: line-through; }
+
+        .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .sound-btn { padding: 9px 4px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 12px; cursor: pointer; text-align: center; font-family: var(--dm); transition: all 0.2s; }
+        .sound-btn:hover { border-color: var(--glow); color: var(--text); }
+        .sound-btn.active { background: rgba(109,40,217,0.2); border-color: var(--accent); color: var(--glow); }
+
+        .pomo-stat-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
+        .pomo-stat-row:last-child { margin-bottom: 0; }
+        .pomo-stat-row span:last-child { font-weight: 700; color: var(--glow); }
+
+        .pomo-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--card); border: 1px solid rgba(109,40,217,0.4); border-radius: 12px; padding: 13px 24px; font-size: 14px; font-weight: 600; z-index: 9999; opacity: 0; transition: all 0.4s; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .pomo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 768px) {
+            .pomo-layout { grid-template-columns: 1fr; }
+            .pomo-tabs { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Toast -->
+    <div class="pomo-toast" id="pomoToast">🍅 Session complete! Take a break.</div>
+
+    <nav id="main-nav">
+        <a href="landing.html" class="nav-logo">
+            <div class="nav-logo-icon">🔗</div>
+            StudySphere
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a class="nav-link" href="landing.html">Intro</a>
+            <a class="nav-link" href="dashboard.html">Dashboard</a>
+            <a class="nav-link" href="match.html">Match</a>
+            <a class="nav-link" href="session.html">Session</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+            <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+            <a class="nav-link" href="resources.html">Resources</a>
+            <a class="nav-link active" href="pomodoro.html">Pomodoro</a>
+            <a class="nav-link" href="onboard.html">Onboard</a>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <div id="page-pomodoro" class="page">
+            <div class="pomo-page">
+                <div class="content">
+
+                    <div style="margin-bottom:28px;">
+                        <div class="section-tag">Focus Engine</div>
+                        <h1 class="heading-lg" style="margin-bottom:6px;">Pomodoro <span class="gradient-text">Timer</span></h1>
+                        <p style="color:var(--muted);font-size:14px;">Deep work sessions synced with your CollabSync study schedule</p>
+                    </div>
+
+                    <div class="pomo-layout">
+
+                        <!-- LEFT: TIMER -->
+                        <div>
+                            <div class="timer-card focus" id="timerCard">
+
+                                <div class="pomo-tabs">
+                                    <button class="pomo-tab active" id="tabFocus" onclick="setMode('focus',this)">🍅 Focus</button>
+                                    <button class="pomo-tab short" id="tabShort" onclick="setMode('short',this)">☕ Short Break</button>
+                                    <button class="pomo-tab long"  id="tabLong"  onclick="setMode('long',this)">🌿 Long Break</button>
+                                </div>
+
+                                <div class="ring-timer-wrap">
+                                    <svg width="220" height="220" viewBox="0 0 220 220">
+                                        <circle class="ring-bg" cx="110" cy="110" r="98"/>
+                                        <circle class="ring-prog" cx="110" cy="110" r="98"
+                                            id="ringProg"
+                                            stroke="url(#timerGrad)"
+                                            stroke-dasharray="615.8"
+                                            stroke-dashoffset="0"/>
+                                        <defs>
+                                            <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#6d28d9" id="gradStop1"/>
+                                                <stop offset="100%" stop-color="#22d3ee" id="gradStop2"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="timer-center">
+                                        <div class="timer-display" id="timerDisplay" style="color:var(--glow);">25:00</div>
+                                        <div class="timer-mode-label" id="timerLabel">FOCUS TIME</div>
+                                    </div>
+                                </div>
+
+                                <div class="round-dots" id="roundDots">
+                                    <div class="round-dot active"></div>
+                                    <div class="round-dot"></div>
+                                    <div class="round-dot"></div>
+                                    <div class="round-dot"></div>
+                                </div>
+
+                                <div class="pomo-controls">
+                                    <button class="ctrl-btn" onclick="skipBack()" title="Restart">⟲</button>
+                                    <button class="ctrl-btn play" id="playBtn" onclick="toggleTimer()">▶</button>
+                                    <button class="ctrl-btn" onclick="skipNext()" title="Skip">⟳</button>
+                                </div>
+
+                                <div class="task-input-row">
+                                    <input type="text" id="taskInput" placeholder="What are you working on? (Enter to add)">
+                                    <button class="btn btn-primary" style="padding:10px 16px;font-size:13px;" onclick="addTask()">+</button>
+                                </div>
+                                <div style="font-size:12px;color:var(--muted);text-align:center;">
+                                    Linked to: <span style="color:var(--teal-glow);font-weight:600;">Bio 301 Finals Prep</span>
+                                    &nbsp;·&nbsp;
+                                    <a href="session.html" style="color:var(--glow);">→ View Session</a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: SIDEBAR -->
+                        <div class="pomo-sidebar">
+
+                            <div class="sidebar-card">
+                                <div class="sidebar-title">⚙️ Timer Settings</div>
+                                <div class="setting-row">
+                                    <span class="setting-label">Focus Duration</span>
+                                    <div class="dur-ctrl">
+                                        <button class="dur-btn" onclick="changeDur('focus',-5)">−</button>
+                                        <span id="focusDurLabel">25m</span>
+                                        <button class="dur-btn" onclick="changeDur('focus',5)">+</button>
+                                    </div>
+                                </div>
+                                <div class="setting-row">
+                                    <span class="setting-label">Short Break</span>
+                                    <div class="dur-ctrl">
+                                        <button class="dur-btn" onclick="changeDur('short',-1)">−</button>
+                                        <span id="shortDurLabel">5m</span>
+                                        <button class="dur-btn" onclick="changeDur('short',1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="setting-row">
+                                    <span class="setting-label">Long Break</span>
+                                    <div class="dur-ctrl">
+                                        <button class="dur-btn" onclick="changeDur('long',-5)">−</button>
+                                        <span id="longDurLabel">15m</span>
+                                        <button class="dur-btn" onclick="changeDur('long',5)">+</button>
+                                    </div>
+                                </div>
+                                <div class="setting-row">
+                                    <span class="setting-label">Auto-start Breaks</span>
+                                    <label class="toggle-wrap">
+                                        <input type="checkbox" id="autoBreak" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-row">
+                                    <span class="setting-label">Sound Alerts</span>
+                                    <label class="toggle-wrap">
+                                        <input type="checkbox" id="soundAlert" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="sidebar-card">
+                                <div class="sidebar-title">✅ Session Tasks</div>
+                                <div id="taskList">
+                                    <div class="task-item">
+                                        <div class="task-check done" onclick="toggleTask(this)">✓</div>
+                                        <span class="task-text done">Review Chapter 5 notes</span>
+                                    </div>
+                                    <div class="task-item">
+                                        <div class="task-check" onclick="toggleTask(this)"></div>
+                                        <span class="task-text">Practice DNA replication problems</span>
+                                    </div>
+                                    <div class="task-item">
+                                        <div class="task-check" onclick="toggleTask(this)"></div>
+                                        <span class="task-text">Summarise key concepts with Marcus</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sidebar-card">
+                                <div class="sidebar-title">🎵 Peaceful Ambient Music</div>
+                                <div class="sound-grid">
+                                    <button class="sound-btn" data-sound="Meditation" onclick="toggleAmbient(this)">🧘<br>Deep Meditation</button>
+                                    <button class="sound-btn" data-sound="ZenBells" onclick="toggleAmbient(this)">🔔<br>Tibetan Bowls</button>
+                                    <button class="sound-btn" data-sound="Lofi" onclick="toggleAmbient(this)">🎹<br>Calm Lo-fi</button>
+                                    <button class="sound-btn" data-sound="Rain" onclick="toggleAmbient(this)">🌧️<br>Gentle Rain</button>
+                                    <button class="sound-btn" data-sound="Forest" onclick="toggleAmbient(this)">🌲<br>Forest Dawn</button>
+                                    <button class="sound-btn" data-sound="Ocean" onclick="toggleAmbient(this)">🌊<br>Ocean Breeze</button>
+                                    <button class="sound-btn" data-sound="Silence" onclick="toggleAmbient(this)">🔇<br>Silence</button>
+                                </div>
+                            </div>
+
+                            <div class="sidebar-card">
+                                <div class="sidebar-title">📊 Today's Stats</div>
+                                <div class="pomo-stat-row"><span>Pomodoros Done</span><span>3 🍅</span></div>
+                                <div class="pomo-stat-row"><span>Focus Time</span><span style="color:var(--teal-glow);">75 min</span></div>
+                                <div class="pomo-stat-row"><span>XP Earned</span><span style="color:var(--green-glow);">+150</span></div>
+                                <div class="pomo-stat-row"><span>Streak</span><span style="color:var(--orange-glow);">7 days 🔥</span></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── STRONG AUDIO UNLOCK ─────────────────────────────────────────────
+        let audioUnlocked = false;
+
+        function forceUnlockAudio() {
+            if (audioUnlocked) return;
+            audioUnlocked = true;
+
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') ctx.resume();
+
+                // Silent dummy tone for strict browsers
+                const osc = ctx.createOscillator();
+                osc.connect(ctx.destination);
+                osc.start(0);
+                osc.stop(ctx.currentTime + 0.001);
+            } catch (e) {}
+        }
+
+        ['click', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, forceUnlockAudio, { once: true, passive: true });
+        });
+
+        // ─── PEACEFUL LONG AMBIENT MUSIC (hotlink-safe) ───────────────────────
+        // Even softer alternative (single gentle bell)
+const alertSound = new Audio("https://assets.mixkit.co/active_storage/sfx/105/105-preview.mp3");
+        alertSound.volume = 0.50;
+
+        const ambientSounds = {
+            Meditation: new Audio("https://assets.mixkit.co/active_storage/sfx/109/109-preview.mp3"), // calm meditation pads (looped)
+            ZenBells:   new Audio("https://assets.mixkit.co/active_storage/sfx/1043/1043-preview.mp3"), // gentle tibetan bowls
+            Lofi:       new Audio("https://assets.mixkit.co/active_storage/sfx/111/111-preview.mp3"), // soft lo-fi chill
+            Rain:       new Audio("https://assets.mixkit.co/active_storage/sfx/107/107-preview.mp3"), // gentle rain loop
+            Forest:     new Audio("https://assets.mixkit.co/active_storage/sfx/113/113-preview.mp3"), // peaceful forest
+            Ocean:      new Audio("https://assets.mixkit.co/active_storage/sfx/106/106-preview.mp3")  // ocean waves
+        };
+
+        Object.values(ambientSounds).forEach(sound => {
+            sound.loop = true;
+            sound.volume = 0.32; // calm background
+            sound.preload = "auto";
+        });
+
+        let currentAmbient = null;
+
+        function toggleAmbient(btn) {
+            const soundName = btn.dataset.sound;
+
+            if (currentAmbient) {
+                currentAmbient.pause();
+                currentAmbient.currentTime = 0;
+            }
+
+            document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+
+            if (soundName === "Silence") {
+                currentAmbient = null;
+                return;
+            }
+
+            const audio = ambientSounds[soundName];
+            if (!audio) return;
+
+            forceUnlockAudio();
+
+            audio.currentTime = 0;
+            audio.play()
+                .then(() => {
+                    btn.classList.add("active");
+                    currentAmbient = audio;
+                })
+                .catch(err => {
+                    console.warn("Play failed:", err);
+                    if (err.name === 'NotAllowedError') {
+                        alert("Please interact first:\n1. Click the timer ▶ button\n2. Or tap anywhere on the page once\n\nThen try music again.");
+                    } else {
+                        alert("Music load issue.\nStart timer first or refresh page.");
+                    }
+                });
+        }
+
+        // ─── TIMER LOGIC (unchanged from your last version) ───────────────────
+        const DURATIONS = { focus: 25, short: 5, long: 15 };
+        let currentMode = 'focus';
+        let totalSecs   = 25 * 60;
+        let remaining   = totalSecs;
+        let running     = false;
+        let timerInterval = null;
+        let currentRound  = 0;
+        const CIRCUM = 615.8;
+
+        const elements = {
+            ringProg:     document.getElementById('ringProg'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            timerLabel:   document.getElementById('timerLabel'),
+            playBtn:      document.getElementById('playBtn'),
+            timerCard:    document.getElementById('timerCard'),
+            roundDots:    document.getElementById('roundDots')
+        };
+
+        const modeConfig = {
+            focus: { color: 'var(--glow)',       label: 'FOCUS TIME',    card: 'focus', g1: '#6d28d9', g2: '#22d3ee' },
+            short: { color: 'var(--green-glow)', label: 'SHORT BREAK',  card: 'short', g1: '#059669', g2: '#10b981' },
+            long:  { color: 'var(--teal-glow)',  label: 'LONG BREAK',   card: 'long',  g1: '#0891b2', g2: '#22d3ee' }
+        };
+
+        function updateDisplay() {
+            const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+            const s = String(remaining % 60).padStart(2, '0');
+            elements.timerDisplay.textContent = `${m}:${s}`;
+            document.title = `${m}:${s} · CollabSync Pomodoro`;
+            const pct = remaining / totalSecs;
+            elements.ringProg.style.strokeDashoffset = CIRCUM * pct;
+        }
+
+        function setMode(mode, tabEl) {
+            if (running) toggleTimer();
+            currentMode = mode;
+            totalSecs = DURATIONS[mode] * 60;
+            remaining = totalSecs;
+            document.querySelectorAll('.pomo-tab').forEach(t => t.classList.remove('active'));
+            if (tabEl) tabEl.classList.add('active');
+            const cfg = modeConfig[mode];
+            elements.timerDisplay.style.color = cfg.color;
+            elements.timerLabel.textContent   = cfg.label;
+            elements.timerCard.className      = 'timer-card ' + cfg.card;
+            document.getElementById('gradStop1').setAttribute('stop-color', cfg.g1);
+            document.getElementById('gradStop2').setAttribute('stop-color', cfg.g2);
+            updateDisplay();
+        }
+
+        function toggleTimer() {
+            if (running) {
+                clearInterval(timerInterval);
+                running = false;
+                elements.playBtn.textContent = '▶';
+                elements.playBtn.classList.remove('running');
+            } else {
+                running = true;
+                elements.playBtn.textContent = '⏸';
+                elements.playBtn.classList.add('running');
+                timerInterval = setInterval(tick, 1000);
+                forceUnlockAudio();
+            }
+        }
+
+        function tick() {
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                running = false;
+                elements.playBtn.textContent = '▶';
+                elements.playBtn.classList.remove('running');
+                onComplete();
+                return;
+            }
+            remaining--;
+            updateDisplay();
+        }
+
+        function onComplete() {
+            if (document.getElementById('soundAlert').checked) {
+                alertSound.currentTime = 0;
+                alertSound.play().catch(() => {});
+            }
+
+            const msg = currentMode === 'focus' ? '🍅 Focus complete! Take a break.' : '⚡ Break over — back to work!';
+            showToast(msg);
+
+            if (currentMode === 'focus') {
+                markRound();
+                const next = (currentRound % 4 === 0) ? 'long' : 'short';
+                if (document.getElementById('autoBreak').checked) {
+                    setTimeout(() => {
+                        const nextTab = document.getElementById(`tab${next.charAt(0).toUpperCase() + next.slice(1)}`);
+                        setMode(next, nextTab);
+                        toggleTimer();
+                    }, 1400);
+                }
+            } else {
+                if (document.getElementById('autoBreak').checked) {
+                    setTimeout(() => {
+                        setMode('focus', document.getElementById('tabFocus'));
+                        toggleTimer();
+                    }, 1400);
+                }
+            }
+        }
+
+        function markRound() {
+            currentRound = (currentRound + 1) % 4;
+            const dots = elements.roundDots.querySelectorAll('.round-dot');
+            dots.forEach((d, i) => {
+                d.className = 'round-dot' +
+                    (i < currentRound ? ' done' : (i === currentRound ? ' active' : ''));
+            });
+            if (currentRound === 0) dots.forEach(d => d.className = 'round-dot');
+        }
+
+        function skipBack() { remaining = totalSecs; updateDisplay(); }
+        function skipNext() { remaining = 0; tick(); }
+
+        function changeDur(mode, delta) {
+            const min = mode === 'short' ? 1 : 5;
+            const max = mode === 'short' ? 15 : 60;
+            DURATIONS[mode] = Math.max(min, Math.min(max, DURATIONS[mode] + delta));
+            document.getElementById(mode + 'DurLabel').textContent = DURATIONS[mode] + 'm';
+            if (currentMode === mode) {
+                totalSecs = DURATIONS[mode] * 60;
+                remaining = totalSecs;
+                updateDisplay();
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('pomoToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const val = input.value.trim();
+            if (!val) return;
+            const list = document.getElementById('taskList');
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.innerHTML = `<div class="task-check" onclick="toggleTask(this)"></div><span class="task-text">${val}</span>`;
+            list.appendChild(div);
+            input.value = '';
+        }
+
+        document.getElementById('taskInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        function toggleTask(el) {
+            el.classList.toggle('done');
+            el.textContent = el.classList.contains('done') ? '✓' : '';
+            el.nextElementSibling.classList.toggle('done');
+        }
+
+        // Init
+        updateDisplay();
+    </script>
+</body>
+</html>

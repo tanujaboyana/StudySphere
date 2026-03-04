@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match - StudySphere</title>
+    <link rel="stylesheet" href="stylesheet1.css">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card: #111118;
+            --surface: #1a1a24;
+            --border: rgba(255,255,255,0.08);
+            --muted: #6b7280;
+            --accent: #6d28d9;
+            --glow: #a78bfa;
+            --teal: #0891b2;
+            --teal-glow: #22d3ee;
+            --orange-glow: #fbbf24;
+            --green-glow: #34d399;
+            --red: #ef4444;
+            --syne: 'Syne', sans-serif;
+            --inter: 'Inter', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #e2e8f0; font-family: var(--inter, sans-serif); min-height: 100vh; }
+
+        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+        .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:#e2e8f0; text-decoration:none; font-family:var(--syne); font-size:15px; }
+        .nav-links { display:flex; gap:2px; flex-wrap:wrap; }
+        .nav-link { color:var(--muted); text-decoration:none; font-size:12px; padding:5px 10px; border-radius:6px; transition:all 0.2s; }
+        .nav-link:hover,.nav-link.active { color:#e2e8f0; background:var(--surface); }
+        .nav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+
+        .content-wrapper { max-width:980px; margin:0 auto; padding:88px 20px 60px; }
+
+        .card { background:var(--card); border:1px solid var(--border); border-radius:16px; }
+        .section-tag { display:inline-block; background:rgba(109,40,217,0.15); border:1px solid rgba(109,40,217,0.3); color:var(--glow); font-size:11px; padding:4px 12px; border-radius:999px; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
+        .heading-lg { font-size:32px; font-weight:800; font-family:var(--syne); }
+        .gradient-text { background:linear-gradient(135deg,#a78bfa,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+        .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; font-family:var(--inter); }
+        .btn-primary { background:linear-gradient(135deg,var(--accent),#7c3aed); color:#fff; }
+        .btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+        .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
+        .btn-ghost:hover { border-color:var(--accent); color:var(--glow); }
+        .btn-sm { padding:6px 14px; font-size:12px; }
+        .btn-success { background:linear-gradient(135deg,#059669,#10b981); color:#fff; }
+        .btn-danger  { background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; }
+
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        @media(max-width:700px){ .grid-2{ grid-template-columns:1fr; } }
+
+        .progress-bar { height:6px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+        .progress-fill { height:100%; border-radius:999px; transition:width 0.7s ease; }
+
+        .avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; }
+
+        /* HERO */
+        .match-hero { background:linear-gradient(135deg,rgba(109,40,217,0.12),rgba(8,145,178,0.07)); border:1px solid rgba(109,40,217,0.28); border-radius:20px; padding:28px; margin-bottom:24px; position:relative; overflow:hidden; }
+        .match-hero::before { content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(109,40,217,0.18),transparent 70%); border-radius:50%; pointer-events:none; }
+        .connector { display:flex; align-items:center; gap:16px; margin-top:22px; flex-wrap:wrap; }
+        .user-bubble { width:54px; height:54px; border-radius:50%; border:2px solid; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; }
+        .conn-line { flex:1; height:2px; min-width:30px; background:linear-gradient(90deg,var(--accent),var(--teal)); position:relative; }
+        .conn-line::after { content:'⚡'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--bg); padding:2px 6px; font-size:13px; }
+
+        /* MATCH CARDS */
+        .match-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; transition:all 0.25s; cursor:pointer; margin-bottom:10px; }
+        .match-card:hover { border-color:rgba(109,40,217,0.4); transform:translateY(-2px); box-shadow:0 8px 24px rgba(109,40,217,0.1); }
+        .match-card.selected { border-color:var(--accent); background:rgba(109,40,217,0.08); }
+        /* Connected state */
+        .match-card.connected { border-color:rgba(16,185,129,0.45); background:rgba(16,185,129,0.05); opacity:0.75; }
+
+        .score-ring { width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; border:3px solid; flex-shrink:0; text-align:center; line-height:1.2; }
+
+        .chip { display:inline-flex; align-items:center; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; margin:2px; }
+        .chip-strong { background:rgba(16,185,129,0.15); color:var(--green-glow); border:1px solid rgba(16,185,129,0.25); }
+        .chip-weak   { background:rgba(239,68,68,0.12);  color:#f87171;           border:1px solid rgba(239,68,68,0.2); }
+        .chip-avail  { background:rgba(8,145,178,0.12);  color:var(--teal-glow);  border:1px solid rgba(8,145,178,0.2); }
+        .chip-connected { background:rgba(16,185,129,0.2); color:var(--green-glow); border:1px solid rgba(16,185,129,0.4); }
+
+        .bell-btn { position:relative; cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:13px; display:flex; align-items:center; gap:6px; transition:all 0.2s; color:#e2e8f0; }
+        .bell-btn:hover { border-color:var(--accent); color:var(--glow); }
+        .bell-count { position:absolute; top:-5px; right:-5px; background:var(--red); color:#fff; width:18px; height:18px; border-radius:50%; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+        #invitePanel { position:fixed; top:58px; right:20px; width:340px; background:var(--card); border:1px solid var(--border); border-radius:16px; z-index:500; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.6); max-height:74vh; overflow-y:auto; }
+        .invite-item { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:8px; }
+
+        .compat-row { margin-bottom:12px; }
+        .compat-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; }
+        .double-bar { display:flex; gap:6px; align-items:center; }
+        .bar-label { font-size:10px; color:var(--muted); width:38px; flex-shrink:0; }
+
+        #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:rgba(17,17,24,0.97); border:1px solid var(--border); color:#e2e8f0; padding:12px 24px; border-radius:10px; font-size:13px; z-index:9999; opacity:0; transition:all 0.3s; white-space:nowrap; box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+        #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+        .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--glow); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
+        @keyframes spin { to{ transform:rotate(360deg); } }
+
+        .empty { text-align:center; padding:30px 16px; color:var(--muted); font-size:13px; }
+        .empty .e { font-size:32px; display:block; margin-bottom:8px; }
+
+        .warn-box { padding:12px 18px; border:1px solid rgba(245,158,11,0.3); background:rgba(245,158,11,0.06); border-radius:12px; font-size:13px; color:var(--orange-glow); margin-bottom:20px; }
+
+        .avail-match { background:rgba(8,145,178,0.08); border:1px solid rgba(8,145,178,0.2); border-radius:10px; padding:12px 14px; margin-top:14px; font-size:12px; }
+
+        /* Follower status badge */
+        .follower-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:10px; font-weight:700; background:rgba(16,185,129,0.15); color:var(--green-glow); border:1px solid rgba(16,185,129,0.3); }
+
+        /* Connected users section */
+        #connectedSection { margin-bottom:24px; }
+        .connected-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:14px; }
+        .connected-chip { background:var(--surface); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px; }
+        .connected-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:white; flex-shrink:0; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="landing.html" class="nav-logo">🔗 StudySphere</a>
+    <div class="nav-links">
+        <a class="nav-link" href="landing.html">Intro</a>
+        <a class="nav-link" href="dashboard.html">Dashboard</a>
+        <a class="nav-link active" href="match.html">Match</a>
+        <a class="nav-link" href="session.html">Session</a>
+        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+        <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="onboard.html">Onboard</a>
+    </div>
+    <div class="nav-right" id="navRight" style="display:none;">
+        <span id="myNameTag" style="font-size:12px;color:var(--muted);"></span>
+        <span id="followerCountBadge" style="font-size:11px;color:var(--green-glow);display:none;">
+            👥 <span id="followerCountNum">0</span> followers
+        </span>
+        <button class="bell-btn" onclick="togglePanel()">
+            🔔 Invites
+            <span id="bellCount" class="bell-count" style="display:none;">0</span>
+        </button>
+    </div>
+</nav>
+
+<!-- INVITE PANEL -->
+<div id="invitePanel">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);z-index:1;">
+        <span style="font-weight:700;font-size:14px;">📬 Study Invites</span>
+        <span onclick="togglePanel()" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;">×</span>
+    </div>
+    <div id="inviteList" style="padding:12px;">
+        <div class="empty"><span class="e">⏳</span>Loading...</div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<div class="content-wrapper">
+
+    <div id="authError" style="display:none;text-align:center;padding:80px 20px;">
+        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+        <p style="color:var(--muted);margin-bottom:16px;font-size:14px;">Please log in to use SmartMatch.</p>
+        <a href="login.html" class="btn btn-primary">Go to Login →</a>
+    </div>
+
+    <div id="pageLoading" style="text-align:center;padding:100px 20px;">
+        <div class="spinner" style="width:36px;height:36px;margin:0 auto 16px;"></div>
+        <p style="color:var(--muted);font-size:14px;">Reading your onboard skill profile...</p>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
+        <!-- Header -->
+        <div style="margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+            <div>
+                <div class="section-tag">AI Matching Engine</div>
+                <h1 class="heading-lg" style="margin-bottom:6px;">
+                    SmartMatch <span class="gradient-text">Algorithm</span>
+                </h1>
+                <p style="color:var(--muted);font-size:14px;">
+                    Matched from <strong style="color:var(--glow);">onboards → skillLevels</strong> — partners who cover your exact weak skills
+                </p>
+            </div>
+            <button class="btn btn-ghost" onclick="rerunMatch()">🔄 Refresh</button>
+        </div>
+
+        <div id="noOnboardWarn" style="display:none;" class="warn-box">
+            ⚠️ You haven't completed onboarding yet.
+            <a href="onboard.html" style="color:var(--glow);text-decoration:underline;">Complete it here →</a>
+            so we can match you accurately.
+        </div>
+
+        <!-- Connected Partners (mutual followers from accepted invites) -->
+        <div id="connectedSection" style="display:none;">
+            <div class="card" style="padding:20px;margin-bottom:20px;border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.04);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <h3 style="font-family:var(--syne);font-weight:700;font-size:15px;">✅ Your Study Partners</h3>
+                    <span id="connectedCount" style="font-size:12px;color:var(--green-glow);font-weight:700;"></span>
+                </div>
+                <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Accepted invites — also added as mutual followers on your dashboard</p>
+                <div id="connectedGrid" class="connected-grid"></div>
+            </div>
+        </div>
+
+        <!-- Best Match Hero -->
+        <div id="bestMatchHero" style="display:none;" class="match-hero"></div>
+        <div id="noMatchMsg" style="display:none;" class="empty" style="margin-bottom:24px;">
+            <span class="e">🔍</span>
+            No complementary matches found. Ask others to complete onboarding.
+        </div>
+
+        <!-- My Skills + Match List -->
+        <div class="grid-2" style="margin-bottom:24px;">
+
+            <div class="card" style="padding:24px;">
+                <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:4px;">🧪 Your Onboard Skills</h3>
+                <p style="font-size:12px;color:var(--muted);margin-bottom:6px;">
+                    From <code style="color:var(--glow);">onboards → skillLevels</code>
+                    · <a href="onboard.html" style="color:var(--glow);">update</a>
+                </p>
+                <div id="myAvailSummary" style="margin-bottom:16px;"></div>
+                <div id="mySkillsPanel">
+                    <div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>
+                </div>
+            </div>
+
+            <div class="card" style="padding:24px;">
+                <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:16px;">
+                    🎯 Complementary Matches
+                    <span id="matchCountBadge" style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px;"></span>
+                </h3>
+                <div id="matchList">
+                    <div class="empty">
+                        <div class="spinner" style="margin:0 auto 10px;"></div>
+                        Calculating matches...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compat Breakdown -->
+        <div id="compatCard" class="card" style="padding:24px;display:none;margin-bottom:24px;">
+            <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:16px;">
+                📊 Skill-Level Compatibility Breakdown
+            </h3>
+            <div id="compatDetails"></div>
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import {
+    getFirestore, collection, doc,
+    getDoc, getDocs, setDoc, addDoc, updateDoc,
+    query, where, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+    authDomain: "collabsyncai.firebaseapp.com",
+    projectId: "collabsyncai",
+    storageBucket: "collabsyncai.firebasestorage.app",
+    messagingSenderId: "862378374401",
+    appId: "1:862378374401:web:4438203269261b15011700"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let currentUid    = null;
+let myUserData    = null;
+let myOnboard     = null;
+let mySkillLevels = {};
+let mySkills      = [];
+let myAvailability= [];
+let allOnboards   = [];
+let matchResults  = [];
+let connectedUids = new Set(); // UIDs of accepted/mutual connections
+let pendingUids   = new Set(); // UIDs we've already sent an invite to
+let unsubInvites  = null;
+let unsubFollowers= null;
+let unsubSentInvites = null;
+
+const GRAD = [
+    'linear-gradient(135deg,#f59e0b,#ef4444)',
+    'linear-gradient(135deg,#6d28d9,#ec4899)',
+    'linear-gradient(135deg,#0891b2,#6d28d9)',
+    'linear-gradient(135deg,#059669,#0891b2)',
+    'linear-gradient(135deg,#d97706,#ec4899)',
+    'linear-gradient(135deg,#7c3aed,#06b6d4)',
+];
+function avatarGrad(uid=''){
+    let h=0; for(const c of uid) h=(h*31+c.charCodeAt(0))&0xfffffff;
+    return GRAD[h%GRAD.length];
+}
+function initials(name=''){ return name.split(' ').map(n=>n[0]||'').join('').toUpperCase().slice(0,2)||'??'; }
+
+// ── AUTH ──────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+    if (!user) {
+        document.getElementById('pageLoading').style.display = 'none';
+        document.getElementById('authError').style.display  = 'block';
+        return;
+    }
+    currentUid = user.uid;
+
+    const userSnap = await getDoc(doc(db, 'users', currentUid));
+    myUserData = userSnap.exists()
+        ? { uid: currentUid, ...userSnap.data() }
+        : { uid: currentUid, name: user.displayName || user.email?.split('@')[0] || 'Me' };
+
+    const onboardSnap = await getDoc(doc(db, 'onboards', currentUid));
+    if (onboardSnap.exists()) {
+        myOnboard      = onboardSnap.data();
+        mySkillLevels  = myOnboard.skillLevels  || {};
+        mySkills       = myOnboard.skills        || [];
+        myAvailability = myOnboard.availability  || [];
+    } else {
+        document.getElementById('noOnboardWarn').style.display = 'block';
+    }
+
+    document.getElementById('navRight').style.display = 'flex';
+    document.getElementById('myNameTag').textContent  = myUserData.name || '';
+
+    await loadAllOnboards();
+
+    document.getElementById('pageLoading').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+
+    renderMySkills();
+    renderMyAvailability();
+    runMatch();
+    listenInvites();
+    listenSentInvites();
+    listenFollowers(); // live-watch followers from dashboard social writes
+});
+
+// ── LOAD ALL ONBOARDS ─────────────────────────────────────────────────
+async function loadAllOnboards() {
+    const snap = await getDocs(collection(db, 'onboards'));
+    const promises = snap.docs
+        .filter(d => d.id !== currentUid)
+        .map(async d => {
+            const data = d.data();
+            const userSnap = await getDoc(doc(db, 'users', d.id));
+            const name       = userSnap.exists() ? (userSnap.data().name || userSnap.data().displayName || 'User') : 'User';
+            const university = userSnap.exists() ? (userSnap.data().university || '') : '';
+            const xp         = userSnap.exists() ? (userSnap.data().xp || 0) : 0;
+            const streak     = userSnap.exists() ? (userSnap.data().streak || 0) : 0;
+            return {
+                uid: d.id, name, university, xp, streak,
+                skillLevels:  data.skillLevels  || {},
+                skills:       data.skills        || [],
+                availability: data.availability  || [],
+            };
+        });
+    allOnboards = await Promise.all(promises);
+}
+
+// ── LIVE: watch followers subcollection so match list updates when an invite is accepted ──
+function listenFollowers() {
+    if (unsubFollowers) unsubFollowers();
+    unsubFollowers = onSnapshot(
+        collection(db, 'social', currentUid, 'following'),
+        snap => {
+            const prev = new Set(connectedUids);
+            connectedUids = new Set(snap.docs.map(d => d.id));
+
+            // If a new connection appeared, re-render match list & connected section
+            if (snap.docs.length !== prev.size || [...connectedUids].some(id => !prev.has(id))) {
+                renderMatchList(matchResults);
+                renderBestMatch(matchResults.find(r => !connectedUids.has(r.user.uid)));
+                renderConnectedPartners();
+            }
+
+            // Update follower count badge in nav
+            const el = document.getElementById('followerCountNum');
+            const badge = document.getElementById('followerCountBadge');
+            if (el) el.textContent = snap.size;
+            if (badge) badge.style.display = snap.size > 0 ? 'flex' : 'none';
+        }
+    );
+}
+
+// ── LIVE: watch sent invites (so Invite button changes to "Pending") ──
+function listenSentInvites() {
+    if (unsubSentInvites) unsubSentInvites();
+    unsubSentInvites = onSnapshot(
+        query(collection(db,'invites'), where('fromUid','==',currentUid), where('status','==','pending')),
+        snap => {
+            pendingUids = new Set(snap.docs.map(d => d.data().toUid));
+            renderMatchList(matchResults); // refresh button states
+        }
+    );
+}
+
+// ── MATCHING ALGORITHM ────────────────────────────────────────────────
+function computeCompat(theirData) {
+    const theirLevels = theirData.skillLevels;
+    const mySubjectSet    = new Set([...mySkills,         ...Object.keys(mySkillLevels)]);
+    const theirSubjectSet = new Set([...theirData.skills, ...Object.keys(theirLevels)]);
+    const allSubjects     = new Set([...mySubjectSet, ...theirSubjectSet]);
+
+    if (!allSubjects.size) return { score: 0, breakdown: [], availOverlap: [] };
+
+    let total = 0;
+    const breakdown = [];
+
+    allSubjects.forEach(subj => {
+        const me   = mySkillLevels[subj]   ?? (mySubjectSet.has(subj)    ? 50 : null);
+        const them = theirLevels[subj]      ?? (theirSubjectSet.has(subj) ? 50 : null);
+        if (me === null && them === null) return;
+
+        const meVal   = me   ?? 50;
+        const themVal = them ?? 50;
+        const diff    = Math.abs(meVal - themVal);
+        const stronger = Math.max(meVal, themVal);
+        const cs = (diff / 100) * (stronger / 100) * 100;
+        total += cs;
+
+        const direction = meVal > themVal ? 'you_teach'
+                        : themVal > meVal ? 'they_teach'
+                        : 'equal';
+        breakdown.push({ subj, me: meVal, them: themVal, cs: Math.round(cs), direction });
+    });
+
+    breakdown.sort((a, b) => b.cs - a.cs);
+
+    const availOverlap = getAvailOverlap(myAvailability, theirData.availability);
+    const availBonus   = availOverlap.length > 0 ? 5 : 0;
+    const raw   = allSubjects.size > 0 ? total / allSubjects.size : 0;
+    const score = Math.min(99, Math.round(raw * 1.8 + availBonus));
+
+    return { score, breakdown, availOverlap };
+}
+
+function getAvailOverlap(mine, theirs) {
+    return mine.filter(m => theirs.some(t => t.day === m.day && t.slot === m.slot));
+}
+
+window.rerunMatch = async function() {
+    showToast('🔄 Refreshing...');
+    await loadAllOnboards();
+    runMatch();
+};
+
+function runMatch() {
+    matchResults = allOnboards
+        .map(ob => {
+            const { score, breakdown, availOverlap } = computeCompat(ob);
+            return { user: ob, score, breakdown, availOverlap };
+        })
+        .filter(r => r.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+    // Best match = highest score non-connected user
+    const topUnconnected = matchResults.find(r => !connectedUids.has(r.user.uid));
+    renderBestMatch(topUnconnected || matchResults[0]);
+    renderMatchList(matchResults);
+    renderConnectedPartners();
+}
+
+// ── CONNECTED PARTNERS SECTION ────────────────────────────────────────
+function renderConnectedPartners() {
+    const section = document.getElementById('connectedSection');
+    const grid    = document.getElementById('connectedGrid');
+    const count   = document.getElementById('connectedCount');
+
+    const connectedMatches = matchResults.filter(r => connectedUids.has(r.user.uid));
+
+    if (!connectedMatches.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    count.textContent = connectedMatches.length + ' partner' + (connectedMatches.length !== 1 ? 's' : '');
+
+    grid.innerHTML = connectedMatches.map(r => {
+        const u = r.user;
+        return `<div class="connected-chip">
+            <div class="connected-av" style="background:${avatarGrad(u.uid)};">${initials(u.name)}</div>
+            <div style="min-width:0;">
+                <div style="font-size:12px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
+                <div style="font-size:10px;color:var(--green-glow);margin-top:2px;">✓ ${r.score}% match · Partner</div>
+                <div style="font-size:10px;color:var(--muted);">👥 Now following each other</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ── MY SKILLS PANEL ───────────────────────────────────────────────────
+function renderMySkills() {
+    const el = document.getElementById('mySkillsPanel');
+    const allMySkills = new Set([...mySkills, ...Object.keys(mySkillLevels)]);
+
+    if (!allMySkills.size) {
+        el.innerHTML = `<div class="empty"><span class="e">📝</span>No skills found.<br><a href="onboard.html" style="color:var(--glow);">Complete onboarding →</a></div>`;
+        return;
+    }
+
+    const entries = [...allMySkills].map(s => [s, mySkillLevels[s] ?? 50]);
+    entries.sort((a, b) => b[1] - a[1]);
+
+    el.innerHTML = entries.map(([subj, val]) => {
+        const color = val >= 70 ? '#10b981' : val >= 50 ? '#f59e0b' : '#ef4444';
+        const label = val >= 70 ? '💪 Strong' : val >= 50 ? '📚 Learning' : '⚠️ Weak';
+        return `
+        <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:5px;">
+                <span style="text-transform:capitalize;">${subj}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:10px;color:${color};">${label}</span>
+                    <span style="font-weight:700;color:${color};">${val}%</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width:${val}%;background:${color};"></div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderMyAvailability() {
+    const el = document.getElementById('myAvailSummary');
+    if (!myAvailability.length) { el.innerHTML=''; return; }
+    const slots = myAvailability.slice(0,4).map(a =>
+        `<span class="chip chip-avail">${a.day} ${a.slot}</span>`
+    ).join('');
+    el.innerHTML = `<div style="margin-bottom:12px;font-size:12px;color:var(--muted);">🗓 Your availability: ${slots}${myAvailability.length>4?` +${myAvailability.length-4} more`:''}</div>`;
+}
+
+// ── BEST MATCH HERO ───────────────────────────────────────────────────
+function renderBestMatch(top) {
+    const hero  = document.getElementById('bestMatchHero');
+    const noMsg = document.getElementById('noMatchMsg');
+
+    if (!top || top.score === 0) {
+        hero.style.display  = 'none';
+        noMsg.style.display = 'block';
+        return;
+    }
+    noMsg.style.display = 'none';
+    hero.style.display  = 'block';
+
+    const u           = top.user;
+    const isConnected = connectedUids.has(u.uid);
+    const theyTeachMe = top.breakdown.filter(b => b.direction === 'they_teach').slice(0, 3);
+    const iTeachThem  = top.breakdown.filter(b => b.direction === 'you_teach').slice(0, 3);
+
+    const availHTML = top.availOverlap.length
+        ? `<div class="avail-match">🗓 <strong>Shared availability:</strong> ${top.availOverlap.map(a=>`<span class="chip chip-avail">${a.day} ${a.slot}</span>`).join('')}</div>`
+        : '';
+
+    const actionBtn = isConnected
+        ? `<span class="follower-badge">✅ Connected · Now following each other</span>
+           <a href="dashboard.html" class="btn btn-ghost btn-sm">View on Dashboard →</a>`
+        : `<button class="btn btn-primary"
+               onclick="sendInvite('${u.uid}','${(u.name).replace(/'/g,"\\'")}',${top.score})">
+               🤝 Send Study Invite to ${u.name}
+           </button>
+           <button class="btn btn-ghost btn-sm" onclick="showCompat('${u.uid}')">📊 Full Breakdown</button>`;
+
+    hero.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+            <div>
+                <div class="section-tag">🎯 Best Complementary Match</div>
+                <h2 style="font-family:var(--syne);font-weight:800;font-size:26px;margin-bottom:8px;">
+                    ${top.score}% Compatibility
+                </h2>
+                <p style="font-size:14px;color:var(--muted);max-width:420px;">
+                    <strong style="color:#e2e8f0;">${u.name}</strong>'s onboard skill levels directly
+                    complement yours. A perfect teaching pair.
+                </p>
+            </div>
+            <span style="background:${isConnected?'rgba(16,185,129,0.2)':'rgba(16,185,129,0.2)'};color:var(--green-glow);font-size:13px;padding:8px 20px;border-radius:999px;font-weight:600;align-self:flex-start;">
+                ${isConnected ? '✅ Study Partner' : 'Stable Match ✓'}
+            </span>
+        </div>
+        <div class="connector">
+            <div style="min-width:130px;">
+                <div class="user-bubble" style="background:rgba(109,40,217,0.2);border-color:var(--accent);margin-bottom:8px;">${initials(myUserData.name)}</div>
+                <div style="font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;">You</div>
+                <div>
+                    ${iTeachThem.map(b=>`<span class="chip chip-strong">✓ ${b.subj} (${b.me}%)</span>`).join('')}
+                    ${theyTeachMe.map(b=>`<span class="chip chip-weak">✗ ${b.subj} (${b.me}%)</span>`).join('')}
+                </div>
+            </div>
+            <div class="conn-line"></div>
+            <div style="min-width:130px;text-align:right;">
+                <div class="user-bubble" style="background:rgba(8,145,178,0.2);border-color:var(--teal);margin-bottom:8px;margin-left:auto;">${initials(u.name)}</div>
+                <div style="font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;">${u.name}</div>
+                <div style="text-align:right;">
+                    ${theyTeachMe.map(b=>`<span class="chip chip-strong">✓ ${b.subj} (${b.them}%)</span>`).join('')}
+                    ${iTeachThem.map(b=>`<span class="chip chip-weak">✗ ${b.subj} (${b.them}%)</span>`).join('')}
+                </div>
+            </div>
+        </div>
+        ${availHTML}
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            ${actionBtn}
+            <div style="margin-left:auto;font-size:12px;color:var(--muted);">
+                ${u.university ? `🏫 ${u.university}` : ''}
+                ${u.xp     ? `&nbsp;·&nbsp;⚡${u.xp}XP`   : ''}
+                ${u.streak ? `&nbsp;·&nbsp;🔥${u.streak}d` : ''}
+            </div>
+        </div>`;
+}
+
+// ── MATCH LIST ────────────────────────────────────────────────────────
+function renderMatchList(results) {
+    const el = document.getElementById('matchList');
+    const unconnectedCount = results.filter(r => !connectedUids.has(r.user.uid)).length;
+    document.getElementById('matchCountBadge').textContent =
+        unconnectedCount ? `${unconnectedCount} found` : '';
+
+    if (!results.length) {
+        el.innerHTML = `<div class="empty"><span class="e">🔍</span>No matches yet.<br>Ask others to complete onboarding!</div>`;
+        return;
+    }
+
+    el.innerHTML = results.slice(0, 12).map(r => {
+        const u           = r.user;
+        const isConnected = connectedUids.has(u.uid);
+        const isPending   = pendingUids.has(u.uid);
+        const color       = r.score >= 75 ? '#10b981' : r.score >= 50 ? '#f59e0b' : '#9ca3af';
+
+        const theyTeach = r.breakdown.filter(b => b.direction === 'they_teach')
+            .slice(0, 2).map(b => `${b.subj}(${b.them}%)`).join(', ');
+        const youTeach  = r.breakdown.filter(b => b.direction === 'you_teach')
+            .slice(0, 2).map(b => `${b.subj}(${b.me}%)`).join(', ');
+
+        const availBadge = r.availOverlap.length
+            ? `<span style="font-size:10px;color:var(--teal-glow);">🗓 ${r.availOverlap.length} shared slot${r.availOverlap.length>1?'s':''}</span>`
+            : '';
+
+        // Action button — changes based on connection state
+        let actionBtn;
+        if (isConnected) {
+            actionBtn = `<span class="chip chip-connected" style="white-space:nowrap;">✅ Partner</span>`;
+        } else if (isPending) {
+            actionBtn = `<button class="btn btn-ghost btn-sm" disabled style="white-space:nowrap;opacity:0.6;cursor:default;">⏳ Pending</button>`;
+        } else {
+            actionBtn = `<button class="btn btn-primary btn-sm"
+                onclick="event.stopPropagation();sendInvite('${u.uid}','${(u.name).replace(/'/g,"\\'")}',${r.score})"
+                style="white-space:nowrap;">Invite</button>`;
+        }
+
+        return `
+        <div class="match-card ${isConnected?'connected':''}" id="mc-${u.uid}" onclick="selectMatch('${u.uid}')">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div class="score-ring" style="border-color:${isConnected?'#10b981':color};color:${isConnected?'#10b981':color};">
+                    ${r.score}%
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:14px;font-weight:600;margin-bottom:2px;">
+                        ${u.name}
+                        ${isConnected ? '<span style="font-size:10px;color:var(--green-glow);margin-left:6px;">👥 Following</span>' : ''}
+                    </div>
+                    <div style="font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap;">
+                        ${u.university ? `<span>🏫 ${u.university}</span>` : ''}
+                        ${u.xp     ? `<span>⚡${u.xp}XP</span>`     : ''}
+                        ${u.streak ? `<span>🔥${u.streak}d</span>`   : ''}
+                        ${availBadge}
+                    </div>
+                    ${theyTeach ? `<div style="font-size:10px;color:var(--green-glow);margin-bottom:2px;">📈 They teach you: <strong>${theyTeach}</strong></div>` : ''}
+                    ${youTeach  ? `<div style="font-size:10px;color:var(--teal-glow);">📚 You teach them: <strong>${youTeach}</strong></div>`  : ''}
+                    <div class="progress-bar" style="margin-top:6px;">
+                        <div class="progress-fill" style="width:${r.score}%;background:${isConnected?'#10b981':color};"></div>
+                    </div>
+                </div>
+                ${actionBtn}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ── SELECT → BREAKDOWN ────────────────────────────────────────────────
+window.selectMatch = function(uid) {
+    document.querySelectorAll('.match-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('mc-' + uid);
+    if (card) card.classList.add('selected');
+    showCompat(uid);
+};
+
+window.showCompat = function(uid) {
+    const result = matchResults.find(r => r.user.uid === uid);
+    if (!result) return;
+
+    const u  = result.user;
+    const bd = result.breakdown.slice(0, 10);
+    const el = document.getElementById('compatDetails');
+    const isConnected = connectedUids.has(uid);
+
+    const actionBtn = isConnected
+        ? `<span class="follower-badge">✅ Study Partner · Following each other</span>`
+        : `<button class="btn btn-primary btn-sm"
+               onclick="sendInvite('${u.uid}','${(u.name).replace(/'/g,"\\'")}',${result.score})">
+               🤝 Invite ${u.name}
+           </button>`;
+
+    el.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+                <span style="font-size:14px;font-weight:600;">
+                    ${result.score}% match with <span style="color:var(--glow);">${u.name}</span>
+                </span>
+                <div style="font-size:11px;color:var(--muted);margin-top:3px;">
+                    Based on <code style="color:var(--glow);">onboards.skillLevels</code>
+                </div>
+            </div>
+            ${actionBtn}
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:16px;font-size:11px;flex-wrap:wrap;">
+            <span style="display:flex;align-items:center;gap:5px;">
+                <span style="width:14px;height:4px;border-radius:2px;background:#6d28d9;display:inline-block;"></span> You
+            </span>
+            <span style="display:flex;align-items:center;gap:5px;">
+                <span style="width:14px;height:4px;border-radius:2px;background:#10b981;display:inline-block;"></span> ${u.name}
+            </span>
+            <span style="color:var(--green-glow);">📈 they teach you</span>
+            <span style="color:var(--teal-glow);">📚 you teach them</span>
+            <span style="color:var(--muted);">🤝 equal level</span>
+        </div>
+        ${bd.map(b => {
+            const dir   = b.direction === 'they_teach' ? '📈 They teach you'
+                        : b.direction === 'you_teach'  ? '📚 You teach them' : '🤝 Similar level';
+            const color = b.direction === 'they_teach' ? '#10b981'
+                        : b.direction === 'you_teach'  ? '#22d3ee' : '#6b7280';
+            return `
+            <div class="compat-row">
+                <div class="compat-label">
+                    <span style="font-weight:600;text-transform:capitalize;">${b.subj}</span>
+                    <span style="color:${color};">${dir}
+                        <span style="color:var(--muted);">(gap: ${Math.abs(b.me - b.them)}%)</span>
+                    </span>
+                </div>
+                <div class="double-bar">
+                    <span class="bar-label" style="text-align:right;">You ${b.me}%</span>
+                    <div style="flex:1;" class="progress-bar">
+                        <div class="progress-fill" style="width:${b.me}%;background:#6d28d9;"></div>
+                    </div>
+                    <div style="flex:1;" class="progress-bar">
+                        <div class="progress-fill" style="width:${b.them}%;background:${color};"></div>
+                    </div>
+                    <span class="bar-label">Them ${b.them}%</span>
+                </div>
+            </div>`;
+        }).join('')}
+        ${result.availOverlap.length ? `
+        <div class="avail-match" style="margin-top:16px;">
+            <strong>🗓 Shared availability slots:</strong><br>
+            <div style="margin-top:8px;">
+                ${result.availOverlap.map(a => `<span class="chip chip-avail">${a.day} · ${a.slot}</span>`).join('')}
+            </div>
+        </div>` : `<div style="margin-top:14px;font-size:12px;color:var(--muted);">🗓 No overlapping availability slots found.</div>`}`;
+
+    document.getElementById('compatCard').style.display = 'block';
+    document.getElementById('compatCard').scrollIntoView({ behavior:'smooth', block:'nearest' });
+};
+
+// ── SEND INVITE ───────────────────────────────────────────────────────
+window.sendInvite = async function(toUid, toName, score) {
+    if (!currentUid) return;
+    if (connectedUids.has(toUid)) { showToast('✅ Already connected with ' + toName); return; }
+
+    const existQ = query(
+        collection(db, 'invites'),
+        where('fromUid', '==', currentUid),
+        where('toUid',   '==', toUid),
+        where('status',  '==', 'pending')
+    );
+    const ex = await getDocs(existQ);
+    if (!ex.empty) { showToast(`⚠️ Already sent an invite to ${toName}`); return; }
+
+    const sorted       = Object.entries(mySkillLevels).sort((a,b)=>b[1]-a[1]);
+    const myStrong     = sorted.filter(([,v])=>v>=65).slice(0,3).map(([k])=>k).join(', ');
+    const myWeak       = sorted.filter(([,v])=>v<50 ).slice(0,3).map(([k])=>k).join(', ');
+    const theirEntry   = allOnboards.find(o=>o.uid===toUid);
+    const overlap      = theirEntry ? getAvailOverlap(myAvailability, theirEntry.availability) : [];
+    const sharedSlots  = overlap.map(a=>`${a.day} ${a.slot}`).join(', ');
+
+    await addDoc(collection(db, 'invites'), {
+        fromUid:       currentUid,
+        fromName:      myUserData.name || 'Someone',
+        fromUniversity:myUserData.university || '',
+        fromStrong:    myStrong,
+        fromWeak:      myWeak,
+        sharedSlots,
+        toUid,
+        toName,
+        compatScore:   score || 0,
+        status:        'pending',
+        createdAt:     serverTimestamp()
+    });
+
+    showToast(`✅ Invite sent to ${toName}!`);
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// ACCEPT / DECLINE INVITES
+// When ACCEPTED: write mutual follow to BOTH users' social subcollections
+// This is the key integration: dashboard.html watchSocial() will pick it up live
+// ══════════════════════════════════════════════════════════════════════
+window.respondInvite = async function(inviteId, status, fromUid, fromName, fromData) {
+    try {
+        // 1. Update invite status
+        await updateDoc(doc(db, 'invites', inviteId), {
+            status,
+            respondedAt: serverTimestamp()
+        });
+
+        if (status === 'accepted') {
+            // ── 2. Get both users' profile data for the follow docs ──
+            const [mySnap, theirSnap] = await Promise.all([
+                getDoc(doc(db, 'users', currentUid)),
+                getDoc(doc(db, 'users', fromUid))
+            ]);
+            const myData    = mySnap.exists()    ? mySnap.data()    : {};
+            const theirData = theirSnap.exists() ? theirSnap.data() : {};
+
+            const myName    = myData.displayName    || myData.name    || myUserData?.name    || 'User';
+            const theirDataName = theirData.displayName || theirData.name || fromName || 'User';
+
+            // ── 3. Write MUTUAL follow to Firestore social subcollections ──
+            // I follow them
+            await setDoc(doc(db, 'social', currentUid, 'following', fromUid), {
+                displayName: theirDataName,
+                email:       theirData.email       || '',
+                color:       theirData.color        || '#4d94ff',
+                subject:     theirData.subject      || fromData?.subject || 'Studying',
+                subjects:    theirData.subjects     || [],
+                matchScore:  fromData?.compatScore  || 0,
+                matched:     true,
+                followedAt:  serverTimestamp()
+            });
+
+            // They follow me
+            await setDoc(doc(db, 'social', fromUid, 'following', currentUid), {
+                displayName: myName,
+                email:       myData.email    || '',
+                color:       myData.color    || '#6a4dff',
+                subject:     myData.subject  || 'Studying',
+                subjects:    myData.subjects || [],
+                matchScore:  fromData?.compatScore || 0,
+                matched:     true,
+                followedAt:  serverTimestamp()
+            });
+
+            // I appear in their followers
+            await setDoc(doc(db, 'social', fromUid, 'followers', currentUid), {
+                displayName: myName,
+                email:       myData.email   || '',
+                color:       myData.color   || '#6a4dff',
+                subject:     myData.subject || 'Studying',
+                matchScore:  fromData?.compatScore || 0,
+                matched:     true,
+                followedAt:  serverTimestamp()
+            });
+
+            // They appear in my followers
+            await setDoc(doc(db, 'social', currentUid, 'followers', fromUid), {
+                displayName: theirDataName,
+                email:       theirData.email       || '',
+                color:       theirData.color        || '#4d94ff',
+                subject:     theirData.subject      || 'Studying',
+                matchScore:  fromData?.compatScore  || 0,
+                matched:     true,
+                followedAt:  serverTimestamp()
+            });
+
+            // ── 4. Update matchedCount on both user docs ──
+            try {
+                await updateDoc(doc(db,'users',currentUid), {
+                    matchedCount: (myData.matchedCount||0) + 1,
+                    matchedThisWeek: (myData.matchedThisWeek||0) + 1
+                });
+                await updateDoc(doc(db,'users',fromUid), {
+                    matchedCount: (theirData.matchedCount||0) + 1,
+                    matchedThisWeek: (theirData.matchedThisWeek||0) + 1
+                });
+            } catch(e) { console.warn('matchedCount update failed (non-critical):', e); }
+
+            showToast(`🎉 Accepted! You and ${fromName} are now study partners & following each other.`);
+            document.getElementById('invitePanel').style.display = 'none';
+
+            // connectedUids will auto-update via listenFollowers() snapshot
+        } else {
+            showToast(`❌ Declined ${fromName}'s invite.`);
+        }
+    } catch(e) {
+        console.error('respondInvite failed:', e);
+        showToast('⚠️ Error: ' + e.message);
+    }
+};
+
+// ── REAL-TIME INCOMING INVITES ────────────────────────────────────────
+function listenInvites() {
+    if (unsubInvites) unsubInvites();
+
+    const q = query(
+        collection(db, 'invites'),
+        where('toUid',  '==', currentUid),
+        where('status', '==', 'pending')
+    );
+    unsubInvites = onSnapshot(q, snap => {
+        const invites = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderInvites(invites);
+        const count = document.getElementById('bellCount');
+        if (invites.length) {
+            count.textContent   = invites.length;
+            count.style.display = 'flex';
+        } else {
+            count.style.display = 'none';
+        }
+    });
+
+    // My sent invites accepted → notify me
+    onSnapshot(
+        query(collection(db,'invites'), where('fromUid','==',currentUid), where('status','==','accepted')),
+        snap => {
+            snap.docChanges().forEach(ch => {
+                if (ch.type === 'added' || ch.type === 'modified') {
+                    const d = ch.doc.data();
+                    // Only toast on changes, not initial load
+                    if (ch.type === 'modified') {
+                        showToast(`🎉 ${d.toName} accepted your invite! Now following each other.`);
+                    }
+                }
+            });
+        }
+    );
+}
+
+function renderInvites(invites) {
+    const el = document.getElementById('inviteList');
+    if (!invites.length) {
+        el.innerHTML = `<div class="empty"><span class="e">🎉</span>No pending invites!</div>`;
+        return;
+    }
+    el.innerHTML = invites.map(inv => `
+        <div class="invite-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div class="avatar" style="background:${avatarGrad(inv.fromUid)};">${initials(inv.fromName)}</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;">${inv.fromName}</div>
+                    <div style="font-size:11px;color:var(--muted);">${inv.fromUniversity || 'wants to study with you'}</div>
+                    <div style="font-size:11px;color:var(--green-glow);margin-top:2px;">🎯 ${inv.compatScore}% compatibility</div>
+                </div>
+            </div>
+            ${inv.fromStrong ? `<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">💪 Their strengths: <span style="color:var(--green-glow);">${inv.fromStrong}</span></div>` : ''}
+            ${inv.fromWeak   ? `<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">⚠️ Their gaps: <span style="color:#f87171;">${inv.fromWeak}</span></div>` : ''}
+            ${inv.sharedSlots? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">🗓 Free together: <span style="color:var(--teal-glow);">${inv.sharedSlots}</span></div>` : ''}
+            <div style="display:flex;gap:8px;">
+                <button class="btn btn-success btn-sm" style="flex:1;justify-content:center;"
+                    onclick="respondInvite('${inv.id}','accepted','${inv.fromUid}','${(inv.fromName||'').replace(/'/g,"\\'")}',${JSON.stringify({compatScore:inv.compatScore,subject:inv.fromStrong||''}).replace(/"/g,'&quot;')})">
+                    ✓ Accept
+                </button>
+                <button class="btn btn-danger btn-sm" style="flex:1;justify-content:center;"
+                    onclick="respondInvite('${inv.id}','declined','${inv.fromUid}','${(inv.fromName||'').replace(/'/g,"\\'")}',{})">
+                    ✗ Decline
+                </button>
+            </div>
+        </div>`).join('');
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────
+window.togglePanel = function() {
+    const p = document.getElementById('invitePanel');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+};
+document.addEventListener('click', e => {
+    const p = document.getElementById('invitePanel');
+    const b = document.getElementById('navRight');
+    if (p && p.style.display === 'block' && !p.contains(e.target) && !b.contains(e.target))
+        p.style.display = 'none';
+});
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window._tt);
+    window._tt = setTimeout(() => t.classList.remove('show'), 3500);
+}
+window.showToast = showToast;
+</script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intro page</title>
+    <link rel="stylesheet" href="stylesheet1.css">
+</head>
+
+<body>
+    <!-- Background -->
+    <canvas id="canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Navbar -->
+    <nav id="main-nav">
+        <!-- Logo should navigate to landing page 
+        <a href="landing.html" class="nav-logo">  -->
+        <div class="nav-logo-icon">🔗</div>
+        StudySphere
+        </a>
+
+        <div class="nav-links" id="navLinks">
+            <a class="nav-link active" href="main.html"></a>
+        </div>
+
+        <!-- CTA should also navigate normally -->
+        <a href="login.html" class="nav-cta">Get Started →
+        </a>
+    </nav>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <div id="page-intro" class="page active">
+            <!-- HERO -->
+            <section class="hero-section" style="position:relative; overflow:hidden;">
+                <div class="particles-bg">
+                    <div class="hero-orb"
+                        style="width:600px;height:400px;top:-100px;left:-100px;background:radial-gradient(ellipse,rgba(109,40,217,0.12),transparent);">
+                    </div>
+                    <div class="hero-orb"
+                        style="width:500px;height:400px;bottom:-50px;right:-100px;background:radial-gradient(ellipse,rgba(8,145,178,0.1),transparent);">
+                    </div>
+                    <div class="particle"
+                        style="width:6px;height:6px;background:var(--glow);top:15%;left:10%;--dur:7s;--delay:0s;"></div>
+                    <div class="particle"
+                        style="width:4px;height:4px;background:var(--teal-glow);top:60%;left:20%;--dur:5s;--delay:1s;">
+                    </div>
+                    <div class="particle"
+                        style="width:8px;height:8px;background:var(--orange-glow);top:30%;right:15%;--dur:8s;--delay:2s;">
+                    </div>
+                    <div class="particle"
+                        style="width:5px;height:5px;background:var(--green-glow);top:80%;right:30%;--dur:6s;--delay:0.5s;">
+                    </div>
+                    <div class="particle"
+                        style="width:3px;height:3px;background:var(--pink);top:70%;left:5%;--dur:9s;--delay:1.5s;">
+                    </div>
+                </div>
+                <div class="content" style="position:relative;z-index:2;">
+                    <div class="hero-grid">
+                        <div class="hero-left">
+                            <div class="hero-eyebrow">
+                                <div class="live-dot"></div>
+                                🏆 Hackathon-Ready Platform • 2026 Trend
+                            </div>
+                            <h1 class="hero-title">
+                                Find Your<br>
+                                <span class="gradient-text">Perfect Study</span><br>
+                                Match with AI
+                            </h1>
+                            <p class="hero-desc">
+                                StudySphere AI uses <strong>Predictive Skill Gap Analysis</strong> to pair you with study
+                                partners who have your missing knowledge piece — not just the same class name. Stop
+                                wasting
+                                sessions with everyone equally confused.
+                            </p>
+                            <div class="hero-actions">
+                                <a href="#" class="btn btn-primary" onclick="showPage('onboard')">🚀 Start Matching
+                                    Free</a>
+                                <a href="#" class="btn btn-outline" onclick="showPage('dashboard')">👀 View
+                                    Dashboard</a>
+                            </div>
+                            <div class="hero-stats">
+                                <div>
+                                    <div class="hero-stat-val">94%</div>
+                                    <div class="hero-stat-lbl">Match Accuracy</div>
+                                </div>
+                                <div>
+                                    <div class="hero-stat-val">2.4×</div>
+                                    <div class="hero-stat-lbl">Faster Learning</div>
+                                </div>
+                                <div>
+                                    <div class="hero-stat-val">12K+</div>
+                                    <div class="hero-stat-lbl">Active Students</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FLOATING CARDS CLUSTER -->
+                        <div class="hero-right">
+                            <div class="central-orb">🔗</div>
+
+                            <!-- Orbit dots -->
+                            <div
+                                style="position:absolute;top:50%;left:50%;margin:-120px 0 0 -120px;width:240px;height:240px;">
+                                <div class="orbit-dot"
+                                    style="background:rgba(109,40,217,0.3);border:1px solid rgba(109,40,217,0.5);animation:orbit 8s linear infinite;">
+                                    A</div>
+                                <div class="orbit-dot"
+                                    style="background:rgba(8,145,178,0.3);border:1px solid rgba(8,145,178,0.5);animation:orbit 8s linear infinite;animation-delay:-2.7s;">
+                                    M</div>
+                                <div class="orbit-dot"
+                                    style="background:rgba(5,150,105,0.3);border:1px solid rgba(5,150,105,0.5);animation:orbit 8s linear infinite;animation-delay:-5.3s;">
+                                    P</div>
+                            </div>
+
+                            <!-- Floating cards -->
+                            <div class="float-card" style="top:8%;left:0;--dur:6s;--delay:0s;">
+                                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🎯 Match Found</div>
+                                <div style="font-size:13px;font-weight:600;">94% Compatible!</div>
+                                <div style="font-size:11px;color:var(--teal-glow);margin-top:2px;">Aisha ↔ Marcus</div>
+                            </div>
+
+                            <div class="float-card" style="top:8%;right:0;--dur:7s;--delay:1s;">
+                                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⚡ Teaching XP</div>
+                                <div style="font-size:13px;font-weight:600;color:var(--orange-glow);">+150 XP earned
+                                </div>
+                                <div style="font-size:11px;color:var(--muted);">Krebs Cycle explained</div>
+                            </div>
+
+                            <div class="float-card" style="bottom:30%;left:-5%;--dur:5s;--delay:0.5s;">
+                                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🧠 Group Mood</div>
+                                <div style="display:flex;gap:4px;align-items:center;">
+                                    <div
+                                        style="width:80px;height:6px;background:var(--dim);border-radius:3px;overflow:hidden;">
+                                        <div
+                                            style="width:74%;height:100%;background:linear-gradient(90deg,var(--accent),var(--green-glow));border-radius:3px;">
+                                        </div>
+                                    </div>
+                                    <span style="font-size:12px;font-weight:600;color:var(--green-glow);">74%</span>
+                                </div>
+                            </div>
+
+                            <div class="float-card" style="bottom:30%;right:-5%;--dur:8s;--delay:1.5s;">
+                                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🔮 Exam Oracle</div>
+                                <div style="font-size:12px;color:var(--glow);">87% chance: Krebs Cycle</div>
+                                <div style="font-size:11px;color:var(--muted);">appears on tomorrow's exam</div>
+                            </div>
+
+                            <div class="float-card"
+                                style="bottom:5%;left:50%;transform:translateX(-50%);--dur:6.5s;--delay:0.8s;">
+                                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🔥 Group Streak</div>
+                                <div style="display:flex;gap:12px;">
+                                    <span style="font-size:12px;">Leon <strong
+                                            style="color:var(--orange-glow);">30🔥</strong></span>
+                                    <span style="font-size:12px;">Marcus <strong
+                                            style="color:var(--orange-glow);">21🔥</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROBLEM / SOLUTION -->
+            <section class="problem-section" style="background:var(--surface);">
+                <div class="content">
+                    <div style="text-align:center;margin-bottom:60px;">
+                        <div class="section-tag" style="justify-content:center;">The Problem We Solve</div>
+                        <h2 class="heading-lg">Why Current Study Groups <span class="gradient-text">Fail</span></h2>
+                    </div>
+                    <div class="grid-2">
+                        <div class="problem-card">
+                            <div style="font-size:36px;margin-bottom:16px;">❌</div>
+                            <h3
+                                style="font-family:var(--syne);font-size:20px;font-weight:800;margin-bottom:14px;color:var(--red);">
+                                The Old Way</h3>
+                            <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--red);font-size:16px;">✗</span> Matched by class name only —
+                                    ignores actual knowledge levels
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--red);font-size:16px;">✗</span> One person does all the
+                                    work,
+                                    others just copy
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--red);font-size:16px;">✗</span> Everyone equally confused —
+                                    no
+                                    one can help anyone
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--red);font-size:16px;">✗</span> Off-topic for 40+ minutes
+                                    with
+                                    no accountability
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--red);font-size:16px;">✗</span> No structure, no agenda, no
+                                    outcome tracking
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="solution-card">
+                            <div style="font-size:36px;margin-bottom:16px;">✅</div>
+                            <h3
+                                style="font-family:var(--syne);font-size:20px;font-weight:800;margin-bottom:14px;color:var(--green-glow);">
+                                The Studysphere Way</h3>
+                            <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--green-glow);font-size:16px;">✓</span> AI extracts Knowledge
+                                    Vectors from your notes
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--green-glow);font-size:16px;">✓</span> Matches you with
+                                    someone
+                                    who has YOUR missing piece
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--green-glow);font-size:16px;">✓</span> Shadow AI Moderator
+                                    keeps
+                                    sessions on track
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--green-glow);font-size:16px;">✓</span> Dynamic agenda
+                                    generated
+                                    from collective weak spots
+                                </li>
+                                <li
+                                    style="font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;">
+                                    <span style="color:var(--green-glow);font-size:16px;">✓</span> Gamified teaching
+                                    with
+                                    XP, streaks, and badges
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FEATURES GRID -->
+            <section class="features-strip">
+                <div class="content">
+                    <div style="text-align:center;margin-bottom:60px;">
+                        <div class="section-tag" style="justify-content:center;">Core Features</div>
+                        <h2 class="heading-lg">Everything You Need to <span class="gradient-text">Learn Smarter</span>
+                        </h2>
+                        <p
+                            style="color:var(--muted);margin-top:14px;font-size:16px;max-width:500px;margin-inline:auto;">
+                            8
+                            powerful tools, one unified platform, infinite collaborative potential.</p>
+                    </div>
+                    <div class="grid-3" style="gap:16px;">
+                        <!-- Feature cards -->
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(109,40,217,0.15);">🎯</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">
+                                SmartMatch
+                                Algorithm</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Gale-Shapley inspired matching
+                                weighted by complementary knowledge vectors. Maximum group knowledge, minimum weak
+                                overlap.
+                            </p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(8,145,178,0.15);">🤖</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">Shadow
+                                AI
+                                Moderator</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Sits in your group chat.
+                                Detects
+                                off-topic drift, frustration spikes, and nudges the group back with targeted resources.
+                            </p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(5,150,105,0.15);">📋</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">
+                                Dynamic
+                                Agenda</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">AI scans everyone's quiz
+                                scores
+                                and notes before the session to generate a priority agenda tailored to collective
+                                weaknesses.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(217,119,6,0.15);">🧠</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">Mood
+                                Heatmap</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Real-time frustration
+                                tracking.
+                                When collective frustration spikes, AI suggests a 5-min brain break or queues lo-fi
+                                music.
+                            </p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(219,39,119,0.15);">👻</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">Brain
+                                Twin
+                            </h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">After 3 sessions, AI builds a
+                                study clone trained on your notes and style. Answers questions on your behalf when
+                                you're
+                                offline.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(109,40,217,0.15);">🔮</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">Exam
+                                Oracle</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">48 hours before exam day, AI
+                                cross-references group weak zones to generate the 10 highest-probability personalized
+                                exam
+                                questions.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(8,145,178,0.15);">💸</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">
+                                Knowledge
+                                Debt Ledger</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">Tracks who taught whom what
+                                concept. Creates a social economy of teaching with exclusive Teaching XP and social
+                                accountability.</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(220,38,38,0.15);">⚡</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">Flash
+                                Duel
+                                Mode</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">60-second flashcard battles
+                                between peers with overlapping weak areas. Loser must teach winner the concept they
+                                missed.
+                            </p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background:rgba(5,150,105,0.15);">🔥</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">
+                                Confusion
+                                Heatmap</h4>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.6;">When 2+ members highlight the
+                                same
+                                paragraph in shared docs, AI auto-detects the collective confusion zone and simplifies
+                                it.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HOW IT WORKS -->
+            <section style="padding:100px 0;background:var(--bg);">
+                <div class="content">
+                    <div style="text-align:center;margin-bottom:60px;">
+                        <div class="section-tag" style="justify-content:center;">The AI Secret Sauce</div>
+                        <h2 class="heading-lg">How StudySphere <span class="gradient-text">Works</span></h2>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:0;">
+                        <!-- Steps -->
+                        <div
+                            style="display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;margin-bottom:0;">
+                            <div style="padding:32px;background:var(--card);border:1px solid var(--border);border-radius:20px;"
+                                class="anim-fade-up">
+                                <div style="font-size:40px;margin-bottom:12px;">📤</div>
+                                <h4 style="font-family:var(--syne);font-weight:800;font-size:18px;margin-bottom:8px;">1.
+                                    Ingest</h4>
+                                <p style="font-size:14px;color:var(--muted);line-height:1.6;">Upload your notes, connect
+                                    Canvas/Blackboard, or paste recent quiz scores. Our LLM engine processes everything
+                                    silently.</p>
+                            </div>
+                            <div style="display:flex;justify-content:center;">
+                                <div
+                                    style="width:2px;height:80px;background:linear-gradient(180deg,var(--accent),var(--teal-glow));">
+                                </div>
+                            </div>
+                            <div></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;">
+                            <div></div>
+                            <div style="display:flex;justify-content:center;">
+                                <div
+                                    style="width:2px;height:80px;background:linear-gradient(180deg,var(--teal-glow),var(--green-glow));">
+                                </div>
+                            </div>
+                            <div style="padding:32px;background:var(--card);border:1px solid var(--border);border-radius:20px;"
+                                class="anim-fade-up-2">
+                                <div style="font-size:40px;margin-bottom:12px;">🧬</div>
+                                <h4 style="font-family:var(--syne);font-weight:800;font-size:18px;margin-bottom:8px;">2.
+                                    Profile</h4>
+                                <p style="font-size:14px;color:var(--muted);line-height:1.6;">Gemini 1.5 Pro extracts a
+                                    Knowledge Vector ranking your proficiency in every sub-topic. E.g., <em>Biology →
+                                        Genetics → CRISPR: 82%</em></p>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;">
+                            <div style="padding:32px;background:var(--card);border:1px solid var(--border);border-radius:20px;"
+                                class="anim-fade-up-3">
+                                <div style="font-size:40px;margin-bottom:12px;">⚖️</div>
+                                <h4 style="font-family:var(--syne);font-weight:800;font-size:18px;margin-bottom:8px;">3.
+                                    Match</h4>
+                                <p style="font-size:14px;color:var(--muted);line-height:1.6;">Modified Gale-Shapley
+                                    algorithm maximizes total group knowledge while minimizing overlap of weak areas.
+                                    Your
+                                    puzzle pieces fit.</p>
+                            </div>
+                            <div style="display:flex;justify-content:center;">
+                                <div
+                                    style="width:2px;height:80px;background:linear-gradient(180deg,var(--green-glow),var(--glow));">
+                                </div>
+                            </div>
+                            <div></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;">
+                            <div></div>
+                            <div style="display:flex;justify-content:center;">
+                                <div
+                                    style="width:2px;height:80px;background:linear-gradient(180deg,var(--glow),var(--orange-glow));">
+                                </div>
+                            </div>
+                            <div style="padding:32px;background:var(--card);border:1px solid var(--border);border-radius:20px;"
+                                class="anim-fade-up-4">
+                                <div style="font-size:40px;margin-bottom:12px;">🚀</div>
+                                <h4 style="font-family:var(--syne);font-weight:800;font-size:18px;margin-bottom:8px;">4.
+                                    Collaborate</h4>
+                                <p style="font-size:14px;color:var(--muted);line-height:1.6;">AI moderates your session
+                                    in
+                                    real-time — detecting confusion, generating peer-teaching prompts, and tracking
+                                    learning
+                                    outcomes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TECH STACK -->
+            <section class="tech-section" style="background:var(--surface);">
+                <div class="content">
+                    <div class="section-tag" style="justify-content:center;">Powered By</div>
+                    <h2 class="heading-lg" style="margin-bottom:36px;">Enterprise-Grade <span class="gradient-text">Tech
+                            Stack</span></h2>
+                    <div>
+                        <span class="tech-pill">🐍 Python</span>
+                        <span class="tech-pill">🤖 Gemini 1.5 Pro</span>
+                        <span class="tech-pill">📊 Scikit-learn</span>
+                        <span class="tech-pill">🔥 Firebase</span>
+                        <span class="tech-pill">⚡ Next.js</span>
+                        <span class="tech-pill">📱 Flutter</span>
+                        <span class="tech-pill">🔗 Canvas LMS API</span>
+                        <span class="tech-pill">🎙️ Emotion AI</span>
+                        <span class="tech-pill">🧮 Gale-Shapley Algorithm</span>
+                        <span class="tech-pill">🧠 NLP Intent Recognition</span>
+                        <span class="tech-pill">📐 Knowledge Vectors</span>
+                        <span class="tech-pill">🔄 Real-time Sync</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- USER PERSONAS -->
+            <section style="padding:100px 0;">
+                <div class="content">
+                    <div style="text-align:center;margin-bottom:60px;">
+                        <div class="section-tag" style="justify-content:center;">User Personas</div>
+                        <h2 class="heading-lg">Built for <span class="gradient-text">Real Students</span></h2>
+                    </div>
+                    <div class="grid-4">
+                        <div class="card" style="padding:24px;text-align:center;transition:transform 0.2s;"
+                            onmouseover="this.style.transform='translateY(-6px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;margin:0 auto 14px;">
+                                A</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;margin-bottom:6px;">Aisha K.</h4>
+                            <div style="font-size:11px;color:var(--glow);margin-bottom:10px;">Biology Pre-Med • Year 2
+                            </div>
+                            <p style="font-size:12px;color:var(--muted);line-height:1.6;">"I ace Genetics but Krebs
+                                Cycle is
+                                my nightmare. I need someone who actually understands it."</p>
+                        </div>
+                        <div class="card" style="padding:24px;text-align:center;transition:transform 0.2s;"
+                            onmouseover="this.style.transform='translateY(-6px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;margin:0 auto 14px;">
+                                M</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;margin-bottom:6px;">Marcus T.</h4>
+                            <div style="font-size:11px;color:var(--teal-glow);margin-bottom:10px;">Physics Major • Year
+                                3
+                            </div>
+                            <p style="font-size:12px;color:var(--muted);line-height:1.6;">"Mechanics is easy for me but
+                                Quantum is wild. I'd trade my Newtonian notes for bio help any day."</p>
+                        </div>
+                        <div class="card" style="padding:24px;text-align:center;transition:transform 0.2s;"
+                            onmouseover="this.style.transform='translateY(-6px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;margin:0 auto 14px;">
+                                P</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;margin-bottom:6px;">Priya S.</h4>
+                            <div style="font-size:11px;color:var(--green-glow);margin-bottom:10px;">Math & CS Double •
+                                Year
+                                2</div>
+                            <p style="font-size:12px;color:var(--muted);line-height:1.6;">"Calculus clicks for me but
+                                Statistics is a mess. I need a study partner, not just a friend who agrees."</p>
+                        </div>
+                        <div class="card" style="padding:24px;text-align:center;transition:transform 0.2s;"
+                            onmouseover="this.style.transform='translateY(-6px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;margin:0 auto 14px;">
+                                L</div>
+                            <h4 style="font-family:var(--syne);font-weight:700;margin-bottom:6px;">Leon W.</h4>
+                            <div style="font-size:11px;color:var(--orange-glow);margin-bottom:10px;">Chemistry PhD Track
+                                •
+                                Year 4</div>
+                            <p style="font-size:12px;color:var(--muted);line-height:1.6;">"30-day study streak. Organic
+                                Chem
+                                is my territory. Spectroscopy and Quantum Chem? Send help."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FINAL CTA -->
+            <section class="cta-section" style="background:var(--surface);">
+                <div class="cta-glow"></div>
+                <div class="content" style="position:relative;z-index:1;">
+                    <div style="max-width:600px;margin:0 auto;">
+                        <div style="font-size:48px;margin-bottom:20px;">🚀</div>
+                        <h2 class="heading-lg" style="margin-bottom:16px;">Ready to Find Your <span
+                                class="gradient-text">Perfect Match?</span></h2>
+                        <p style="font-size:16px;color:var(--muted);margin-bottom:36px;line-height:1.7;">Join thousands
+                            of
+                            students who stopped struggling alone and started learning together — intelligently.</p>
+                        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+                            <a href="#" class="btn btn-primary" onclick="showPage('onboard')"
+                                style="font-size:15px;padding:13px 36px;">🎯 Start Your Free Match</a>
+                            <a href="#" class="btn btn-outline" onclick="showPage('dashboard')"
+                                style="font-size:15px;padding:13px 36px;">📊 Explore Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</body>
+
+</html>

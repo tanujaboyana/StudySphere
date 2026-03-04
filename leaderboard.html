@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - StudySphere </title>
+    <link rel="stylesheet" href="stylesheet1.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card: #111118;
+            --surface: #1a1a24;
+            --border: rgba(255,255,255,0.08);
+            --muted: #6b7280;
+            --accent: #6d28d9;
+            --glow: #a78bfa;
+            --teal: #0891b2;
+            --teal-glow: #22d3ee;
+            --orange: #d97706;
+            --orange-glow: #fbbf24;
+            --green-glow: #34d399;
+            --syne: 'Syne', sans-serif;
+            --inter: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #e2e8f0; font-family: var(--inter, sans-serif); min-height: 100vh; }
+
+        .content-wrapper { max-width: 900px; margin: 0 auto; padding: 100px 20px 60px; }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(109,40,217,0.15);
+            border: 1px solid rgba(109,40,217,0.3);
+            color: var(--glow);
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .heading-lg { font-size: 32px; font-weight: 800; font-family: var(--syne, sans-serif); }
+        .gradient-text { background: linear-gradient(135deg, #a78bfa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; }
+        @media(max-width:700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent), var(--glow));
+            transition: width 0.8s ease;
+        }
+
+        .btn { display: inline-block; padding: 8px 18px; border-radius: 999px; font-size: 13px; cursor: pointer; border: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), #7c3aed); color: #fff; text-decoration: none; }
+        .btn-sm { font-size: 11px; padding: 5px 14px; }
+
+        .lb-tab {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 7px 18px;
+            border-radius: 999px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--inter, sans-serif);
+        }
+        .lb-tab:hover { border-color: var(--accent); color: var(--glow); }
+        .lb-tab.active { background: rgba(109,40,217,0.2); border-color: var(--accent); color: var(--glow); }
+
+        .rank-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            transition: background 0.2s;
+        }
+        .rank-row:hover { background: var(--surface); }
+        .rank-row.is-me {
+            background: rgba(109,40,217,0.12);
+            border: 1px solid rgba(109,40,217,0.3);
+        }
+
+        .rank-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Podium */
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .podium-slot {
+            border-radius: 14px;
+            padding: 18px 12px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .podium-slot:hover { transform: translateY(-4px); }
+        .podium-avatar {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            border: 2px solid;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* Badge grid */
+        .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
+        .badge-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            font-size: 22px;
+            cursor: default;
+            transition: all 0.2s;
+        }
+        .badge-item:hover { border-color: var(--accent); transform: scale(1.05); }
+        .badge-item.locked { opacity: 0.3; filter: grayscale(1); }
+        .badge-item .badge-label { font-size: 9px; color: var(--muted); margin-top: 4px; }
+
+        /* Nav minimal */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 24px; }
+        .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; color: #e2e8f0; text-decoration: none; font-family: var(--syne, sans-serif); }
+        .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav-link { color: var(--muted); text-decoration: none; font-size: 13px; padding: 5px 10px; border-radius: 6px; transition: all 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #e2e8f0; background: var(--surface); }
+
+        #toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--card); border: 1px solid var(--border);
+            color: #e2e8f0; padding: 12px 20px; border-radius: 10px;
+            font-size: 13px; z-index: 9999;
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.3s;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+
+<body>
+    <nav id="main-nav">
+        <a href="landing.html" class="nav-logo">
+            <span>🔗</span> StudySphere
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="landing.html">Intro</a>
+            <a class="nav-link" href="dashboard.html">Dashboard</a>
+            <a class="nav-link" href="match.html">Match</a>
+            <a class="nav-link" href="session.html">Session</a>
+            <a class="nav-link active" href="leaderboard.html">Leaderboard</a>
+            <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+            <a class="nav-link" href="resources.html">Resources</a>
+            <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+            <a class="nav-link" href="onboard.html">Onboard</a>
+             
+        </div>
+        <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
+    </nav>
+
+    <div id="toast"></div>
+
+    <div class="content-wrapper">
+        <div style="margin-bottom:36px;">
+            <div class="section-tag">Rankings</div>
+            <h1 class="heading-lg" style="margin-bottom:6px;">
+                🏆 <span class="gradient-text">Leaderboard</span>
+            </h1>
+            <p style="font-size:14px;">XP rankings, streaks, and badge achievements — updated in real-time</p>
+        </div>
+
+        <!-- Tab Filter -->
+        <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+            <button class="lb-tab active" data-tab="xp" onclick="switchTab('xp',this)">⚡ XP Ranking</button>
+            <button class="lb-tab" data-tab="streak" onclick="switchTab('streak',this)">🔥 Streak</button>
+            <button class="lb-tab" data-tab="sessionsJoined" onclick="switchTab('sessionsJoined',this)">🎓 Sessions</button>
+            <button class="lb-tab" data-tab="teachingSessions" onclick="switchTab('teachingSessions',this)">🧠 Teaching</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="lbLoading" style="text-align:center;padding:60px 0;color:var(--muted);font-size:14px;">
+            <div style="font-size:32px;margin-bottom:12px;">⏳</div>
+            Loading real-time leaderboard...
+        </div>
+
+        <!-- Auth Error -->
+        <div id="lbAuthError" style="display:none;text-align:center;padding:60px 0;">
+            <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+            <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Log in to view real rankings and your position.</p>
+            <a href="login.html" class="btn btn-primary">Go to Login →</a>
+        </div>
+
+        <!-- Main Content -->
+        <div id="lbContent" style="display:none;">
+
+            <!-- Your Rank Banner -->
+            <div id="myRankBanner" class="card" style="padding:16px 24px;margin-bottom:28px;background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(8,145,178,0.1));border:1px solid rgba(109,40,217,0.3);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                <div style="font-size:28px;" id="myRankEmoji">🏅</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;color:var(--muted);margin-bottom:2px;">Your Current Rank</div>
+                    <div style="font-size:22px;font-weight:700;font-family:var(--syne);">
+                        <span id="myRankNum" style="color:var(--glow);">#—</span>
+                        <span style="font-size:14px;color:var(--muted);font-weight:400;" id="myRankOf">of — users</span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:11px;color:var(--muted);">Your XP</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--teal-glow);" id="myXPDisplay">—</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:11px;color:var(--muted);">Streak</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--orange-glow);" id="myStreakDisplay">—</div>
+                </div>
+                <div id="streakWarning" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:6px 12px;font-size:11px;color:#f87171;">
+                    ⚠️ Login daily to keep your streak!
+                </div>
+            </div>
+
+            <!-- Podium (top 3) -->
+            <div class="podium" id="podium" style="margin-bottom:36px;"></div>
+
+            <!-- Full Rankings Table -->
+            <div class="card" style="padding:24px;margin-bottom:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                    <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;" id="tableTitle">⚡ Full XP Rankings</h3>
+                    <span style="font-size:12px;color:var(--green-glow);">🔴 Live</span>
+                </div>
+                <div id="rankTable"></div>
+            </div>
+
+            <!-- Bottom Grid -->
+            <div class="grid-2" style="gap:24px;">
+
+                <!-- Badge Wall -->
+                <div class="card" style="padding:24px;">
+                    <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:18px;">🏅 Your Badges</h3>
+                    <div class="badge-grid" id="badgeGrid"></div>
+                </div>
+
+                <!-- Right column -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+
+                    <!-- Flash Duel -->
+                    <div class="card" style="padding:24px;background:linear-gradient(135deg,rgba(109,40,217,0.1),var(--card));">
+                        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:8px;">⚡ Flash Duel Mode</h3>
+                        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Challenge someone with overlapping weak areas to a 60-second flashcard battle!</p>
+                        <div id="duelCandidates" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px;"></div>
+                    </div>
+
+                    <!-- Progress Analytics -->
+                    <div class="card" style="padding:24px;">
+                        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:14px;">📈 Your Progress</h3>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                                    <span style="color:var(--muted);">Skills Mastered</span>
+                                    <span style="color:var(--green-glow);" id="analyticsMastered">—</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="masteredBar" style="width:0%;"></div></div>
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                                    <span style="color:var(--muted);">Teaching Sessions</span>
+                                    <span style="color:var(--teal-glow);" id="analyticsTeaching">—</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="teachingBar" style="width:0%;background:linear-gradient(90deg,var(--teal),var(--teal-glow));"></div></div>
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                                    <span style="color:var(--muted);">Quiz Average</span>
+                                    <span style="color:var(--orange-glow);" id="analyticsQuiz">—</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="quizBar" style="width:0%;background:linear-gradient(90deg,var(--orange),var(--orange-glow));"></div></div>
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                                    <span style="color:var(--muted);">Weekly XP Earned</span>
+                                    <span style="color:var(--glow);" id="analyticsWeeklyXP">—</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="weeklyXPBar" style="width:0%;"></div></div>
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+                                    <span style="color:var(--muted);">Current Streak</span>
+                                    <span style="color:var(--orange-glow);" id="analyticsStreak">—</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="streakBar" style="width:0%;background:linear-gradient(90deg,#d97706,#fbbf24);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div><!-- end lbContent -->
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDoc,
+            getDocs,
+            query,
+            orderBy,
+            limit,
+            onSnapshot,
+            updateDoc,
+            serverTimestamp,
+            Timestamp,
+            increment
+        } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+            authDomain: "collabsyncai.firebaseapp.com",
+            projectId: "collabsyncai",
+            storageBucket: "collabsyncai.firebasestorage.app",
+            messagingSenderId: "862378374401",
+            appId: "1:862378374401:web:4438203269261b15011700",
+            measurementId: "G-GV97YDHCBK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUid = null;
+        let myUserData = null;
+        let allUsers = [];
+        let currentField = 'xp';
+
+        const AVATAR_GRADIENTS = [
+            'linear-gradient(135deg,#f59e0b,#ef4444)',
+            'linear-gradient(135deg,#6d28d9,#ec4899)',
+            'linear-gradient(135deg,#0891b2,#6d28d9)',
+            'linear-gradient(135deg,#059669,#0891b2)',
+            'linear-gradient(135deg,#d97706,#ec4899)',
+            'linear-gradient(135deg,#7c3aed,#06b6d4)',
+        ];
+
+        const ALL_BADGES = [
+            { id: 'first_login',   icon: '🚀', label: 'First Login',   condition: u => true },
+            { id: 'streak_3',      icon: '🔥', label: '3-Day Streak',  condition: u => (u.streak ?? 0) >= 3 },
+            { id: 'streak_7',      icon: '⚡', label: '7-Day Streak',  condition: u => (u.streak ?? 0) >= 7 },
+            { id: 'streak_30',     icon: '💎', label: '30-Day Streak', condition: u => (u.streak ?? 0) >= 30 },
+            { id: 'sessions_5',    icon: '🎓', label: '5 Sessions',    condition: u => (u.sessionsJoined ?? 0) >= 5 },
+            { id: 'sessions_20',   icon: '🏫', label: '20 Sessions',   condition: u => (u.sessionsJoined ?? 0) >= 20 },
+            { id: 'teach_1',       icon: '🧠', label: 'First Teach',   condition: u => (u.teachingSessions ?? 0) >= 1 },
+            { id: 'teach_10',      icon: '🎤', label: '10 Taught',     condition: u => (u.teachingSessions ?? 0) >= 10 },
+            { id: 'xp_500',        icon: '💫', label: '500 XP',        condition: u => (u.xp ?? 0) >= 500 },
+            { id: 'xp_1000',       icon: '🌟', label: '1000 XP',       condition: u => (u.xp ?? 0) >= 1000 },
+            { id: 'xp_5000',       icon: '🏆', label: '5000 XP',       condition: u => (u.xp ?? 0) >= 5000 },
+            { id: 'top10',         icon: '🎯', label: 'Top 10',        condition: (u, rank) => rank <= 10 },
+        ];
+
+        // ─── Dynamic XP Award Function ────────────────────────────────────────────
+        // This function can be called from any page to dynamically award XP.
+        // Usage examples:
+        // - Accepting invite (e.g., in match.html): await awardXP(currentUid, 50, 'Accepted Invite');
+        // - Uploading resource (e.g., in resources.html): await awardXP(currentUid, 20, 'Uploaded Resource');
+        // - Sending a chat message in match (e.g., in match.html chat): await awardXP(currentUid, 5, 'Chatted with Match');
+        // - Sending a chat message in session (e.g., in session.html chat): await awardXP(currentUid, 5, 'Chatted in Session');
+        // To prevent spam (e.g., per-message XP), add client-side throttling or server-side checks (e.g., lastChatTime).
+        // For weeklyXP, you can update it separately if needed (e.g., on award: updateDoc(..., { weeklyXP: increment(amount) })).
+        async function awardXP(uid, amount, reason = '') {
+            if (amount <= 0) return; // Safety check
+            try {
+                const userRef = doc(db, 'users', uid);
+                await updateDoc(userRef, {
+                    xp: increment(amount),
+                    // Optional: Track activity log (uncomment if needed)
+                    // activity: arrayUnion({ amount, reason, timestamp: serverTimestamp() })
+                });
+                // Optional: Update weeklyXP (reset weekly at start of week via cron or on login)
+                // await updateDoc(userRef, { weeklyXP: increment(amount) });
+                showToast(`+${amount} XP${reason ? ` for ${reason}` : ''}!`);
+                console.log(`Awarded ${amount} XP to ${uid} for: ${reason}`);
+            } catch (error) {
+                console.error('Failed to award XP:', error);
+            }
+        }
+
+        // ─── Streak Logic with XP Integration ─────────────────────────────────────
+        function toDateStr(ts) {
+            // ts can be a Firestore Timestamp, a JS Date, or null
+            if (!ts) return null;
+            const d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toISOString().slice(0, 10); // "YYYY-MM-DD"
+        }
+
+        function todayStr() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function yesterdayStr() {
+            const d = new Date();
+            d.setDate(d.getDate() - 1);
+            return d.toISOString().slice(0, 10);
+        }
+
+        async function updateStreakAndLogin(uid, userData) {
+            const today = todayStr();
+            const yesterday = yesterdayStr();
+            const lastActive = toDateStr(userData.lastActive);
+            const lastStreakDate = toDateStr(userData.lastStreakDate);
+
+            let streak = userData.streak ?? 0;
+            let oldStreak = streak; // Track old streak for XP calculation
+            let updates = { lastActive: serverTimestamp() };
+
+            if (lastStreakDate === today) {
+                // Already logged in today — streak stays same, no update needed beyond lastActive
+            } else if (lastStreakDate === yesterday) {
+                // Consecutive day — increment streak and award XP
+                streak += 1;
+                updates.streak = streak;
+                updates.lastStreakDate = today;
+                // Dynamic XP: Base 10 + bonus per streak day (e.g., scales with streak)
+                const streakXP = 10 + (streak * 2); // e.g., Day 1: 12, Day 7: 24, etc.
+                await awardXP(uid, streakXP, `Streak extended to ${streak} days`);
+            } else if (!lastStreakDate) {
+                // First ever login with streak tracking — start streak and award initial XP
+                streak = 1;
+                updates.streak = streak;
+                updates.lastStreakDate = today;
+                await awardXP(uid, 10, 'First Daily Login');
+                showToast(`🚀 Streak started! Day 1!`);
+            } else {
+                // Missed a day — reset streak and award minimal XP for logging in
+                streak = 1;
+                updates.streak = streak;
+                updates.lastStreakDate = today;
+                await awardXP(uid, 5, 'Daily Login (Streak Reset)');
+                showToast(`💔 Streak reset. Starting fresh — Day 1!`);
+            }
+
+            await updateDoc(doc(db, "users", uid), updates).catch(console.error);
+            return streak;
+        }
+
+        // ─── Auth ─────────────────────────────────────────────────────────────────
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                document.getElementById('lbLoading').style.display = 'none';
+                document.getElementById('lbAuthError').style.display = 'block';
+                return;
+            }
+            currentUid = user.uid;
+
+            // Fetch own data first to run streak logic (now includes XP awards)
+            const mySnap = await getDoc(doc(db, "users", currentUid));
+            if (mySnap.exists()) {
+                myUserData = { uid: currentUid, ...mySnap.data() };
+                const newStreak = await updateStreakAndLogin(currentUid, myUserData);
+                myUserData.streak = newStreak; // reflect locally
+            } else {
+                // Create minimal doc if missing
+                await updateDoc(doc(db, "users", currentUid), {
+                    lastActive: serverTimestamp(),
+                    lastStreakDate: todayStr(),
+                    streak: 1,
+                    xp: 0,
+                    sessionsJoined: 0,
+                    teachingSessions: 0,
+                    weeklyXP: 0, // Initialize weekly XP
+                    name: user.displayName || user.email?.split('@')[0] || 'User'
+                }).catch(console.error);
+                await awardXP(currentUid, 5, 'Account Created'); // Bonus for new user
+            }
+
+            await initLeaderboard();
+        });
+
+        // ─── Real-time Leaderboard ────────────────────────────────────────────────
+        async function initLeaderboard() {
+            // Load top 100 by XP
+            const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(100));
+
+            onSnapshot(q, async (snapshot) => {
+                allUsers = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+
+                // Make sure current user is in the list even if outside top 100
+                const inList = allUsers.some(u => u.uid === currentUid);
+                if (!inList && myUserData) {
+                    allUsers.push(myUserData);
+                }
+
+                // Refresh my data in allUsers with latest streak
+                if (myUserData) {
+                    const idx = allUsers.findIndex(u => u.uid === currentUid);
+                    if (idx !== -1) {
+                        allUsers[idx] = { ...allUsers[idx], streak: myUserData.streak };
+                    }
+                }
+
+                document.getElementById('lbLoading').style.display = 'none';
+                document.getElementById('lbContent').style.display = 'block';
+
+                renderAll();
+            }, (error) => {
+                console.error("Leaderboard error:", error);
+                document.getElementById('lbLoading').innerHTML =
+                    `<div style="color:#f87171;">Error loading leaderboard: ${error.message}</div>`;
+            });
+        }
+
+        // ─── Render All ───────────────────────────────────────────────────────────
+        function renderAll() {
+            const sorted = getSorted(currentField);
+            renderMyBanner(sorted);
+            renderPodium(sorted);
+            renderTable(sorted);
+            renderBadges();
+            renderMyAnalytics();
+            renderDuelCandidates();
+        }
+
+        function getSorted(field) {
+            return [...allUsers].sort((a, b) => (b[field] ?? 0) - (a[field] ?? 0));
+        }
+
+        function getInitials(name) {
+            if (!name) return '??';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // ─── My Rank Banner ───────────────────────────────────────────────────────
+        function renderMyBanner(sorted) {
+            const myIndex = sorted.findIndex(u => u.uid === currentUid);
+            const me = myIndex !== -1 ? sorted[myIndex] : myUserData;
+            if (!me) return;
+
+            const rank = myIndex !== -1 ? myIndex + 1 : '?';
+            const total = sorted.length;
+            const streak = me.streak ?? 0;
+
+            document.getElementById('myRankNum').textContent = `#${rank}`;
+            document.getElementById('myRankOf').textContent = `of ${total} users`;
+            document.getElementById('myXPDisplay').textContent = `${(me.xp ?? 0).toLocaleString()} XP`;
+            document.getElementById('myStreakDisplay').textContent = `${streak} 🔥`;
+
+            const emoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank <= 10 ? '🏅' : '🎯';
+            document.getElementById('myRankEmoji').textContent = emoji;
+
+            // Show streak warning if streak is 0 or last login was yesterday
+            if (streak === 0) {
+                document.getElementById('streakWarning').style.display = 'block';
+            }
+        }
+
+        // ─── Podium ───────────────────────────────────────────────────────────────
+        function renderPodium(sorted) {
+            const top3 = sorted.slice(0, 3);
+            // Display order: 2nd, 1st, 3rd
+            const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+            const medals = ['🥈', '🥇', '🥉'];
+            const heights = ['160px', '220px', '140px'];
+            const configs = [
+                { border: 'rgba(148,163,184,0.2)', bg: 'rgba(148,163,184,0.05)', avatarBorder: 'var(--muted)', avatarBg: 'rgba(100,116,139,0.2)', xpColor: 'var(--muted)' },
+                { border: 'rgba(217,119,6,0.3)', bg: 'rgba(217,119,6,0.08)', avatarBorder: 'var(--orange)', avatarBg: 'rgba(217,119,6,0.2)', xpColor: 'var(--orange-glow)', big: true },
+                { border: 'rgba(109,40,217,0.25)', bg: 'rgba(109,40,217,0.06)', avatarBorder: 'var(--accent)', avatarBg: 'rgba(109,40,217,0.2)', xpColor: 'var(--muted)' },
+            ];
+
+            const podium = document.getElementById('podium');
+            podium.innerHTML = '';
+
+            order.forEach((user, i) => {
+                if (!user) return;
+                const isMe = user.uid === currentUid;
+                const realRank = sorted.findIndex(u => u.uid === user.uid) + 1;
+                const cfg = configs[i];
+
+                const fieldVal = getFieldDisplay(user);
+
+                const slot = document.createElement('div');
+                slot.className = 'podium-slot';
+                slot.style.cssText = `height:${heights[i]};background:linear-gradient(180deg,${cfg.bg},transparent);border:1px solid ${cfg.border};${isMe ? 'box-shadow:0 0 18px rgba(109,40,217,0.3);' : ''}`;
+                slot.innerHTML = `
+                    <div class="podium-avatar" style="border-color:${cfg.avatarBorder};background:${cfg.avatarBg};${cfg.big ? 'width:64px;height:64px;font-size:22px;' : ''}">
+                        ${getInitials(user.name)}
+                    </div>
+                    <div style="font-size:${cfg.big ? '14px' : '13px'};font-weight:${cfg.big ? '700' : '600'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">
+                        ${user.name || 'User'}${isMe ? ' 👤' : ''}
+                    </div>
+                    <div style="font-size:${cfg.big ? '12px' : '11px'};color:${cfg.xpColor};">${fieldVal}</div>
+                    <div style="font-size:11px;color:var(--orange-glow);">🔥 ${user.streak ?? 0}-day streak</div>
+                    <div style="font-size:${cfg.big ? '28px' : '24px'};margin-top:6px;">${medals[i]}</div>
+                `;
+                podium.appendChild(slot);
+            });
+
+            // Ranks 4–10
+            const rest = sorted.slice(3, 10);
+            if (rest.length > 0) {
+                const restContainer = document.createElement('div');
+                restContainer.style.cssText = 'grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:12px;';
+                rest.forEach((user, i) => {
+                    const rank = i + 4;
+                    const isMe = user.uid === currentUid;
+                    restContainer.innerHTML += `
+                        <div class="rank-row ${isMe ? 'is-me' : ''}">
+                            <span style="font-size:13px;color:var(--muted);width:22px;text-align:center;">#${rank}</span>
+                            <div class="rank-avatar" style="background:${AVATAR_GRADIENTS[rank % AVATAR_GRADIENTS.length]};">${getInitials(user.name)}</div>
+                            <div style="flex:1;">
+                                <div style="font-size:13px;font-weight:600;">${user.name || 'User'}${isMe ? ' (You)' : ''}</div>
+                                <div style="font-size:11px;color:var(--muted);">${Array.isArray(user.subjects) ? user.subjects.slice(0,2).join(', ') : ''}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:13px;font-weight:700;color:var(--glow);">${getFieldDisplay(user)}</div>
+                                <div style="font-size:10px;color:var(--muted);">🔥 ${user.streak ?? 0}d · 🎓${user.sessionsJoined ?? 0}</div>
+                            </div>
+                        </div>`;
+                });
+                podium.appendChild(restContainer);
+            }
+        }
+
+        function getFieldDisplay(user) {
+            switch (currentField) {
+                case 'xp': return `${(user.xp ?? 0).toLocaleString()} XP`;
+                case 'streak': return `🔥 ${user.streak ?? 0}-day streak`;
+                case 'sessionsJoined': return `🎓 ${user.sessionsJoined ?? 0} sessions`;
+                case 'teachingSessions': return `🧠 ${user.teachingSessions ?? 0} taught`;
+                default: return '';
+            }
+        }
+
+        // ─── Full Rankings Table ──────────────────────────────────────────────────
+        function renderTable(sorted) {
+            const titles = {
+                xp: '⚡ Full XP Rankings',
+                streak: '🔥 Streak Rankings',
+                sessionsJoined: '🎓 Sessions Rankings',
+                teachingSessions: '🧠 Teaching Rankings'
+            };
+            document.getElementById('tableTitle').textContent = titles[currentField];
+
+            const table = document.getElementById('rankTable');
+            table.innerHTML = sorted.map((user, i) => {
+                const rank = i + 1;
+                const isMe = user.uid === currentUid;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+
+                return `
+                    <div class="rank-row ${isMe ? 'is-me' : ''}">
+                        <span style="font-size:14px;width:32px;text-align:center;flex-shrink:0;">${medal}</span>
+                        <div class="rank-avatar" style="background:${AVATAR_GRADIENTS[rank % AVATAR_GRADIENTS.length]};">${getInitials(user.name)}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:13px;font-weight:600;">${user.name || 'User'}${isMe ? ' 👤' : ''}</div>
+                            <div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                ${Array.isArray(user.subjects) ? user.subjects.slice(0,3).join(' · ') : ''}
+                            </div>
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:14px;font-weight:700;color:var(--glow);">${getFieldDisplay(user)}</div>
+                            <div style="font-size:10px;color:var(--muted);">🔥${user.streak ?? 0}d · 🎓${user.sessionsJoined ?? 0}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // ─── Badges ───────────────────────────────────────────────────────────────
+        function renderBadges() {
+            const me = allUsers.find(u => u.uid === currentUid) || myUserData;
+            if (!me) return;
+
+            const sorted = getSorted('xp');
+            const myRank = sorted.findIndex(u => u.uid === currentUid) + 1;
+
+            const grid = document.getElementById('badgeGrid');
+            grid.innerHTML = ALL_BADGES.map(badge => {
+                const earned = badge.condition(me, myRank);
+                return `
+                    <div class="badge-item ${earned ? '' : 'locked'}" title="${badge.label}${earned ? '' : ' (not yet earned)'}">
+                        ${badge.icon}
+                        <div class="badge-label">${badge.label}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        // ─── Progress Analytics ───────────────────────────────────────────────────
+        function renderMyAnalytics() {
+            const me = allUsers.find(u => u.uid === currentUid) || myUserData;
+            if (!me) return;
+
+            const mastered = me.skillsMastered ?? 0;
+            const teaching = me.teachingSessions ?? 0;
+            const quizAvg = me.quizAverage ?? 0;
+            const weeklyXP = me.weeklyXP ?? 0;
+            const streak = me.streak ?? 0;
+
+            document.getElementById('analyticsMastered').textContent = `${mastered} / 20`;
+            document.getElementById('analyticsTeaching').textContent = `${teaching} sessions`;
+            document.getElementById('analyticsQuiz').textContent = `${quizAvg}%`;
+            document.getElementById('analyticsWeeklyXP').textContent = `${weeklyXP} XP`;
+            document.getElementById('analyticsStreak').textContent = `${streak} 🔥`;
+
+            setTimeout(() => {
+                document.getElementById('masteredBar').style.width = `${Math.min((mastered / 20) * 100, 100)}%`;
+                document.getElementById('teachingBar').style.width = `${Math.min((teaching / 20) * 100, 100)}%`;
+                document.getElementById('quizBar').style.width = `${Math.min(quizAvg, 100)}%`;
+                document.getElementById('weeklyXPBar').style.width = `${Math.min((weeklyXP / 500) * 100, 100)}%`;
+                document.getElementById('streakBar').style.width = `${Math.min((streak / 30) * 100, 100)}%`;
+            }, 100);
+        }
+
+        // ─── Duel Candidates ─────────────────────────────────────────────────────
+        function renderDuelCandidates() {
+            const me = allUsers.find(u => u.uid === currentUid) || myUserData;
+            const container = document.getElementById('duelCandidates');
+
+            const candidates = allUsers.filter(u => u.uid !== currentUid).slice(0, 3);
+
+            if (candidates.length === 0) {
+                container.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px;">No candidates available yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = candidates.map(u => `
+                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--surface);border-radius:8px;">
+                    <div class="rank-avatar" style="background:${AVATAR_GRADIENTS[Math.floor(Math.random()*AVATAR_GRADIENTS.length)]};width:30px;height:30px;font-size:12px;">
+                        ${getInitials(u.name)}
+                    </div>
+                    <div style="flex:1;font-size:12px;">${u.name || 'User'}</div>
+                    <div style="font-size:11px;color:var(--muted);">🔥${u.streak ?? 0}d</div>
+                    <button class="btn btn-primary btn-sm" onclick="startDuel('${u.uid}','${u.name || 'User'}')">Duel</button>
+                </div>
+            `).join('');
+        }
+
+        window.startDuel = function(opponentUid, opponentName) {
+            showToast(`⚡ Duel challenge sent to ${opponentName}!`);
+            // Optional: Award XP for initiating duel: awardXP(currentUid, 5, 'Initiated Duel');
+        };
+
+        // ─── Tab Switching ────────────────────────────────────────────────────────
+        window.switchTab = function(field, btn) {
+            currentField = field;
+            document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderAll();
+        };
+
+        // ─── Toast ────────────────────────────────────────────────────────────────
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // Expose awardXP globally for use in other pages (e.g., via window.awardXP)
+        window.awardXP = awardXP;
+    </script>
+     <script>
+        fetch('profile.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('profile-container').innerHTML = html;
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
+                            .then(({ getAuth, signOut }) => signOut(getAuth()).then(() => window.location.href = 'login.html'));
+                    });
+                }
+                const profileBtn = document.getElementById('profile-btn');
+                const profileMenu = document.getElementById('profile-menu');
+                if (profileBtn && profileMenu) {
+                    profileBtn.addEventListener('click', () => {
+                        profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target))
+                            profileMenu.style.display = 'none';
+                    });
+                }
+            })
+            .catch(err => console.error('Profile load failed:', err));
+    </script>
+</body>
+</html>

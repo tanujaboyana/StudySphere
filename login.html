@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b10;
+            --bg-card: #12141c;
+            --accent-blue: #4d94ff;
+            --accent-gradient: linear-gradient(90deg, #4d94ff, #80b3ff);
+            --text-gray: #8b92a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .auth-side {
+            text-align: center;
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #cursor-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .content-side {
+            flex: 1.2;
+            padding: 4rem 6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge {
+            background: rgba(77, 148, 255, 0.1);
+            color: var(--accent-blue);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: fit-content;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(77, 148, 255, 0.2);
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            line-height: 0.95;
+            margin: 0;
+            letter-spacing: -2px;
+            font-weight: 900;
+        }
+
+        .gradient-text {
+            display: inline-block;
+            background: linear-gradient(90deg, #4d94ff, #a1c4fd);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            word-break: keep-all;
+        }
+
+        .subtext {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            max-width: 500px;
+            line-height: 1.6;
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            max-width: 600px;
+        }
+
+        .feature-item span {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .feature-item b {
+            color: white;
+            margin-right: 5px;
+        }
+
+        .feature-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        .auth-side {
+            flex: 0.8;
+            background-color: var(--bg-card);
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #222;
+        }
+
+        .tab {
+            padding-bottom: 10px;
+            cursor: pointer;
+            color: var(--text-gray);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .tab.active {
+            color: white;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            background: #1d1f27;
+            border: 1px solid #2d303a;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #333;
+            font-size: 0.7rem;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #222;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #1d1f27;
+            border: 1px solid #2d303a;
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #signup-form { display: none; }
+
+        .error-msg {
+            color: #ff5555;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-msg {
+            color: #55ff99;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="cursor-canvas"></canvas>
+    <div class="main-container">
+        <div class="content-side">
+            <div class="badge">🏆 #1 STUDY MATCHING PLATFORM 2026</div>
+            <h1>Find the Right Study Partner.</h1>
+            <h1 class="gradient-text">Build the Perfect Group.</h1>
+            <p class="subtext">
+                StudySphere AI matches you with peers who complement your exact knowledge gaps — using the same algorithm
+                that powers top university collaboration programs worldwide.
+            </p>
+
+            <div class="feature-item">
+                <span>🧠</span>
+                <p><b>Smart Matching Algorithm</b> — Connects students by goals, strengths, and compatibility.</p>
+            </div>
+            <div class="feature-item">
+                <span>🍓</span>
+                <p><b>Group Pomodoro Timers</b> — Synchronized focus sessions keep the group on track.</p>
+            </div>
+            <div class="feature-item">
+                <span>🖌️</span>
+                <p><b>Virtual Whiteboard</b> — Real-time collaborative drawing and brainstorming.</p>
+            </div>
+        </div>
+
+        <div class="auth-side">
+            <div class="nav-logo-icon">🔗</div>
+            <h2 style="color:#6868f7">StudySphere AI</h2>
+            <div class="tabs">
+                <div class="tab active" id="login-tab" onclick="toggleAuth('login')">Sign In</div>
+                <div class="tab" id="signup-tab" onclick="toggleAuth('signup')">Sign Up</div>
+            </div>
+
+            <h2 id="form-title">Welcome 👋</h2>
+            <p style="color: #666; font-size: 0.8rem; margin-top: -10px; margin-bottom: 2rem;">Signin to continue your
+                study journey</p>
+
+            <!-- <div class="social-btns">
+                <button class="social-btn" onclick="handleGoogleSignIn()">G Google</button>
+                <button class="social-btn">🎓 Campus SSO</button>
+            </div> -->
+
+            <div class="divider">OR</div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="error-msg" id="login-error">Please fill all fields!</div>
+                <div class="success-msg" id="login-success">Signed in! Redirecting...</div>
+                <label>Email / Username</label>
+                <input type="email" placeholder="alex@university.edu" id="login-email" required>
+                <label>Password</label>
+                <input type="password" placeholder="••••••••" id="login-password" required>
+                <button type="submit" class="btn-submit" id="login-btn">Sign In →</button>
+            </form>
+
+            <!-- SIGNUP FORM -->
+            <form id="signup-form" onsubmit="handleSignup(event)">
+                <div class="error-msg" id="signup-error">Please fill all fields!</div>
+                <div class="success-msg" id="signup-success">Account created! Redirecting...</div>
+                <label>Full Name</label>
+                <input type="text" placeholder="Alex Rivera" id="signup-name" required>
+                <label>University Email</label>
+                <input type="email" placeholder="alex@university.edu" id="signup-email" required>
+                <label>Create Password</label>
+                <input type="password" placeholder="••••••••" id="signup-password" required>
+                <button type="submit" class="btn-submit" id="signup-btn">Join CollabSync →</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuth(type) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const loginTab = document.getElementById('login-tab');
+            const signupTab = document.getElementById('signup-tab');
+            const title = document.getElementById('form-title');
+
+            if (type === 'login') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                title.innerText = "Welcome back 👋";
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                loginTab.classList.remove('active');
+                signupTab.classList.add('active');
+                title.innerText = "Create Account ✨";
+            }
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function hideError(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showSuccess(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function redirectTo(target) {
+            document.body.style.opacity = '0';
+            setTimeout(() => { window.location.href = target; }, 500);
+        }
+
+        // Cursor Trail
+        const canvas = document.getElementById('cursor-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        const maxPoints = 20;
+
+        window.addEventListener('mousemove', (e) => {
+            points.push({ x: e.clientX, y: e.clientY });
+            if (points.length > maxPoints) points.shift();
+        });
+
+        function animateCursor() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (points.length > 0) {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.strokeStyle = 'rgba(77, 148, 255, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                const head = points[points.length - 1];
+                ctx.beginPath();
+                ctx.arc(head.x, head.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#4d94ff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#4d94ff';
+                ctx.fill();
+            }
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+    </script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+            authDomain: "collabsyncai.firebaseapp.com",
+            projectId: "collabsyncai",
+            storageBucket: "collabsyncai.firebasestorage.app",
+            messagingSenderId: "862378374401",
+            appId: "1:862378374401:web:4438203269261b15011700",
+            measurementId: "G-GV97YDHCBK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // ── Save user profile to Firestore ─────────────────────
+        // Called on signup & first Google sign-in.
+        // merge:true means returning users won't lose existing Firestore data.
+        async function saveUserToFirestore(user, extraData = {}) {
+            const userRef = doc(db, 'users', user.uid);
+            await setDoc(userRef, {
+                uid:        user.uid,
+                name:       user.displayName || extraData.name || '',
+                email:      user.email,
+                photoURL:   user.photoURL || '',
+                createdAt:  serverTimestamp(),
+                // Placeholders — filled in during onboarding
+                university: '',
+                subjects:   [],
+                studyGoals: '',
+                ...extraData
+            }, { merge: true });
+        }
+
+        // ── Login ──────────────────────────────────────────────
+        window.handleLogin = async function (e) {
+            e.preventDefault();
+            hideError('login-error');
+
+            const email    = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn      = document.getElementById('login-btn');
+
+            if (!email || !password) {
+                showError('login-error', 'Please fill all fields!');
+                return;
+            }
+
+            btn.disabled    = true;
+            btn.textContent = 'Signing in…';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showSuccess('login-success');
+                redirectTo('dashboard.html');
+            } catch (err) {
+                btn.disabled    = false;
+                btn.textContent = 'Sign In →';
+                showError('login-error', friendlyError(err.code));
+            }
+        };
+
+        // ── Sign Up ────────────────────────────────────────────
+        window.handleSignup = async function (e) {
+            e.preventDefault();
+            hideError('signup-error');
+
+            const name     = document.getElementById('signup-name').value.trim();
+            const email    = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const btn      = document.getElementById('signup-btn');
+
+            if (!name || !email || !password) {
+                showError('signup-error', 'Please fill all fields!');
+                return;
+            }
+
+            btn.disabled    = true;
+            btn.textContent = 'Creating account…';
+
+            try {
+                // 1. Create auth user
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+                // 2. Set display name in Auth
+                await updateProfile(userCred.user, { displayName: name });
+
+                // 3. ✅ Write profile document to Firestore → visible in console
+                await saveUserToFirestore(userCred.user, { name });
+
+                showSuccess('signup-success');
+                redirectTo('onboard.html');
+            } catch (err) {
+                btn.disabled    = false;
+                btn.textContent = 'Join CollabSync →';
+                showError('signup-error', friendlyError(err.code));
+            }
+        };
+
+        // ── Google Sign-In ─────────────────────────────────────
+        window.handleGoogleSignIn = async function () {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+
+                // ✅ Save Google user to Firestore too (merge so repeat logins are safe)
+                await saveUserToFirestore(result.user);
+
+                redirectTo('dashboard.html');
+            } catch (err) {
+                showError('login-error', friendlyError(err.code));
+                document.getElementById('login-error').style.display = 'block';
+            }
+        };
+
+        // ── Friendly error messages ────────────────────────────
+        function friendlyError(code) {
+            const messages = {
+                'auth/user-not-found':       'No account found with this email.',
+                'auth/wrong-password':        'Incorrect password. Please try again.',
+                'auth/invalid-credential':    'Invalid email or password.',
+                'auth/email-already-in-use':  'This email is already registered. Try signing in.',
+                'auth/weak-password':         'Password must be at least 6 characters.',
+                'auth/invalid-email':         'Please enter a valid email address.',
+                'auth/too-many-requests':     'Too many attempts. Please try again later.',
+                'auth/popup-closed-by-user':  'Google sign-in was cancelled.',
+            };
+            return messages[code] || 'Something went wrong. Please try again.';
+        }
+    </script>
+</body>
+</html>
