@@ -1,616 +1,882 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onboard - StudySphere</title>
+    <title>Onboard - CollabSync AI</title>
     <link rel="stylesheet" href="stylesheet1.css">
     <style>
-        /* ── Match Cards ── */
-        .match-card {
-            background: linear-gradient(135deg, rgba(109,40,217,0.10), rgba(8,145,178,0.05));
-            border: 1px solid rgba(109,40,217,0.25);
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 14px;
-            text-align: left;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-        .match-card:hover {
-            border-color: rgba(109,40,217,0.5);
-            box-shadow: 0 8px 32px rgba(109,40,217,0.15);
-        }
-        .match-card.top {
-            border-color: rgba(109,40,217,0.45);
-            background: linear-gradient(135deg, rgba(109,40,217,0.15), rgba(8,145,178,0.08));
-        }
-        .match-score-ring {
-            width: 62px; height: 62px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 15px; color: white; flex-shrink: 0;
-        }
-        .match-bar-outer {
-            height: 5px; background: rgba(255,255,255,0.07);
-            border-radius: 3px; margin-top: 10px; overflow: hidden;
-        }
-        .match-bar-fill {
-            height: 100%; border-radius: 3px;
-            background: linear-gradient(90deg, #6a4dff, #00c9a7);
-            transition: width 1.2s cubic-bezier(.4,0,.2,1);
-        }
-        .skill-pill {
-            display: inline-block; font-size: 11px; font-weight: 600;
-            padding: 3px 10px; border-radius: 20px; margin: 2px;
-        }
-        .pill-teach { background: rgba(16,185,129,0.15); color: #34d399; }
-        .pill-learn  { background: rgba(109,40,217,0.15); color: #b48dff; }
-        .pill-sched  { background: rgba(8,145,178,0.15);  color: #38bdf8; }
-
-        /* ── Loading shimmer ── */
-        .shimmer {
-            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 10px;
-        }
-        @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
-
-        /* ── No matches ── */
-        .no-match {
-            text-align: center; padding: 32px 20px;
-            color: rgba(255,255,255,0.3); font-size: 13px;
-        }
-
-        /* Avatar colors */
-        .av-a { background: linear-gradient(135deg, #6a4dff, #4d94ff); }
-        .av-b { background: linear-gradient(135deg, #00c9a7, #4d94ff); }
-        .av-c { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-        .av-d { background: linear-gradient(135deg, #10b981, #6a4dff); }
-        .av-e { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+        .sched-wrapper{overflow-x:auto;overflow-y:auto;max-height:320px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);}
+        .sched-inner{display:grid;grid-template-columns:70px repeat(7,minmax(36px,1fr));min-width:340px;}
+        .sched-header-cell{text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);padding:8px 4px;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;background:rgba(13,13,25,0.95);}
+        .sched-time-label{font-size:9px;color:rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:flex-end;padding-right:6px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap;user-select:none;}
+        .sched-cell{height:32px;cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.04);border-left:1px solid rgba(255,255,255,0.04);transition:background .12s;}
+        .sched-cell:hover{background:rgba(109,40,217,0.22);}
+        .sched-cell.on{background:linear-gradient(135deg,#6a4dff88,#00c9a766);border-color:rgba(109,40,217,0.25);}
+        .sched-cell.on:hover{background:linear-gradient(135deg,#6a4dff,#00c9a7);}
+        .sched-cell.noon,.sched-time-label.noon{border-top:2px solid rgba(255,255,255,0.12);}
+        .sched-legend{display:flex;gap:14px;font-size:11px;color:rgba(255,255,255,0.35);align-items:center;}
+        .sched-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+        .quiz-opt{width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:13px 16px;font-size:14px;cursor:pointer;margin-bottom:10px;transition:all .18s;display:flex;align-items:center;gap:10px;}
+        .quiz-opt:hover:not(:disabled){background:rgba(109,40,217,0.18);border-color:rgba(109,40,217,0.5);}
+        .quiz-opt.correct{background:rgba(16,185,129,0.18)!important;border-color:#10b981!important;color:#34d399;}
+        .quiz-opt.wrong{background:rgba(239,68,68,0.15)!important;border-color:#ef4444!important;color:#f87171;}
+        .quiz-opt:disabled{cursor:default;}
+        .q-letter{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+        .q-prog-bar{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+        .q-prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#6a4dff,#00c9a7);transition:width .5s;}
+        .lvl-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+        .lv-easy{background:rgba(16,185,129,0.15);color:#34d399;}
+        .lv-med{background:rgba(245,158,11,0.15);color:#fbbf24;}
+        .lv-hard{background:rgba(239,68,68,0.15);color:#f87171;}
+        .res-stat{display:inline-flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 24px;min-width:90px;}
+        .res-val{font-family:var(--syne);font-size:28px;font-weight:900;}
+        .res-lbl{font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .fade-up{animation:fadeUp .3s ease;}
     </style>
 </head>
-
 <body>
-    <canvas id="canvas"></canvas>
-    <div class="scanlines"></div>
+<canvas id="canvas"></canvas>
+<div class="scanlines"></div>
 
-    <nav id="main-nav">
-        <a href="landing.html" class="nav-logo">
-            <div class="nav-logo-icon">🔗</div>
-            StudySphere
-        </a>
-        <div class="nav-links" id="navLinks">
-            <a class="nav-link" href="landing.html">Intro</a>
-            <a class="nav-link" href="dashboard.html">Dashboard</a>
-            <a class="nav-link" href="match.html">Match</a>
-            <a class="nav-link" href="session.html">Session</a>
-            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-            <a class="nav-link" href="whiteboard.html">Whiteboard</a>
-            <a class="nav-link" href="resources.html">Resources</a>
-            <a class="nav-link" href="pomodoro.html">Pomodoro</a>
-            <a class="nav-link active" href="onboard.html">Onboard</a>
+<nav id="main-nav">
+    <a href="landing.html" class="nav-logo"><div class="nav-logo-icon">🔗</div>CollabSync AI</a>
+    <div class="nav-links">
+        <a class="nav-link" href="landing.html">Intro</a>
+        <a class="nav-link" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="match.html">Match</a>
+        <a class="nav-link" href="session.html">Session</a>
+        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+        <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+        <a class="nav-link active" href="onboard.html">Onboard</a>
+    </div>
+</nav>
+
+<div class="content-wrapper">
+ <div id="page-onboard" class="page">
+  <div class="onboard-page">
+   <div class="content">
+    <div class="onboard-container">
+
+     <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:40px;margin-bottom:10px;">🔗</div>
+        <h1 style="font-family:var(--syne);font-weight:900;font-size:28px;margin-bottom:8px;">Welcome to CollabSync AI</h1>
+        <p style="color:var(--muted);font-size:15px;">Build your profile · Verify your knowledge · Enter StudySphere</p>
+     </div>
+
+     <div class="step-progress" style="margin-bottom:36px;">
+        <div class="step-dot active" id="sd-0" onclick="goStep(0)">1<span class="step-label">Skills</span></div>
+        <div class="step-line" id="sl-0"></div>
+        <div class="step-dot" id="sd-1" onclick="goStep(1)">2<span class="step-label">Rate</span></div>
+        <div class="step-line" id="sl-1"></div>
+        <div class="step-dot" id="sd-2" onclick="goStep(2)">3<span class="step-label">Schedule</span></div>
+        <div class="step-line" id="sl-2"></div>
+        <div class="step-dot" id="sd-3">4<span class="step-label">Quiz</span></div>
+     </div>
+
+     <!-- STEP 0 -->
+     <div id="ob-step-0" class="onboard-panel">
+        <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">🧠 Enter Your Skills</h2>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Type a skill and press Enter</p>
+        <div id="skillsDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;"></div>
+        <input type="text" id="skillInput" placeholder="e.g. Python, Java, Maths, Chemistry…"
+            style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:white;outline:none;margin-bottom:20px;">
+        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;" onclick="goStep(1)">Continue → Step 2</button>
+     </div>
+
+     <!-- STEP 1 -->
+     <div id="ob-step-1" class="onboard-panel" style="display:none;">
+        <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">📊 Rate Your Skill Levels</h2>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:6px;">Your percentage determines quiz difficulty</p>
+        <div style="display:flex;gap:14px;margin-bottom:18px;font-size:11px;flex-wrap:wrap;">
+            <span class="lvl-badge lv-easy">0–40% → Beginner</span>
+            <span class="lvl-badge lv-med">41–70% → Intermediate</span>
+            <span class="lvl-badge lv-hard">71–100% → Advanced</span>
         </div>
-    </nav>
+        <div id="ob-skills-list" style="margin-bottom:24px;"></div>
+        <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" style="flex:1;padding:11px;" onclick="goStep(0)">← Back</button>
+            <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="goStep(2)">Continue → Step 3</button>
+        </div>
+     </div>
 
-    <div class="content-wrapper">
-        <div id="page-onboard" class="page">
-            <div class="onboard-page">
-                <div class="content">
-                    <div class="onboard-container">
-                        <div style="text-align:center; margin-bottom:14px;">
-                            <div style="font-size:40px; margin-bottom:10px;">🔗</div>
-                            <h1 style="font-family:var(--syne); font-weight:900; font-size:28px; margin-bottom:8px;">
-                                Welcome to CollabSync AI
-                            </h1>
-                            <p style="color:var(--muted); font-size:15px;">
-                                Build your learner profile in 4 steps and find your perfect study match
-                            </p>
-                        </div>
-
-                        <!-- Step Progress -->
-                        <div class="step-progress" id="stepProgress" style="margin-bottom:36px;">
-                            <div class="step-dot active" id="sd-0" onclick="goStep(0)">1<span class="step-label">Subjects</span></div>
-                            <div class="step-line" id="sl-0"></div>
-                            <div class="step-dot" id="sd-1" onclick="goStep(1)">2<span class="step-label">Skills</span></div>
-                            <div class="step-line" id="sl-1"></div>
-                            <div class="step-dot" id="sd-2" onclick="goStep(2)">3<span class="step-label">Schedule</span></div>
-                            <div class="step-line" id="sl-2"></div>
-                            <div class="step-dot" id="sd-3" onclick="goStep(3)">4<span class="step-label">Match!</span></div>
-                        </div>
-
-                        <!-- Step 0 — Enter Skills -->
-                        <div id="ob-step-0" class="onboard-panel">
-                            <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">🧠 Enter Your Skills</h2>
-                            <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Type a skill and press Enter</p>
-                            <div id="skillsDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;"></div>
-                            <input type="text" id="skillInput" placeholder="Example: Python, Calculus, Biology…"
-                                style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:white;outline:none;margin-bottom:20px;">
-                            <button class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;" onclick="goStep(1)">Continue → Step 2</button>
-                        </div>
-
-                        <!-- Step 1 — Rate Skills -->
-                        <div id="ob-step-1" class="onboard-panel" style="display:none;">
-                            <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">🧠 Rate Your Skill Levels</h2>
-                            <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Be honest — this helps us find your perfect complement</p>
-                            <div id="ob-skills-list" style="margin-bottom:24px;"></div>
-                            <div style="display:flex;gap:10px;">
-                                <button class="btn btn-outline" style="flex:1;padding:11px;" onclick="goStep(0)">← Back</button>
-                                <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="goStep(2)">Continue → Step 3</button>
-                            </div>
-                        </div>
-
-                        <!-- Step 2 — Schedule -->
-                        <div id="ob-step-2" class="onboard-panel" style="display:none;">
-                            <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">📅 Set Your Availability</h2>
-                            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Click cells to mark when you're free (each cell ≈ 2hr block)</p>
-                            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:8px;">
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Mon</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Tue</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Wed</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Thu</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Fri</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Sat</div>
-                                <div style="text-align:center;font-size:11px;font-weight:600;color:var(--muted);">Sun</div>
-                            </div>
-                            <div class="schedule-grid" style="margin-bottom:18px;" id="schedGrid"></div>
-                            <div style="font-size:11px;color:var(--muted);margin-bottom:20px;">6 AM – 12 AM slots (rows = 2hr blocks)</div>
-                            <div style="display:flex;gap:10px;">
-                                <button class="btn btn-outline" style="flex:1;padding:11px;" onclick="goStep(1)">← Back</button>
-                                <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="saveAndMatch()">Find My Match! →</button>
-                            </div>
-                        </div>
-
-                        <!-- Step 3 — Dynamic Match Results -->
-                        <div id="ob-step-3" class="onboard-panel" style="display:none;text-align:center;">
-                            <div style="font-size:52px;margin-bottom:12px;" id="matchEmoji">🔍</div>
-                            <h2 style="font-family:var(--syne);font-weight:900;font-size:24px;margin-bottom:8px;" id="matchHeading">Finding Your Matches…</h2>
-                            <p style="font-size:13px;color:var(--muted);margin-bottom:24px;" id="matchSubtext">
-                                Analysing skill gaps and schedule overlap across all learners…
-                            </p>
-
-                            <!-- Save status -->
-                            <div id="saveStatus" style="font-size:13px;margin-bottom:14px;min-height:20px;"></div>
-
-                            <!-- Match results container -->
-                            <div id="matchResults" style="text-align:left;">
-                                <!-- Loading shimmer -->
-                                <div id="matchLoading">
-                                    <div class="shimmer" style="height:110px;margin-bottom:12px;"></div>
-                                    <div class="shimmer" style="height:90px;margin-bottom:12px;"></div>
-                                    <div class="shimmer" style="height:90px;margin-bottom:12px;"></div>
-                                </div>
-                            </div>
-
-                            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
-                                <button class="btn btn-primary" style="font-size:15px;padding:13px 32px;" onclick="location.href='dashboard.html'">🚀 Enter CollabSync</button>
-                                <button class="btn btn-outline" style="font-size:15px;padding:13px 24px;" onclick="location.href='match.html'">🎯 See All Matches</button>
-                            </div>
-                        </div>
-
-                    </div><!-- /onboard-container -->
-                </div>
+     <!-- STEP 2 -->
+     <div id="ob-step-2" class="onboard-panel" style="display:none;">
+        <h2 style="font-family:var(--syne);font-weight:800;font-size:20px;margin-bottom:6px;">📅 Set Your Availability</h2>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Click or drag to mark free time — each block = 2 hours</p>
+        <div class="sched-wrapper" style="margin-bottom:12px;"><div class="sched-inner" id="schedGrid"></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div class="sched-legend">
+                <div class="sched-legend-dot" style="background:linear-gradient(135deg,#6a4dff88,#00c9a766);"></div><span>Free</span>
+                <div class="sched-legend-dot" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);"></div><span>Busy</span>
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button onclick="selectAllCells()" style="background:rgba(109,40,217,0.15);border:1px solid rgba(109,40,217,0.3);color:#b48dff;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;">All</button>
+                <button onclick="clearAllCells()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;">Clear</button>
             </div>
         </div>
+        <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" style="flex:1;padding:11px;" onclick="goStep(1)">← Back</button>
+            <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="saveAndStartQuiz()">Save & Take Quiz →</button>
+        </div>
+     </div>
+
+     <!-- STEP 3 -->
+     <div id="ob-step-3" class="onboard-panel" style="display:none;">
+        <div id="quiz-intro">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="font-size:52px;margin-bottom:10px;">📝</div>
+                <h2 style="font-family:var(--syne);font-weight:900;font-size:22px;margin-bottom:8px;">Knowledge Verification</h2>
+                <p style="font-size:13px;color:var(--muted);">
+                    Answer <strong style="color:white;">4 out of 5</strong> correctly per subject to enter StudySphere.<br>
+                    Every retake gives you <strong style="color:#b48dff;">different questions</strong>.
+                </p>
+            </div>
+            <div id="quiz-skill-summary" style="margin-bottom:20px;"></div>
+            <button class="btn btn-primary" id="quiz-start-btn" style="width:100%;padding:13px;font-size:15px;" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+        <div id="quiz-area" style="display:none;"></div>
+        <div id="quiz-result" style="display:none;text-align:center;">
+            <div id="res-icon" style="font-size:64px;margin-bottom:12px;"></div>
+            <h2 id="res-heading" style="font-family:var(--syne);font-weight:900;font-size:24px;margin-bottom:8px;"></h2>
+            <p id="res-sub" style="font-size:13px;color:var(--muted);margin-bottom:24px;"></p>
+            <div id="res-stats" style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;"></div>
+            <div id="res-breakdown" style="text-align:left;margin-bottom:22px;"></div>
+            <div id="res-actions"></div>
+        </div>
+     </div>
+
     </div>
+   </div>
+  </div>
+ </div>
+</div>
 
-    <!-- ===================== MAIN SCRIPT ===================== -->
-    <script>
-        let currentStep = 0;
-        let skills = [];
-        let skillLevels = {};
-        const AV_CLASSES = ['av-a','av-b','av-c','av-d','av-e'];
-        const COLORS = ['#6a4dff','#4d94ff','#00c9a7','#f59e0b','#10b981'];
+<script>
+// ─── State ───────────────────────────────────────────────────────────────
+let skills = [], skillLevels = {}, currentStep = 0;
+const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const HOURS = ['12AM–2AM','2AM–4AM','4AM–6AM','6AM–8AM','8AM–10AM','10AM–12PM','12PM–2PM','2PM–4PM','4PM–6PM','6PM–8PM','8PM–10PM','10PM–12AM'];
+let isDrag = false, dragOn = false;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const input = document.getElementById("skillInput");
-            input.addEventListener("keypress", e => {
-                if (e.key === "Enter") { e.preventDefault(); addSkill(); }
-            });
-            buildSchedule();
-        });
+// ═══════════════════════════════════════════════════════════════════════════
+// QUESTION BANK — 15 questions per subject per level (easy/medium/hard)
+// 5 shown per attempt, cycling through all 15 across retakes without repeats
+// ═══════════════════════════════════════════════════════════════════════════
+const QB = {
+  python: {
+    easy: [
+      {q:"What keyword defines a function in Python?",o:["func","def","define","fn"],a:1,e:"Python uses 'def' to declare functions, e.g. def greet():"},
+      {q:"What does len('hello') return?",o:["4","5","6","Error"],a:1,e:"len() counts characters. 'hello' has 5."},
+      {q:"Which symbol starts a comment in Python?",o:["//","/*","#","--"],a:2,e:"# is Python's single-line comment character."},
+      {q:"What is the output of print(2 ** 3)?",o:["5","6","8","9"],a:2,e:"** is the power operator. 2³ = 8."},
+      {q:"Which of these creates an empty list?",o:["{}","()","[]","<>"],a:2,e:"[] is an empty list literal."},
+      {q:"How do you get user input in Python 3?",o:["scan()","readline()","input()","gets()"],a:2,e:"input() reads a line from stdin."},
+      {q:"What data type is the result of 5 / 2 in Python 3?",o:["int","float","str","bool"],a:1,e:"/ always returns a float in Python 3."},
+      {q:"Which keyword exits a loop early?",o:["exit","stop","break","return"],a:2,e:"break immediately terminates the innermost loop."},
+      {q:"What does print(type(42)) output?",o:["int","<class 'int'>","42","number"],a:1,e:"type() returns the class object, printed as <class 'int'>."},
+      {q:"How do you create variable 'x' equal to 10?",o:["var x=10","int x=10","x=10","x:=10"],a:2,e:"Python uses simple assignment: x = 10."},
+      {q:"What does 'print' do in Python?",o:["Reads input","Outputs to console","Imports module","Defines variable"],a:1,e:"print() outputs text to the standard console."},
+      {q:"Which operator checks equality in Python?",o:["=","==","===","!="],a:1,e:"== checks if two values are equal. = is assignment."},
+      {q:"What is a string in Python?",o:["A number type","A sequence of characters","A list of integers","A boolean"],a:1,e:"Strings are sequences of characters, e.g. 'hello'."},
+      {q:"How do you write a for loop over a list?",o:["for x in list","foreach x in list","loop x over list","for(x; list)"],a:0,e:"Python for loops: for item in collection:"},
+      {q:"What does range(5) produce?",o:["1 to 5","0 to 4","0 to 5","1 to 4"],a:1,e:"range(5) generates numbers 0,1,2,3,4 — 5 numbers starting at 0."}
+    ],
+    medium: [
+      {q:"What does the 'yield' keyword do?",o:["Stops the program","Returns a value from a generator","Imports a module","Raises an exception"],a:1,e:"yield pauses the function and emits a value, making it a generator."},
+      {q:"Average-case time complexity of dict lookup?",o:["O(n)","O(log n)","O(1)","O(n²)"],a:2,e:"Dicts are hash tables — average lookup is O(1)."},
+      {q:"What does *args capture in a function?",o:["Only keyword arguments","Variable positional arguments as a tuple","A single list","Named-only arguments"],a:1,e:"*args collects extra positional arguments into a tuple."},
+      {q:"What is a list comprehension?",o:["A way to document lists","A compact syntax: [expr for x in iterable]","A sorted list","A frozen list"],a:1,e:"[x*2 for x in range(5)] produces [0,2,4,6,8]."},
+      {q:"What does enumerate() do?",o:["Sorts an iterable","Reverses an iterable","Yields (index, value) pairs","Zips two lists"],a:2,e:"enumerate(lst) yields (0,lst[0]),(1,lst[1]),…"},
+      {q:"What is the output of bool(0) and bool('')?",o:["True, True","False, False","True, False","False, True"],a:1,e:"0 and '' are both falsy — bool() returns False for both."},
+      {q:"What does **kwargs capture?",o:["Positional args","All keyword arguments as a dict","A default argument","Class attributes"],a:1,e:"**kwargs collects all extra keyword arguments as a dictionary."},
+      {q:"Which method removes and returns last list element?",o:["remove()","delete()","pop()","discard()"],a:2,e:"list.pop() removes and returns the last item by default."},
+      {q:"What is the result of 'hello'[::-1]?",o:["hello","olleh","h","Error"],a:1,e:"[::-1] reverses the string."},
+      {q:"What does the 'with' statement do?",o:["Creates a loop","Defines context manager block, auto-closing resources","Imports a module","Declares a class"],a:1,e:"'with open(f) as fh:' ensures the file is closed automatically."},
+      {q:"What is a lambda function?",o:["A named multi-line function","An anonymous single-expression function","A class method","A generator"],a:1,e:"lambda x: x*2 creates an anonymous function inline."},
+      {q:"What does zip() do?",o:["Compresses a file","Pairs elements from multiple iterables","Sorts two lists","Flattens a nested list"],a:1,e:"zip([1,2],[3,4]) → [(1,3),(2,4)] — pairs elements from iterables."},
+      {q:"What is the difference between is and ==?",o:["No difference","== checks value; is checks identity (same object)","is checks value; == checks identity","Both check identity"],a:1,e:"== compares values; 'is' checks if two names point to the same object in memory."},
+      {q:"What does map(func, iterable) return?",o:["A list","A map object (lazy iterator) applying func to each element","A sorted iterable","A filtered iterable"],a:1,e:"map() applies a function to every element lazily — convert to list() to see results."},
+      {q:"What does filter(func, iterable) do?",o:["Maps each element","Returns elements where func(element) is True","Sorts elements","Reverses the iterable"],a:1,e:"filter() keeps only elements for which the function returns True."}
+    ],
+    hard: [
+      {q:"What is the GIL in CPython?",o:["Global Import Lock","Global Interpreter Lock","General Instruction List","Graph Interface Layer"],a:1,e:"The GIL prevents multiple native threads from executing Python bytecode simultaneously."},
+      {q:"What does __slots__ do in a class?",o:["Adds GUI slots","Prevents __dict__ per instance, saving memory","Locks class attributes","Enables multi-inheritance"],a:1,e:"__slots__ stops per-instance __dict__ creation, reducing memory."},
+      {q:"What is a descriptor in Python?",o:["A docstring format","An object defining __get__/__set__/__delete__","A file path descriptor","A network socket type"],a:1,e:"Descriptors power properties, classmethods, and staticmethods."},
+      {q:"What is __mro__ used for?",o:["Memory Release Order","Method Resolution Order","Module Reference Object","Metaclass Resolver Object"],a:1,e:"MRO defines the order base classes are searched in multi-inheritance."},
+      {q:"What does functools.lru_cache do?",o:["Sorts function calls","Memoises results with a least-recently-used cache","Logs function calls","Limits recursion depth"],a:1,e:"lru_cache stores recent return values; same args return cached results instantly."},
+      {q:"Difference between deepcopy and copy?",o:["No difference","copy clones top level only; deepcopy recursively clones nested objects","deepcopy is faster","copy works only on dicts"],a:1,e:"copy.copy() is shallow; copy.deepcopy() recursively duplicates all nested objects."},
+      {q:"What does __enter__ and __exit__ enable?",o:["Iteration protocol","Context manager protocol (with statement)","Comparison operators","Attribute access"],a:1,e:"Defining __enter__ and __exit__ lets instances be used in 'with' statements."},
+      {q:"What is a metaclass in Python?",o:["A base class","A class whose instances are classes","A hidden class","An abstract class"],a:1,e:"A metaclass is a 'class of a class'. type is the default metaclass."},
+      {q:"What does asyncio.gather() do?",o:["Runs coroutines sequentially","Runs multiple coroutines concurrently and collects results","Cancels all tasks","Creates a new event loop"],a:1,e:"asyncio.gather(*coros) schedules all coroutines concurrently and returns results."},
+      {q:"What is the purpose of __new__ vs __init__?",o:["They are identical","__new__ creates the instance; __init__ initialises it","__init__ creates; __new__ initialises","__new__ is only for metaclasses"],a:1,e:"__new__ returns a new instance; __init__ then initialises its attributes."},
+      {q:"What is the difference between @classmethod and @staticmethod?",o:["No difference","classmethod receives cls; staticmethod receives neither self nor cls","staticmethod receives cls","classmethod receives self"],a:1,e:"@classmethod gets cls as first arg; @staticmethod gets no implicit first arg."},
+      {q:"What is a coroutine in Python?",o:["A normal function","A function defined with async def that can be awaited","A type of thread","A generator without yield"],a:1,e:"Coroutines are defined with 'async def' and suspended with 'await', enabling async I/O."},
+      {q:"What does __repr__ vs __str__ do?",o:["They are identical","__repr__ is for developers (unambiguous); __str__ is for end users (readable)","__str__ is for debugging","__repr__ is only called by print()"],a:1,e:"__repr__ should return an unambiguous representation; __str__ a human-readable one."},
+      {q:"What is the purpose of weakref in Python?",o:["Makes variables constant","References an object without preventing garbage collection","Speeds up dict lookups","Creates immutable references"],a:1,e:"weakref allows references that don't prevent the garbage collector from collecting the object."},
+      {q:"What does sys.setrecursionlimit() do?",o:["Speeds up recursion","Sets the maximum depth of the Python call stack","Disables recursion","Sets memory limit"],a:1,e:"Python has a default recursion limit (~1000); sys.setrecursionlimit() changes this ceiling."}
+    ]
+  },
 
-        function addSkill() {
-            const input = document.getElementById("skillInput");
-            const skill = input.value.trim();
-            if (!skill || skills.includes(skill)) return;
-            skills.push(skill);
-            skillLevels[skill] = 50;
-            input.value = "";
-            renderSkills();
-        }
+  java: {
+    easy: [
+      {q:"Entry point of a Java program?",o:["start()","run()","main()","init()"],a:2,e:"Java execution starts at public static void main(String[] args)."},
+      {q:"What does JVM stand for?",o:["Java Virtual Machine","Java Variable Manager","Java Verified Module","Java Visual Mode"],a:0,e:"JVM executes Java bytecode on any platform."},
+      {q:"Which is NOT a primitive type in Java?",o:["int","String","boolean","double"],a:1,e:"String is a class (reference type). int, boolean, double are primitives."},
+      {q:"Keyword for inheritance in Java?",o:["implements","inherits","extends","super"],a:2,e:"class Dog extends Animal — Java uses 'extends' for class inheritance."},
+      {q:"How do you print to console in Java?",o:["print()","console.log()","System.out.println()","echo()"],a:2,e:"System.out.println() writes a line to standard output."},
+      {q:"Default value of an int field in Java?",o:["null","undefined","0","1"],a:2,e:"Numeric instance fields default to 0 in Java if not initialised."},
+      {q:"Which access modifier is accessible everywhere?",o:["private","protected","default","public"],a:3,e:"public members are accessible from any class in any package."},
+      {q:"What does 'static' mean on a method?",o:["Only called once","Belongs to the class, not an instance","Thread-safe","Cannot be overridden"],a:1,e:"static methods belong to the class and can be called without creating an object."},
+      {q:"What is an interface in Java?",o:["A class with private methods","A contract defining method signatures","A final class","A singleton class"],a:1,e:"Interfaces define a contract — implementing classes must provide the method bodies."},
+      {q:"What does 'new' do in Java?",o:["Declares a variable","Creates an object on the heap","Imports a class","Defines a method"],a:1,e:"'new' allocates heap memory and calls the constructor to create an object."},
+      {q:"What is the default value of a boolean in Java?",o:["true","false","null","0"],a:1,e:"boolean fields default to false in Java."},
+      {q:"Which loop is guaranteed to execute at least once?",o:["for","while","do-while","foreach"],a:2,e:"do-while tests the condition after executing the block at least once."},
+      {q:"What does the 'final' keyword do on a class?",o:["Makes it abstract","Prevents the class from being subclassed","Makes all methods static","Allows only one instance"],a:1,e:"A final class cannot be extended/subclassed."},
+      {q:"How do you cast an int to a double in Java?",o:["(int) x","(double) x","int.toDouble(x)","Double.cast(x)"],a:1,e:"(double) x is an explicit widening cast from int to double."},
+      {q:"What is the size of an int in Java?",o:["2 bytes","4 bytes","8 bytes","Platform-dependent"],a:1,e:"Java int is always 32 bits (4 bytes) regardless of platform."}
+    ],
+    medium: [
+      {q:"Difference between == and .equals() in Java?",o:["No difference","== compares references; .equals() compares content","== compares content; .equals() compares references","Both compare memory addresses"],a:1,e:"== checks reference equality; .equals() checks logical/content equality."},
+      {q:"What is autoboxing?",o:["Converting arrays to ArrayLists","Auto-conversion between primitives and wrapper classes","Boxing GUI components","Auto-importing packages"],a:1,e:"Autoboxing: int↔Integer, double↔Double conversions done automatically."},
+      {q:"What does 'final' do on a variable?",o:["Makes it static","Makes it thread-safe","Prevents reassignment","Deletes it after scope"],a:2,e:"A final variable can only be assigned once — it becomes a constant."},
+      {q:"Result of 10 / 3 in Java?",o:["3.33","3","4","3.0"],a:1,e:"Integer division truncates: 10/3 = 3 in Java."},
+      {q:"Interface for natural ordering with Collections.sort()?",o:["Sortable","Ordered","Comparable","Comparator"],a:2,e:"Implementing Comparable and compareTo() enables natural ordering."},
+      {q:"What is a checked exception?",o:["Any runtime error","An exception the compiler forces you to handle or declare","An error thrown by the JVM","An unchecked exception subclass"],a:1,e:"Checked exceptions (e.g. IOException) must be caught or declared."},
+      {q:"What does 'abstract' on a class mean?",o:["No methods allowed","Cannot be instantiated directly","Only static methods","The class is immutable"],a:1,e:"Abstract classes cannot be instantiated — they must be subclassed."},
+      {q:"Difference between ArrayList and LinkedList?",o:["No difference","ArrayList uses dynamic array; LinkedList uses doubly-linked nodes","LinkedList is always faster","ArrayList always uses more memory"],a:1,e:"ArrayList has O(1) random access; LinkedList has O(1) insert/remove at ends."},
+      {q:"What does 'try-with-resources' do?",o:["Handles only RuntimeExceptions","Automatically closes AutoCloseable resources","Retries failed operations","Catches all exceptions silently"],a:1,e:"Resources opened in try(...) are automatically closed when the block exits."},
+      {q:"What is method overloading?",o:["Overriding a parent method","Same method name, different parameter lists","Making a method static","Hiding a method"],a:1,e:"Overloading = same method name, different signatures. Resolved at compile time."},
+      {q:"What does HashMap.getOrDefault(key, def) do?",o:["Always returns def","Returns the value for key, or def if key not present","Inserts def if key missing","Throws exception if missing"],a:1,e:"getOrDefault() is a safe way to access map values without NullPointerException."},
+      {q:"What is the purpose of the 'super' keyword?",o:["Creates a new object","Refers to the parent class constructor or method","Makes method final","Calls a static method"],a:1,e:"super() calls the parent class constructor; super.method() calls the parent's method."},
+      {q:"What is an enum in Java?",o:["A type of array","A class of constant named values","A generic interface","A lambda function"],a:1,e:"Enums define a fixed set of named constants, e.g. enum Day { MON, TUE, WED }"},
+      {q:"What does the ternary operator do?",o:["Loops 3 times","A compact if-else: condition ? valueIfTrue : valueIfFalse","Performs 3-way comparison","Declares 3 variables"],a:1,e:"x = (a > b) ? a : b; assigns the larger value — a compact if-else."},
+      {q:"What is StringBuilder vs String in Java?",o:["No difference","StringBuilder is mutable; String is immutable","String is faster for concatenation","StringBuilder is thread-safe"],a:1,e:"String is immutable — each change creates a new object. StringBuilder modifies in-place."}
+    ],
+    hard: [
+      {q:"Difference between HashMap and ConcurrentHashMap?",o:["No difference","ConcurrentHashMap is thread-safe; HashMap is not","HashMap is always faster","ConcurrentHashMap uses more memory always"],a:1,e:"ConcurrentHashMap uses segment-level locking for thread safety."},
+      {q:"What is a functional interface?",o:["Interface with many defaults","Interface with exactly one abstract method","Interface extending Function","A deprecated interface type"],a:1,e:"@FunctionalInterface has exactly one abstract method — usable as a lambda target."},
+      {q:"What does 'volatile' guarantee in Java?",o:["Mutual exclusion","Atomic compound operations","Visibility of changes across threads","Immutability"],a:2,e:"volatile ensures reads/writes go to main memory — guarantees visibility not atomicity."},
+      {q:"What is Double-Checked Locking used for?",o:["Validating input twice","Thread-safe lazy singleton initialisation","Locking two resources at once","Comparing floating-point numbers"],a:1,e:"DCL reduces synchronisation overhead by checking the instance twice."},
+      {q:"What does 'transient' keyword do?",o:["Makes a field final","Excludes a field from serialisation","Creates a temporary variable","Marks a method abstract"],a:1,e:"transient fields are skipped during Java object serialisation."},
+      {q:"Method hiding vs method overriding?",o:["They are the same","Overriding uses instance type; hiding uses reference type for static methods","Hiding works only with final methods","Overriding applies only to static methods"],a:1,e:"Overriding resolves at runtime; hiding resolves at compile time based on reference type."},
+      {q:"Purpose of 'synchronized' keyword?",o:["Speeds up methods","Ensures only one thread executes the block at a time","Makes a variable volatile","Prevents overriding"],a:1,e:"synchronized acquires the object's intrinsic lock, preventing concurrent execution."},
+      {q:"What does CompletableFuture.thenApply() do?",o:["Blocks until completion","Applies a function to the result when it completes","Cancels the future","Runs callback on main thread"],a:1,e:"thenApply() chains a transformation on the result without blocking."},
+      {q:"Difference between Comparable and Comparator?",o:["They are identical","Comparable defines natural order in the class; Comparator is external","Comparator is in the class itself","Comparable requires a separate class"],a:1,e:"Comparable is in the class (compareTo); Comparator is a separate strategy (compare)."},
+      {q:"What is a phantom reference in Java?",o:["A null reference","A reference that doesn't prevent GC, enqueued after finalisation","A WeakReference blocking GC","A reference to a static field"],a:1,e:"PhantomReference is the weakest reference — object is GC'd first, then reference is enqueued."},
+      {q:"What is the purpose of Java's Optional class?",o:["A faster alternative to null","A container that may or may not hold a non-null value, preventing NPEs","A thread-safe reference","A lazy initialiser"],a:1,e:"Optional<T> explicitly represents the possibility of a missing value, avoiding NullPointerException."},
+      {q:"What is method reference syntax (::)?",o:["Calls a method twice","A shorthand for a lambda calling an existing method","Accesses a static field","Declares a function pointer"],a:1,e:"ClassName::method is shorthand for a lambda like (x) -> ClassName.method(x)."},
+      {q:"What is the difference between Runnable and Callable?",o:["No difference","Runnable has no return value; Callable returns a value and can throw checked exceptions","Callable has no return","Runnable can throw checked exceptions"],a:1,e:"Runnable.run() returns void; Callable.call() returns a value and can throw checked exceptions."},
+      {q:"What does ReentrantLock offer over synchronized?",o:["Nothing extra","Fairness, try-lock, interruptibility, and multiple conditions","Automatic release","Faster performance always"],a:1,e:"ReentrantLock offers tryLock(), lockInterruptibly(), fairness policy, and multiple Condition objects."},
+      {q:"What is the diamond problem and how does Java handle it?",o:["A memory layout issue","Multiple inheritance ambiguity — Java resolves via interface default method rules","A GC issue","A serialisation conflict"],a:1,e:"When two interfaces have the same default method, the implementing class must override it to resolve ambiguity."}
+    ]
+  },
 
-        function renderSkills() {
-            const container = document.getElementById("skillsDisplay");
-            container.innerHTML = "";
-            skills.forEach((skill, i) => {
-                container.innerHTML += `
-                    <div style="background:rgba(109,40,217,0.15);color:var(--glow);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;">
-                        ${skill}
-                        <span style="cursor:pointer;font-weight:bold;" onclick="removeSkill(${i})">×</span>
-                    </div>`;
-            });
-        }
+  c: {
+    easy: [
+      {q:"Header needed for printf()?",o:["iostream","stdlib.h","stdio.h","string.h"],a:2,e:"stdio.h contains printf(), scanf(), etc."},
+      {q:"What does '&' before a variable do?",o:["Logical AND","Returns the memory address","Bitwise AND","Dereferences a pointer"],a:1,e:"& is the address-of operator — it gives the memory address."},
+      {q:"Correct syntax to declare an integer in C?",o:["var x = 10","int x = 10;","x := 10","integer x = 10"],a:1,e:"C requires explicit type: int x = 10;"},
+      {q:"Which loop always runs at least once?",o:["for","while","do-while","foreach"],a:2,e:"do { } while(condition); tests after the first execution."},
+      {q:"Size of char in C?",o:["2 bytes","4 bytes","1 byte","8 bytes"],a:2,e:"char is always 1 byte (8 bits) in C."},
+      {q:"Operator to access struct member via pointer?",o:[".","->","::","*"],a:1,e:"ptr->member is shorthand for (*ptr).member."},
+      {q:"What does '*' before a pointer do?",o:["Gets address","Multiplies","Dereferences — accesses value at the address","Declares a pointer"],a:2,e:"*ptr dereferences the pointer, giving the value stored at that address."},
+      {q:"Correct way to declare a pointer to int?",o:["int& p","int p","int *p","pointer p"],a:2,e:"int *p; declares p as a pointer to an integer."},
+      {q:"Function to free heap memory in C?",o:["delete","free()","release()","dispose()"],a:1,e:"free(ptr) releases memory back to the system."},
+      {q:"What does NULL represent in C?",o:["Zero integer","An empty string","A null pointer","The number -1"],a:2,e:"NULL is a macro (typically 0 or (void*)0) representing a pointer to nothing."},
+      {q:"What does #include do?",o:["Defines a macro","Inserts the contents of the specified file","Declares a function","Links a library"],a:1,e:"#include inserts the header file's contents, giving access to its declarations."},
+      {q:"What is a variable in C?",o:["A fixed value","A named memory location that holds data","A function pointer","A preprocessor directive"],a:1,e:"A variable is a named storage location in memory that can hold a value of a declared type."},
+      {q:"How do you end a statement in C?",o:["newline","{}",";","end"],a:2,e:"C statements are terminated with a semicolon ;"},
+      {q:"What is the main() function's return type in C?",o:["void","string","int","char"],a:2,e:"main() returns int. Returning 0 indicates successful execution."},
+      {q:"What does scanf() do?",o:["Prints to console","Reads formatted input from stdin","Scans a file","Allocates memory"],a:1,e:"scanf() reads formatted input (like int or string) from standard input."}
+    ],
+    medium: [
+      {q:"What is a dangling pointer?",o:["A pointer to NULL","A pointer to freed memory","A pointer to a global","An uninitialised pointer"],a:1,e:"A dangling pointer holds the address of freed memory — dereferencing is undefined behaviour."},
+      {q:"What does malloc() return on failure?",o:["0","NULL","-1","An exception"],a:1,e:"malloc() returns NULL if it cannot allocate the requested memory."},
+      {q:"Difference between struct and union?",o:["No difference","Union members share the same memory location","Struct has only one active member","Union is always faster"],a:1,e:"All union members occupy the same memory; only one member is valid at a time."},
+      {q:"What does 'static' mean for a local variable?",o:["Makes it global","Persists across function calls","Makes it constant","Removes it from the stack"],a:1,e:"static local variables retain their value between calls — stored in the data segment."},
+      {q:"What causes a segmentation fault?",o:["A compile error","Accessing memory the process isn't permitted to access","Dividing by zero","A floating-point overflow"],a:1,e:"A segfault is triggered when the OS detects an illegal memory access."},
+      {q:"Purpose of 'const' keyword in C?",o:["Allocates on heap","Prevents modification after initialisation","Makes variable global","Optimises memory layout"],a:1,e:"const tells the compiler the variable's value must not be changed."},
+      {q:"Difference between stack and heap allocation?",o:["No difference","Stack is automatic/fast/limited; heap is manual/flexible/larger","Heap is always faster","Stack requires malloc"],a:1,e:"Stack is managed automatically; heap is manually managed with malloc/free."},
+      {q:"What does calloc() do differently from malloc()?",o:["Allocates on the stack","Allocates and zero-initialises the memory","Allocates more memory","Is faster than malloc"],a:1,e:"calloc(n, size) allocates n*size bytes and initialises all to zero."},
+      {q:"What is a function pointer in C?",o:["A pointer to the return value","A variable storing the address of a function","A pointer to a struct","A constant pointer"],a:1,e:"Function pointers store the address of a function and can be called like a regular function."},
+      {q:"What does 'extern' keyword mean?",o:["Makes a variable constant","Declares a variable/function defined in another file","Hides a variable","Allocates on heap"],a:1,e:"extern tells the compiler the variable or function is defined in another translation unit."},
+      {q:"What is a buffer overflow?",o:["Running out of heap memory","Writing beyond the allocated bounds of a buffer, overwriting adjacent memory","A stack being too large","Printing too much output"],a:1,e:"Buffer overflows occur when data written exceeds buffer size, corrupting adjacent memory — a major security vulnerability."},
+      {q:"What does realloc() do?",o:["Releases memory","Allocates new memory and frees old","Resizes a previously allocated memory block","Copies memory"],a:2,e:"realloc(ptr, newSize) resizes the block pointed to by ptr, copying existing data if needed."},
+      {q:"What is the sizeof operator?",o:["A function that counts elements","A compile-time operator returning the size in bytes of a type or variable","A runtime memory checker","A pointer to size"],a:1,e:"sizeof(int) returns 4 on most platforms — it's evaluated at compile time."},
+      {q:"What does the preprocessor do with #define?",o:["Allocates memory","Performs textual substitution before compilation","Links a library","Declares a typed constant"],a:1,e:"#define NAME value causes the preprocessor to replace NAME with value throughout the code before compilation."},
+      {q:"What is a pointer to pointer (int **p)?",o:["A 2D array always","A variable that stores the address of a pointer to int","A double value","An error in C"],a:1,e:"int **p is a pointer that holds the address of another int pointer — used for 2D arrays and out-parameters."}
+    ],
+    hard: [
+      {q:"What is undefined behaviour in C?",o:["A compile-time error","Behaviour not defined by the C standard — compiler can do anything","A controlled runtime warning","A type mismatch error"],a:1,e:"UB lets compilers assume UB never happens and optimise aggressively, causing catastrophic bugs."},
+      {q:"What does 'volatile' do in C?",o:["Makes variable immutable","Prevents compiler caching the variable in a register","Allocates on the heap","Makes thread-safe"],a:1,e:"volatile forces every read/write to actual memory — critical for hardware registers."},
+      {q:"What does 'restrict' keyword mean in C99?",o:["Pointer is const","No other pointer in scope aliases this memory","Pointer is read-only","Pointer is on the stack"],a:1,e:"restrict is a promise to the compiler enabling better optimisation by ruling out aliasing."},
+      {q:"Difference between #include <f> and #include \"f\"?",o:["No difference","<> searches system dirs first; \"\" searches local dir first","\"\" is deprecated","<> is only for user headers"],a:1,e:"<> looks in system paths; \"\" starts in the current directory."},
+      {q:"What does (*fp)(x) mean if fp is a function pointer?",o:["Dereference fp as int","Call the function fp points to with argument x","Declare a new function","Pointer arithmetic"],a:1,e:"(*fp)(x) calls the function stored at fp's address. Equivalent to fp(x)."},
+      {q:"What is a memory leak?",o:["Reading uninitialised memory","Heap memory allocated but never freed while pointer is lost","Overwriting adjacent memory","Stack overflow"],a:1,e:"A memory leak occurs when heap memory is allocated but never freed and all references are lost."},
+      {q:"What is type punning and why is it risky?",o:["Casting between unrelated pointer types to reinterpret memory — risks UB","A safe cast between int and float","Using union to add types","A compiler optimisation"],a:0,e:"Type punning reinterprets bit patterns via pointer casting, violating strict aliasing rules."},
+      {q:"What does the C preprocessor do?",o:["Compiles code to object files","Runs macro expansion and file inclusion before compilation","Links object files","Optimises code"],a:1,e:"The preprocessor handles #include, #define, #ifdef etc. before the compiler sees source."},
+      {q:"What is the strict aliasing rule in C?",o:["Pointers must be aligned","You may not access an object through a pointer of an incompatible type","Only one pointer per address","Global variables are always aliased"],a:1,e:"Strict aliasing allows the compiler to assume different-type pointers don't alias, enabling optimisations."},
+      {q:"Difference between shallow and deep copy of a struct?",o:["No difference","Shallow copies pointer values; deep also copies the data they point to","Deep is always wrong in C","Shallow uses memcpy only"],a:1,e:"Shallow copy duplicates pointer values; deep copy also duplicates the heap data pointed to."},
+      {q:"What is the difference between a process and a thread in C (POSIX)?",o:["No difference","Processes have separate memory spaces; threads share memory within a process","Threads have separate memory","Processes are always faster"],a:1,e:"Processes are isolated with separate address spaces; threads share address space and are lighter-weight."},
+      {q:"What does longjmp() do?",o:["Jumps to next function","Performs a non-local jump to a previously saved setjmp point","Exits the process","Calls a function pointer"],a:1,e:"longjmp() unwinds the stack non-locally back to where setjmp() was called — used for error recovery."},
+      {q:"What is an ABI (Application Binary Interface)?",o:["A type of API","The low-level conventions for how compiled code calls functions, passes arguments, and lays out data","A network protocol","A linking tool"],a:1,e:"ABI defines calling conventions, data layout, and name mangling — critical for library compatibility."},
+      {q:"What is the purpose of the volatile keyword with memory-mapped I/O?",o:["Speed up access","Prevent the compiler from caching the value since it can change outside program control","Make the address constant","Allocate on the heap"],a:1,e:"Hardware registers can change at any time; volatile forces the compiler to re-read from the actual address every time."},
+      {q:"What is a translation unit in C?",o:["A compiled library","A single .c source file after preprocessing, forming one compilation input","A header file","A linker script"],a:1,e:"A translation unit is a .c file + all included headers after preprocessing — what the compiler compiles at once."}
+    ]
+  },
 
-        function removeSkill(index) {
-            const skill = skills[index];
-            delete skillLevels[skill];
-            skills.splice(index, 1);
-            renderSkills();
-        }
+  maths: {
+    easy: [
+      {q:"Derivative of x²?",o:["x","2x","2","x³/3"],a:1,e:"Power rule: d/dx(xⁿ)=nxⁿ⁻¹. So d/dx(x²)=2x."},
+      {q:"What is 15% of 200?",o:["20","25","30","35"],a:2,e:"15%×200 = 0.15×200 = 30."},
+      {q:"Area of a circle with radius 5?",o:["25π","10π","5π","50π"],a:0,e:"Area = πr² = π×25 = 25π."},
+      {q:"Solve: 3x + 6 = 21. What is x?",o:["3","5","7","9"],a:1,e:"3x=15 → x=5."},
+      {q:"What is log₁₀(1000)?",o:["2","3","4","10"],a:1,e:"1000=10³, so log₁₀(1000)=3."},
+      {q:"Sum of angles in a triangle?",o:["90°","180°","270°","360°"],a:1,e:"Interior angles of any triangle always sum to 180°."},
+      {q:"The Pythagorean theorem?",o:["a+b=c","a²+b²=c²","a²-b²=c","ab=c²"],a:1,e:"In a right triangle: a²+b²=c² where c is the hypotenuse."},
+      {q:"Factorial of 5 (5!)?",o:["25","60","120","720"],a:2,e:"5! = 5×4×3×2×1 = 120."},
+      {q:"What is 2³ × 2² equal to?",o:["2⁵","2⁶","4⁵","8³"],a:0,e:"When multiplying same bases add exponents: 2³×2² = 2⁵ = 32."},
+      {q:"Mean of 4, 8, 12?",o:["6","7","8","10"],a:2,e:"Mean = (4+8+12)/3 = 24/3 = 8."},
+      {q:"What is a prime number?",o:["Divisible by 2","Has exactly two distinct factors: 1 and itself","Any odd number","Any even number"],a:1,e:"A prime number has exactly two factors: 1 and itself. E.g. 2, 3, 5, 7, 11."},
+      {q:"What is 7² ?",o:["14","42","49","56"],a:2,e:"7² = 7 × 7 = 49."},
+      {q:"Perimeter of a rectangle 4 × 6?",o:["24","20","10","12"],a:1,e:"Perimeter = 2(l + w) = 2(4+6) = 20."},
+      {q:"What is the reciprocal of 4?",o:["4","2","0.25","0.5"],a:2,e:"The reciprocal of n is 1/n. Reciprocal of 4 = 1/4 = 0.25."},
+      {q:"If x = 3, what is x³ + 1?",o:["10","27","28","30"],a:2,e:"3³ + 1 = 27 + 1 = 28."}
+    ],
+    medium: [
+      {q:"What is ∫sin(x) dx?",o:["cos(x)+C","-cos(x)+C","sin(x)+C","-sin(x)+C"],a:1,e:"∫sin(x)dx = -cos(x)+C. Verify: d/dx(-cos x) = sin x."},
+      {q:"A matrix A is invertible iff its determinant is:",o:["Equal to 1","Equal to 0","Non-zero","Positive"],a:2,e:"det(A) ≠ 0 is required for A to have an inverse."},
+      {q:"Sum of first n natural numbers?",o:["n(n+1)","n²","n(n+1)/2","(n-1)n/2"],a:2,e:"∑ᵢ₌₁ⁿ i = n(n+1)/2 — Gauss's formula."},
+      {q:"Conditions for continuity of f at x=a?",o:["f(a) exists only","Limit exists only","f(a) exists, limit exists, and they are equal","f must be differentiable at a"],a:2,e:"All three: f(a) defined, limit exists, and they are equal."},
+      {q:"Which is NOT a property of probability?",o:["All probabilities ≥ 0","Sum of all probabilities = 1","Individual probability can exceed 1","P(A∪B)=P(A)+P(B)-P(A∩B)"],a:2,e:"Probabilities are always between 0 and 1."},
+      {q:"What does standard deviation measure?",o:["Average value","Middle value","Spread/dispersion around the mean","Total sum"],a:2,e:"Standard deviation quantifies how spread out values are from the mean."},
+      {q:"What is the chain rule?",o:["d/dx(f+g) = f'+g'","d/dx(f(g(x))) = f'(g(x))·g'(x)","d/dx(fg) = f'g + fg'","d/dx(f/g) = (f'g-fg')/g²"],a:1,e:"Chain rule: differentiate outer, keep inner, multiply by inner's derivative."},
+      {q:"Determinant of 2×2 matrix [[a,b],[c,d]]?",o:["a+d","ac-bd","ad-bc","ab+cd"],a:2,e:"det([[a,b],[c,d]]) = ad - bc."},
+      {q:"Geometric series sum?",o:["Sum = a/(1+r)","Sum = a(1-rⁿ)/(1-r) for finite; a/(1-r) for |r|<1 infinite","Sum = na","Sum = a·r"],a:1,e:"Finite: S = a(1-rⁿ)/(1-r). Infinite (|r|<1): S = a/(1-r)."},
+      {q:"Bayes' Theorem?",o:["P(A|B)=P(A)·P(B)","P(A|B)=P(B|A)·P(A)/P(B)","P(A|B)=P(A)+P(B)","P(A|B)=1-P(B|A)"],a:1,e:"Bayes: P(A|B) = P(B|A)·P(A)/P(B)."},
+      {q:"What is a quadratic equation?",o:["ax+b=0","ax²+bx+c=0","ax³=0","aˣ=0"],a:1,e:"A quadratic equation has the form ax²+bx+c=0 where a≠0."},
+      {q:"Quadratic formula?",o:["x=(-b±√b²-4ac)/2a","x=-b/2a","x=√(b²-4ac)","x=b/2a"],a:0,e:"x = (-b ± √(b²-4ac)) / 2a — the quadratic formula for roots of ax²+bx+c=0."},
+      {q:"What is the integral ∫xⁿ dx (n≠-1)?",o:["xⁿ⁺¹+C","xⁿ⁺¹/(n+1)+C","nxⁿ⁻¹+C","xⁿ/n+C"],a:1,e:"Power rule for integration: ∫xⁿdx = xⁿ⁺¹/(n+1) + C."},
+      {q:"What is the median of a dataset?",o:["The most frequent value","The average","The middle value when sorted","The range divided by 2"],a:2,e:"The median is the middle value when data is sorted in order."},
+      {q:"What does the dot product of two vectors represent?",o:["Their cross product","A scalar related to the cosine of the angle between them","A perpendicular vector","Their sum"],a:1,e:"a·b = |a||b|cos(θ). If the dot product is 0, vectors are perpendicular."}
+    ],
+    hard: [
+      {q:"What does the Fundamental Theorem of Calculus state?",o:["Integration and differentiation are unrelated","Differentiation and integration are inverse operations","Every continuous function has a derivative","Every bounded function is integrable"],a:1,e:"The FTC connects antiderivatives to definite integrals, showing the two are inverses."},
+      {q:"What is the rank of a matrix?",o:["Number of rows","Number of columns","Max number of linearly independent rows/columns","Determinant value"],a:2,e:"Rank = dimension of the column space = maximum linearly independent rows/columns."},
+      {q:"What is a Fourier series used for?",o:["Solving ODEs only","Representing a periodic function as a sum of sines and cosines","Finding eigenvalues","Computing matrix inverses"],a:1,e:"Fourier series decompose periodic functions into sinusoidal components."},
+      {q:"When is Ax=b inconsistent?",o:["det(A)≠0","rank(A) < rank([A|b])","A is symmetric","b=0"],a:1,e:"No solution when b is not in the column space of A."},
+      {q:"Cauchy-Schwarz inequality?",o:["|a·b| ≤ ‖a‖·‖b‖","a·b = ‖a‖·‖b‖","|a+b| ≤ |a|+|b|","‖a-b‖ ≥ ‖a‖-‖b‖"],a:0,e:"|⟨a,b⟩| ≤ ‖a‖·‖b‖, with equality iff a and b are linearly dependent."},
+      {q:"Taylor series of eˣ around x=0?",o:["1+x+x²+x³+…","1+x+x²/2!+x³/3!+…","x+x²+x³+…","1+2x+3x²+…"],a:1,e:"eˣ = ∑(xⁿ/n!) = 1 + x + x²/2! + x³/3! + …"},
+      {q:"What is the Euler-Lagrange equation used for?",o:["Solving linear systems","Finding extrema of functionals in calculus of variations","Solving ODEs","Finding eigenvalues"],a:1,e:"The Euler-Lagrange equation gives conditions for extremising a functional."},
+      {q:"What is an eigenvalue of matrix A?",o:["A scalar λ where Av = λv for non-zero v","The determinant of A","The trace of A","The inverse of A"],a:0,e:"λ is an eigenvalue if Av = λv has a non-zero solution v. Found from det(A-λI)=0."},
+      {q:"What makes a set a vector space?",o:["It contains exactly n elements","Closed under addition and scalar multiplication, with zero vector and inverses","It has an orthonormal basis","It is a subset of ℝⁿ"],a:1,e:"A vector space must satisfy 8 axioms including closure under addition and scalar multiplication."},
+      {q:"What is the Intermediate Value Theorem?",o:["Every differentiable function is continuous","If f is continuous on [a,b], it takes every value between f(a) and f(b)","Every bounded sequence converges","A continuous function on a closed interval is uniformly continuous"],a:1,e:"IVT: if f is continuous on [a,b] and k is between f(a) and f(b), ∃c with f(c)=k."},
+      {q:"What is Lagrange multipliers method used for?",o:["Solving linear equations","Optimising a function subject to a constraint","Computing definite integrals","Finding the inverse of a matrix"],a:1,e:"Lagrange multipliers find extrema of f(x,y) subject to a constraint g(x,y)=c."},
+      {q:"What is a Jacobian matrix?",o:["A diagonal matrix","A matrix of all first-order partial derivatives of a vector-valued function","The transpose of the Hessian","A matrix of eigenvalues"],a:1,e:"The Jacobian J contains all ∂fᵢ/∂xⱼ partial derivatives — represents local linear approximation of a vector function."},
+      {q:"What does it mean for a series to converge absolutely?",o:["The partial sums are bounded","The sum of absolute values of terms converges","The terms go to zero","The series is geometric"],a:1,e:"Absolute convergence (∑|aₙ| converges) implies ordinary convergence and is stronger."},
+      {q:"What is the divergence theorem (Gauss's theorem)?",o:["∮ F·dr = surface integral","∯ F·dS = ∭ (∇·F) dV over a closed surface","∇×F = 0 everywhere","∬ curl(F)·dS = ∮ F·dr"],a:1,e:"The divergence theorem relates flux through a closed surface to the divergence of the vector field over the enclosed volume."},
+      {q:"What is L'Hôpital's Rule?",o:["Integration by parts formula","If lim f/g is 0/0 or ∞/∞, then lim f/g = lim f'/g'","A method for solving ODEs","A matrix decomposition technique"],a:1,e:"L'Hôpital's Rule resolves indeterminate limits by differentiating numerator and denominator separately."}
+    ]
+  },
 
-        function buildObSkills() {
-            const el = document.getElementById('ob-skills-list');
-            el.innerHTML = "";
-            skills.forEach(skill => {
-                const safeId = 'obs-' + skill.replace(/[^a-zA-Z0-9]/g, '-');
-                el.innerHTML += `
-                    <div style="margin-bottom:18px;">
-                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;">
-                            <span>${skill}</span>
-                            <span id="${safeId}" style="color:var(--glow);font-weight:600;">50%</span>
-                        </div>
-                        <input type="range" class="skill-slider" min="0" max="100" value="50"
-                            oninput="document.getElementById('${safeId}').textContent=this.value+'%'; skillLevels['${skill}']=parseInt(this.value);">
-                    </div>`;
-            });
-        }
+  chemistry: {
+    easy: [
+      {q:"Atomic number of Carbon?",o:["4","6","8","12"],a:1,e:"Carbon has 6 protons, so its atomic number is 6."},
+      {q:"What is H₂O?",o:["Hydrogen peroxide","Sulfuric acid","Water","Ammonia"],a:2,e:"H₂O is water — 2 hydrogen atoms bonded to 1 oxygen atom."},
+      {q:"pH of pure water at 25°C?",o:["0","7","14","1"],a:1,e:"Pure water is neutral — pH 7 at 25°C."},
+      {q:"Example of a chemical change?",o:["Ice melting","Wood burning","Sugar dissolving","Glass breaking"],a:1,e:"Burning wood produces new substances (CO₂, H₂O, ash) — a chemical change."},
+      {q:"Periodic table organises elements by?",o:["Atomic mass only","Alphabetical order","Atomic number","Discovery date"],a:2,e:"Elements are arranged in order of increasing atomic number (protons)."},
+      {q:"Chemical symbol for Gold?",o:["Go","Gd","Au","Ag"],a:2,e:"Au comes from Latin 'Aurum' — the symbol for Gold."},
+      {q:"Atoms in one molecule of CO₂?",o:["1","2","3","4"],a:2,e:"CO₂ has 1 carbon + 2 oxygen = 3 atoms total."},
+      {q:"What is an element?",o:["A compound of two atoms","A pure substance made of only one type of atom","A mixture of metals","A charged particle"],a:1,e:"An element is a pure substance consisting of only one kind of atom."},
+      {q:"State of matter with definite volume, no definite shape?",o:["Solid","Liquid","Gas","Plasma"],a:1,e:"Liquids have a definite volume but take the shape of their container."},
+      {q:"Most abundant gas in Earth's atmosphere?",o:["Oxygen","Carbon dioxide","Nitrogen","Argon"],a:2,e:"Nitrogen (N₂) makes up about 78% of Earth's atmosphere."},
+      {q:"What is a molecule?",o:["A single proton","Two or more atoms bonded together","A charged atom","A subatomic particle"],a:1,e:"A molecule is formed when two or more atoms bond together, e.g. H₂O, CO₂."},
+      {q:"Symbol for Oxygen?",o:["O","Ox","Og","Om"],a:0,e:"Oxygen's chemical symbol is O (atomic number 8)."},
+      {q:"What does the atomic mass represent?",o:["Number of protons only","Number of protons + neutrons","Number of electrons","Number of neutrons only"],a:1,e:"Atomic mass (mass number) = protons + neutrons in the nucleus."},
+      {q:"What is the charge of an electron?",o:["Positive (+1)","Neutral (0)","Negative (-1)","Varies"],a:2,e:"Electrons carry a negative charge of -1. Protons carry +1. Neutrons are neutral."},
+      {q:"What is NaCl commonly known as?",o:["Sugar","Baking soda","Table salt","Vinegar"],a:2,e:"NaCl (sodium chloride) is ordinary table salt."}
+    ],
+    medium: [
+      {q:"Bond type formed by sharing electrons?",o:["Ionic","Covalent","Metallic","Hydrogen"],a:1,e:"Covalent bonds share electron pairs between atoms."},
+      {q:"Le Chatelier's Principle states?",o:["Electrons orbit in fixed paths","A system at equilibrium shifts to counteract an applied stress","Entropy always increases","Energy is conserved"],a:1,e:"If a stress is applied, the equilibrium shifts to partially relieve it."},
+      {q:"Molar mass of NaCl?",o:["23 g/mol","35.5 g/mol","58.5 g/mol","40 g/mol"],a:2,e:"Na=23 g/mol, Cl=35.5 g/mol → NaCl=58.5 g/mol."},
+      {q:"What is oxidation in a redox reaction?",o:["Gain of electrons","Loss of protons","Loss of electrons","Gain of neutrons"],a:2,e:"OIL RIG: Oxidation Is Loss of electrons, Reduction Is Gain."},
+      {q:"Which subatomic particle determines element identity?",o:["Neutron","Electron","Proton","Positron"],a:2,e:"The number of protons (atomic number) uniquely identifies an element."},
+      {q:"What is an isotope?",o:["Atom with different electrons","Same protons, different neutrons","A negative ion","Same formula, different structure"],a:1,e:"Isotopes: same element (same protons), different number of neutrons."},
+      {q:"What is molarity?",o:["Mass of solute per litre","Moles of solute per litre of solution","Moles per kg of solvent","Grams per 100 mL"],a:1,e:"Molarity (M) = moles of solute / litres of solution."},
+      {q:"What is the empirical formula?",o:["Actual number of atoms in a molecule","Simplest whole-number ratio of atoms","Structural arrangement","Molecular weight"],a:1,e:"The empirical formula gives the simplest integer ratio of elements."},
+      {q:"What does a catalyst do to activation energy?",o:["Increases it","Decreases it","Has no effect","Doubles it"],a:1,e:"A catalyst lowers activation energy, speeding up the reaction without being consumed."},
+      {q:"Acid vs base (Arrhenius definition)?",o:["No difference","Acid produces H⁺; base produces OH⁻","Base produces H⁺; acid produces OH⁻","Both produce H₂O"],a:1,e:"Arrhenius: acids release H⁺ in water; bases release OH⁻."},
+      {q:"What is the law of conservation of mass?",o:["Mass appears from nowhere in reactions","Mass is neither created nor destroyed in a chemical reaction","Products always weigh more","Reactants always weigh more"],a:1,e:"In any chemical reaction, total mass of reactants = total mass of products."},
+      {q:"What is a mole in chemistry?",o:["A small animal","6.022×10²³ particles of a substance","1 gram of any substance","1 litre of gas"],a:1,e:"One mole = Avogadro's number (6.022×10²³) of particles — atoms, molecules, ions, etc."},
+      {q:"What is the ideal gas law?",o:["PV=nRT","PV=RT","P=nRT","PV=nR/T"],a:0,e:"PV = nRT relates pressure, volume, moles, gas constant, and temperature."},
+      {q:"What is electronegativity?",o:["Tendency to lose electrons","Tendency to attract electrons in a bond","The number of valence electrons","Ionisation energy"],a:1,e:"Electronegativity is the ability of an atom to attract shared electrons toward itself in a covalent bond."},
+      {q:"What is a Lewis structure?",o:["A graph of reaction rates","A diagram showing valence electrons and bonds between atoms","A phase diagram","A nuclear energy level diagram"],a:1,e:"Lewis structures use dots and lines to show how valence electrons are shared or held in molecules."}
+    ],
+    hard: [
+      {q:"What does Hund's Rule state?",o:["Electrons fill lower energy orbitals first","Electrons pair before filling empty orbitals","Electrons occupy empty orbitals singly before pairing","Two electrons can't have same 4 quantum numbers"],a:2,e:"Hund's Rule: electrons singly occupy each degenerate orbital before pairing."},
+      {q:"In a galvanic cell, oxidation occurs at the:",o:["Cathode","Anode","Salt bridge","Electrolyte"],a:1,e:"Anode = oxidation. Cathode = reduction. 'AnOx RedCat'."},
+      {q:"Henderson-Hasselbalch equation is used for:",o:["Calculating enthalpy","Estimating pH of buffer solutions","Finding molar mass","Determining reaction rate"],a:1,e:"pH = pKa + log([A⁻]/[HA]) — calculates pH of a buffer solution."},
+      {q:"Hybridisation of carbon in benzene?",o:["sp","sp²","sp³","sp³d"],a:1,e:"Benzene carbon is sp² — 3 sigma bonds + 1 unhybridised p orbital for the π system."},
+      {q:"Which law: total gas pressure = sum of partial pressures?",o:["Boyle's Law","Charles's Law","Dalton's Law","Graham's Law"],a:2,e:"Dalton's Law: P_total = P₁+P₂+P₃+…"},
+      {q:"What is activation energy?",o:["Energy released in a reaction","Minimum energy reactants need to react","Total energy of products","Heat of formation"],a:1,e:"Activation energy (Ea) is the minimum kinetic energy required for reactants to react."},
+      {q:"Difference between SN1 and SN2 reactions?",o:["No difference","SN1 is unimolecular (2 steps, carbocation); SN2 is bimolecular (1 step, backside attack)","SN2 forms a carbocation","SN1 involves backside attack"],a:1,e:"SN1: unimolecular, racemisation, carbocation. SN2: bimolecular, inversion of configuration."},
+      {q:"What does the Aufbau principle state?",o:["Fill higher energy orbitals first","Fill lower energy orbitals before higher ones","Orbitals fill with parallel spins first","Electrons share before splitting"],a:1,e:"Aufbau: electrons occupy the lowest available energy orbital first."},
+      {q:"What is entropy (thermodynamics)?",o:["A measure of temperature","A measure of disorder/randomness","The heat content","The free energy available for work"],a:1,e:"Entropy (S) measures disorder. The 2nd law states total entropy of an isolated system always increases."},
+      {q:"Hybridisation of nitrogen in NH₃?",o:["sp","sp²","sp³","sp³d"],a:2,e:"Nitrogen in NH₃ is sp³ — three bonding pairs + one lone pair."},
+      {q:"What is Gibbs Free Energy (ΔG)?",o:["Total heat of reaction","A thermodynamic potential predicting spontaneity: ΔG=ΔH-TΔS","Activation energy","Entropy of the system"],a:1,e:"ΔG = ΔH - TΔS. A reaction is spontaneous when ΔG < 0."},
+      {q:"What is nuclear magnetic resonance (NMR) used for in chemistry?",o:["Measuring melting points","Determining molecular structure by analysing behaviour of nuclei in a magnetic field","Measuring reaction rate","Determining atomic mass"],a:1,e:"NMR spectroscopy reveals molecular structure — how atoms are connected and their electronic environment."},
+      {q:"What is the difference between a sigma (σ) and pi (π) bond?",o:["No difference","σ bond is head-on overlap (stronger); π bond is side-on overlap (weaker, above/below)","π bond is stronger","σ bonds only exist in aromatic compounds"],a:1,e:"σ bonds are head-on orbital overlap; π bonds are sideways overlap of p orbitals — double bonds contain one σ and one π."},
+      {q:"What is chromatography used for?",o:["Measuring pH","Separating mixtures based on differential migration through a medium","Determining molecular weight","Measuring boiling point"],a:1,e:"Chromatography separates mixture components by how they interact with the stationary vs. mobile phase."},
+      {q:"What is a coordination compound?",o:["A compound of two non-metals","A metal ion bonded to ligands (electron-pair donors)","An ionic crystal","An organic polymer"],a:1,e:"Coordination compounds have a central metal atom/ion surrounded by ligands e.g. [Cu(NH₃)₄]²⁺."}
+    ]
+  }
+};
 
-        function goStep(n) {
-            if (n === 1 && skills.length === 0) {
-                alert("Please enter at least one skill.");
-                return;
-            }
-            if (n === 1) buildObSkills();
-            currentStep = n;
-            document.querySelectorAll('[id^="ob-step-"]').forEach(p => p.style.display = 'none');
-            const active = document.getElementById('ob-step-' + n);
-            if (active) active.style.display = 'block';
-            document.querySelectorAll('.step-dot').forEach((dot, i) => {
-                dot.classList.remove('active', 'done');
-                if (i < n) dot.classList.add('done');
-                if (i === n) dot.classList.add('active');
-            });
-            document.querySelectorAll('.step-line').forEach((line, i) => {
-                line.classList.toggle('done', i < n);
-            });
-        }
+// ─── Subject matcher ─────────────────────────────────────────────────────
+const SUBJECTS = [
+  {keys:['python'],                                                  bank:'python',    label:'Python',    emoji:'🐍'},
+  {keys:['java'],                                                    bank:'java',      label:'Java',      emoji:'☕'},
+  {keys:['c lang','clang'],                                          bank:'c',         label:'C',         emoji:'⚙️'},
+  {keys:['maths','math','calculus','algebra','statistics','trigonometry'], bank:'maths', label:'Maths', emoji:'📐'},
+  {keys:['chemistry','chem'],                                        bank:'chemistry', label:'Chemistry', emoji:'⚗️'},
+];
+function matchSubject(skill) {
+  const low = skill.toLowerCase().trim();
+  if (low === 'c') return SUBJECTS.find(s => s.bank === 'c');
+  const padded = ' ' + low + ' ';
+  for (const s of SUBJECTS) {
+    if (s.keys.some(k => padded.includes(' '+k+' ') || low === k)) return s;
+  }
+  return null;
+}
 
-        function buildSchedule() {
-            const g = document.getElementById('schedGrid');
-            if (!g) return;
-            const presets = [2,3,8,9,10,15,16,22,23];
-            for (let i = 0; i < 28; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'sched-cell' + (presets.includes(i) ? ' on' : '');
-                cell.onclick = () => cell.classList.toggle('on');
-                g.appendChild(cell);
-            }
-        }
+// ─── Anti-repeat question picker ─────────────────────────────────────────
+// Tracks used indices per bank+level so every retake gets different questions
+const usedIdx = {}; // e.g. "python_easy" → Set of used indices
 
-        function getScheduleData() {
-            const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-            const slots = ['6AM-8AM','8AM-10AM','10AM-12PM','12PM-2PM','2PM-4PM','4PM-6PM','6PM-8PM','8PM-10PM','10PM-12AM'];
-            const cells = document.querySelectorAll('.sched-cell');
-            const result = [];
-            cells.forEach((cell, i) => {
-                if (cell.classList.contains('on')) {
-                    result.push({ day: days[i % 7], slot: slots[Math.floor(i / 7)] });
-                }
-            });
-            return result;
-        }
+function pickFresh(bank, lv, count) {
+  const pool = QB[bank][lv];
+  const key  = bank + '_' + lv;
+  if (!usedIdx[key]) usedIdx[key] = new Set();
 
-        // ══════════════════════════════════════════════════════════════
-        // COMPATIBILITY ENGINE
-        // Computes a 0–100 score between current user and a candidate.
-        // Factors:
-        //   40% — Skill complement  (I'm weak where they're strong & vice versa)
-        //   30% — Skill overlap     (shared interests to collaborate on)
-        //   30% — Schedule overlap  (common availability windows)
-        // ══════════════════════════════════════════════════════════════
-        function computeCompatibility(mySkills, myLevels, mySchedule, theirData) {
-            const theirSkills  = theirData.skills  || [];
-            const theirLevels  = theirData.skillLevels || {};
-            const theirSchedule= theirData.schedule || [];
+  // Reset when we've used enough that we can't fill another round
+  if (usedIdx[key].size + count > pool.length) usedIdx[key] = new Set();
 
-            // --- Skill complement score (0–40) ---
-            // For each skill I have, if they also have it and their level
-            // is meaningfully different from mine → good complement
-            let complementScore = 0;
-            let complementCount = 0;
-            mySkills.forEach(skill => {
-                if (theirLevels[skill] !== undefined) {
-                    const myLevel   = myLevels[skill]   || 50;
-                    const theirLevel= theirLevels[skill]|| 50;
-                    const diff = Math.abs(myLevel - theirLevel);
-                    // Max complement when diff is large (one is expert, other is learner)
-                    complementScore += diff;
-                    complementCount++;
-                }
-            });
-            const complementNorm = complementCount > 0
-                ? Math.min(100, (complementScore / complementCount))
-                : 0;
+  const available = pool.map((_, i) => i).filter(i => !usedIdx[key].has(i));
+  const shuffled  = [...available].sort(() => Math.random() - 0.5);
+  const chosen    = shuffled.slice(0, count);
+  chosen.forEach(i => usedIdx[key].add(i));
+  return chosen.map(i => pool[i]);
+}
 
-            // --- Skill overlap score (0–30) ---
-            // How many skills do we share? (out of my total)
-            const mySkillSet   = new Set(mySkills.map(s => s.toLowerCase()));
-            const theirSkillSet= new Set(theirSkills.map(s => s.toLowerCase()));
-            let shared = 0;
-            mySkillSet.forEach(s => { if (theirSkillSet.has(s)) shared++; });
-            const overlapNorm = mySkillSet.size > 0
-                ? (shared / mySkillSet.size) * 100
-                : 0;
+// ─── Helpers ──────────────────────────────────────────────────────────────
+function getLevel(pct) { return pct <= 40 ? 'easy' : pct <= 70 ? 'medium' : 'hard'; }
+function lvlClass(l)   { return l === 'easy' ? 'lv-easy' : l === 'medium' ? 'lv-med' : 'lv-hard'; }
+function lvlText(l)    { return l === 'easy' ? 'Beginner' : l === 'medium' ? 'Intermediate' : 'Advanced'; }
+function $(id)         { return document.getElementById(id); }
 
-            // --- Schedule overlap score (0–30) ---
-            // How many slots do we share?
-            const mySlotKeys   = new Set(mySchedule.map(s   => s.day + '|' + s.slot));
-            const theirSlotKeys= new Set(theirSchedule.map(s => s.day + '|' + s.slot));
-            let sharedSlots = 0;
-            mySlotKeys.forEach(k => { if (theirSlotKeys.has(k)) sharedSlots++; });
-            const scheduleNorm = mySlotKeys.size > 0
-                ? Math.min(100, (sharedSlots / Math.max(mySlotKeys.size, 1)) * 100)
-                : 0;
+// ─── Quiz runtime state ───────────────────────────────────────────────────
+let qList = [], qIdx = 0, qScore = 0, qDone = false;
+let subjectQueue = [], subjectQueueIdx = 0;
+let qSkillRpt = {}, totalScore = 0, totalQs = 0;
 
-            // Weighted total
-            const total = Math.round(
-                complementNorm * 0.40 +
-                overlapNorm    * 0.30 +
-                scheduleNorm   * 0.30
-            );
+// ─── DOM ready ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  $('skillInput').addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } });
+  buildSchedule();
+});
 
-            return {
-                score: total,
-                sharedSkills:  [...mySkillSet].filter(s => theirSkillSet.has(s)),
-                canTeach:      theirSkills.filter(s => !mySkillSet.has(s.toLowerCase())),
-                canLearn:      mySkills.filter(s => !theirSkillSet.has(s.toLowerCase())),
-                sharedSlots,
-            };
-        }
+// ─── Skills ───────────────────────────────────────────────────────────────
+function addSkill() {
+  const inp = $('skillInput'), s = inp.value.trim();
+  if (!s || skills.includes(s)) return;
+  skills.push(s); skillLevels[s] = 50; inp.value = ''; renderSkills();
+}
+function removeSkill(i) { delete skillLevels[skills[i]]; skills.splice(i, 1); renderSkills(); }
+function renderSkills() {
+  $('skillsDisplay').innerHTML = skills.map((s, i) => `
+    <div style="background:rgba(109,40,217,0.15);color:var(--glow);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;">
+      ${s}<span style="cursor:pointer;font-weight:bold;" onclick="removeSkill(${i})">×</span>
+    </div>`).join('');
+}
+function buildObSkills() {
+  $('ob-skills-list').innerHTML = skills.map(s => {
+    const sid = 'obs-' + s.replace(/[^a-zA-Z0-9]/g, '-');
+    const pct = skillLevels[s] || 50;
+    const lv  = pct <= 40 ? '🟢 Beginner' : pct <= 70 ? '🟡 Intermediate' : '🔴 Advanced';
+    return `<div style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+        <span>${s}</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="${sid}-lv" style="font-size:11px;color:rgba(255,255,255,0.35);">${lv}</span>
+          <span id="${sid}" style="color:var(--glow);font-weight:600;">${pct}%</span>
+        </div>
+      </div>
+      <input type="range" class="skill-slider" min="0" max="100" value="${pct}"
+        oninput="skillLevels['${s}']=+this.value;$('${sid}').textContent=this.value+'%';const v=+this.value;$('${sid}-lv').textContent=v<=40?'🟢 Beginner':v<=70?'🟡 Intermediate':'🔴 Advanced';">
+    </div>`;
+  }).join('');
+}
 
-        // ── Render a single match card ────────────────────────────────
-        function renderMatchCard(user, compat, index, isTop) {
-            const name      = user.displayName || user.name || 'User'; // only named users reach here
-            const initial   = name[0].toUpperCase();
-            const avClass   = AV_CLASSES[index % AV_CLASSES.length];
-            const color     = COLORS[index % COLORS.length];
-            const score     = compat.score;
-            const scoreColor= score >= 80 ? '#10b981' : score >= 60 ? '#6a4dff' : '#f59e0b';
+// ─── Steps ────────────────────────────────────────────────────────────────
+function goStep(n) {
+  if (n === 1 && skills.length === 0) { alert('Please enter at least one skill.'); return; }
+  if (n === 1) buildObSkills();
+  currentStep = n;
+  document.querySelectorAll('[id^="ob-step-"]').forEach(p => p.style.display = 'none');
+  const a = $('ob-step-' + n); if (a) a.style.display = 'block';
+  document.querySelectorAll('.step-dot').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i < n) d.classList.add('done');
+    if (i === n) d.classList.add('active');
+  });
+  document.querySelectorAll('.step-line').forEach((l, i) => l.classList.toggle('done', i < n));
+}
 
-            const teachPills = compat.canTeach.slice(0,4).map(s =>
-                `<span class="skill-pill pill-learn">📖 ${s}</span>`).join('');
-            const learnPills = compat.canLearn.slice(0,4).map(s =>
-                `<span class="skill-pill pill-teach">⭐ ${s}</span>`).join('');
-            const sharedPills= compat.sharedSkills.slice(0,3).map(s =>
-                `<span class="skill-pill pill-sched">🤝 ${s}</span>`).join('');
+// ─── Schedule ─────────────────────────────────────────────────────────────
+function buildSchedule() {
+  const g = $('schedGrid'); if (!g) return;
+  g.innerHTML = '';
+  const corner = document.createElement('div');
+  corner.className = 'sched-header-cell';
+  corner.style.cssText = 'position:sticky;top:0;left:0;z-index:3;';
+  g.appendChild(corner);
+  DAYS.forEach(d => { const h = document.createElement('div'); h.className = 'sched-header-cell'; h.textContent = d; g.appendChild(h); });
+  HOURS.forEach((lbl, bi) => {
+    const noon = bi === 6;
+    const l = document.createElement('div'); l.className = 'sched-time-label' + (noon ? ' noon' : ''); l.textContent = lbl; g.appendChild(l);
+    DAYS.forEach((_, di) => {
+      const c = document.createElement('div'); c.className = 'sched-cell' + (noon ? ' noon' : ''); c.dataset.hour = bi; c.dataset.day = di;
+      c.addEventListener('mousedown', e => { isDrag = true; dragOn = !c.classList.contains('on'); c.classList.toggle('on', dragOn); e.preventDefault(); });
+      c.addEventListener('mouseenter', () => { if (isDrag) c.classList.toggle('on', dragOn); });
+      g.appendChild(c);
+    });
+  });
+  document.addEventListener('mouseup', () => { isDrag = false; });
+}
+function selectAllCells() { document.querySelectorAll('.sched-cell').forEach(c => c.classList.add('on')); }
+function clearAllCells()   { document.querySelectorAll('.sched-cell').forEach(c => c.classList.remove('on')); }
+function getScheduleData() {
+  const r = [];
+  document.querySelectorAll('.sched-cell.on').forEach(c => r.push({ day: DAYS[+c.dataset.day], slot: HOURS[+c.dataset.hour] }));
+  return r;
+}
 
-            const topBadge = isTop
-                ? `<div style="position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#6a4dff,#00c9a7);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">⭐ Best Match</div>`
-                : '';
+// ─── Save & go to quiz ────────────────────────────────────────────────────
+async function saveAndStartQuiz() {
+  const sched = getScheduleData();
+  const profile = { skills, skillLevels, schedule: sched, onboardCompleted: false, completedAt: new Date().toISOString() };
+  goStep(3);
+  try { if (typeof window._firestoreSave === 'function') await window._firestoreSave(profile); } catch (e) { console.warn('Profile save:', e.message); }
+  buildQuizIntro();
+}
 
-            return `
-            <div class="match-card ${isTop?'top':''}">
-                ${topBadge}
-                <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
-                    <div class="match-score-ring ${avClass}"
-                        style="background:linear-gradient(135deg,${color},${color}99);box-shadow:0 0 20px ${color}44;">
-                        ${initial}
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-family:var(--syne);font-weight:800;font-size:16px;color:white;">${name}</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">
-                            ${compat.sharedSlots} shared time slot${compat.sharedSlots!==1?'s':''}
-                            · ${compat.sharedSkills.length} shared skill${compat.sharedSkills.length!==1?'s':''}
-                        </div>
-                    </div>
-                    <div style="text-align:center;flex-shrink:0;">
-                        <div style="font-family:var(--syne);font-size:24px;font-weight:900;color:${scoreColor};">${score}%</div>
-                        <div style="font-size:10px;color:rgba(255,255,255,0.3);">match</div>
-                    </div>
-                </div>
+// ─── Quiz intro ───────────────────────────────────────────────────────────
+function buildQuizIntro() {
+  const quizzable = skills.filter(s => matchSubject(s));
+  const other     = skills.filter(s => !matchSubject(s));
+  let html = '';
 
-                <div class="match-bar-outer">
-                    <div class="match-bar-fill" style="width:0%" data-target="${score}"></div>
-                </div>
+  if (!quizzable.length) {
+    html = `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px;text-align:center;">
+      <div style="font-size:24px;margin-bottom:6px;">⚠️</div>
+      <div style="font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:4px;">No quiz-supported subjects found</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);">Supported: Python, Java, C, Maths, Chemistry<br>Your skills will be saved — quiz skipped.</div>
+    </div>`;
+    $('quiz-start-btn').textContent = '✅ Enter StudySphere';
+    $('quiz-start-btn').onclick = () => { window.location.href = 'dashboard.html'; };
+  } else {
+    html = `<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:10px;">
+      📋 <strong style="color:white;">5 questions per subject</strong>, one subject at a time.<br>
+      Need <strong style="color:#10b981;">4/5 correct</strong> to pass each subject.<br>
+      Every retake shows <strong style="color:#b48dff;">completely different questions</strong> (15-question rotating pool).
+    </div>`;
+    html += quizzable.map(s => {
+      const subj = matchSubject(s), pct = skillLevels[s] || 50, lv = getLevel(pct);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:8px;">
+        <div style="font-size:22px;">${subj.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;">${subj.label}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">Self-rated: ${pct}% · 5 questions</div>
+        </div>
+        <span class="lvl-badge ${lvlClass(lv)}">${lvlText(lv)}</span>
+      </div>`;
+    }).join('');
+    if (other.length) html += `<div style="font-size:11px;color:rgba(255,255,255,0.28);margin-top:6px;">Saved only (no quiz): ${other.join(', ')}</div>`;
+  }
+  $('quiz-skill-summary').innerHTML = html;
+}
 
-                ${teachPills || learnPills || sharedPills ? `
-                <div style="margin-top:10px;line-height:2;">
-                    ${teachPills  ? `<div style="margin-bottom:3px;"><span style="font-size:10px;color:rgba(255,255,255,0.3);margin-right:4px;">They can teach you:</span>${teachPills}</div>` : ''}
-                    ${learnPills  ? `<div style="margin-bottom:3px;"><span style="font-size:10px;color:rgba(255,255,255,0.3);margin-right:4px;">You can teach them:</span>${learnPills}</div>` : ''}
-                    ${sharedPills ? `<div><span style="font-size:10px;color:rgba(255,255,255,0.3);margin-right:4px;">Shared interests:</span>${sharedPills}</div>` : ''}
-                </div>` : ''}
-            </div>`;
-        }
+// ─── Start quiz ───────────────────────────────────────────────────────────
+function startQuiz() {
+  $('quiz-intro').style.display = 'none';
+  $('quiz-area').style.display  = 'block';
 
-        // ── Animate bars after render ─────────────────────────────────
-        function animateBars() {
-            requestAnimationFrame(() => {
-                document.querySelectorAll('.match-bar-fill[data-target]').forEach(bar => {
-                    const target = bar.getAttribute('data-target');
-                    setTimeout(() => { bar.style.width = target + '%'; }, 100);
-                });
-            });
-        }
+  subjectQueue = skills.filter(s => matchSubject(s)).map(s => ({
+    skill: s, subj: matchSubject(s), lv: getLevel(skillLevels[s] || 50)
+  }));
+  subjectQueueIdx = 0;
+  totalScore = 0; totalQs = 0;
+  qSkillRpt  = {};
+  subjectQueue.forEach(({ skill }) => { qSkillRpt[skill] = { correct: 0, total: 0, passed: false }; });
 
-        // ── Main: save profile then compute & render matches ──────────
-        async function saveAndMatch() {
-            const scheduleData = getScheduleData();
-            const profileData = {
-                skills,
-                skillLevels,
-                schedule: scheduleData,
-                onboardCompleted: true,
-                completedAt: new Date().toISOString()
-            };
+  if (!subjectQueue.length) { finaliseAllSubjects(); return; }
+  loadSubject(0);
+}
 
-            // Move to step 3 immediately (show loading state)
-            goStep(3);
+// ─── Load subject (picks 5 fresh questions) ───────────────────────────────
+function loadSubject(idx) {
+  const { skill, subj, lv } = subjectQueue[idx];
+  qList  = pickFresh(subj.bank, lv, 5).map(q => ({ ...q, skill, subj, lv }));
+  qIdx   = 0;
+  qScore = 0;
+  qDone  = false;
+  showSubjectBanner(subj, lv, idx + 1, subjectQueue.length);
+}
 
-            const statusEl = document.getElementById('saveStatus');
-            statusEl.style.color = 'var(--teal-glow)';
-            statusEl.textContent = '⏳ Saving profile…';
+// ─── Subject intro banner ─────────────────────────────────────────────────
+function showSubjectBanner(subj, lv, current, total) {
+  $('quiz-area').innerHTML = `
+    <div style="text-align:center;padding:28px 0 20px;">
+      <div style="font-size:48px;margin-bottom:10px;">${subj.emoji}</div>
+      <h3 style="font-family:var(--syne);font-weight:900;font-size:20px;margin-bottom:6px;">${subj.label} Quiz</h3>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;">Subject ${current} of ${total}</div>
+      <span class="lvl-badge ${lvlClass(lv)}" style="margin-bottom:16px;display:inline-block;">${lvlText(lv)} Level · 5 Questions</span>
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">Score 4/5 or more to pass this subject.</p>
+      <button onclick="beginSubjectQuiz()" style="padding:12px 36px;border-radius:12px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;">
+        Start ${subj.label} Questions →
+      </button>
+    </div>`;
+}
 
-            // 1. Save profile
-            try {
-                if (typeof window._firestoreSave !== 'function') throw new Error("Firebase not loaded");
-                await window._firestoreSave(profileData);
-                statusEl.textContent = '✅ Profile saved!';
-            } catch (err) {
-                console.error("Save error:", err);
-                statusEl.style.color = '#f87171';
-                statusEl.textContent = err.message.includes("No user")
-                    ? '⚠️ Please log in first — profile not saved'
-                    : '⚠️ Save failed: ' + (err.message || 'check console');
-            }
+// ─── Build question UI ────────────────────────────────────────────────────
+function beginSubjectQuiz() {
+  $('quiz-area').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div>
+        <span id="q-skill-lbl" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);"></span>
+        <span id="q-lvl-badge" class="lvl-badge" style="margin-left:6px;"></span>
+      </div>
+      <span id="q-counter" style="font-size:12px;color:rgba(255,255,255,0.3);"></span>
+    </div>
+    <div class="q-prog-bar"><div class="q-prog-fill" id="q-pfill" style="width:0%"></div></div>
+    <div id="q-text" class="fade-up" style="font-size:16px;font-weight:600;color:white;margin-bottom:20px;line-height:1.55;"></div>
+    <div id="q-opts"></div>
+    <div id="q-fb" style="display:none;margin-top:14px;padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.5;"></div>
+    <button id="q-next" onclick="nextQ()" style="display:none;width:100%;margin-top:14px;padding:12px;border-radius:12px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;"></button>`;
+  showQ();
+}
 
-            // 2. Load all other users and compute matches
-            try {
-                statusEl.textContent += ' · 🔍 Computing matches…';
-                const candidates = await window._fetchAllOnboards();
-                renderMatches(candidates, profileData);
-            } catch (err) {
-                console.error("Match fetch error:", err);
-                document.getElementById('matchLoading').style.display = 'none';
-                document.getElementById('matchResults').innerHTML +=
-                    `<div class="no-match">⚠️ Could not load matches: ${err.message}</div>`;
-            }
-        }
+// ─── Render current question ──────────────────────────────────────────────
+function showQ() {
+  const q = qList[qIdx], tot = qList.length;
+  $('q-skill-lbl').textContent = q.subj.emoji + ' ' + q.subj.label;
+  $('q-lvl-badge').className   = 'lvl-badge ' + lvlClass(q.lv);
+  $('q-lvl-badge').textContent = lvlText(q.lv);
+  $('q-counter').textContent   = 'Q' + (qIdx + 1) + ' of ' + tot;
+  $('q-pfill').style.width     = Math.round(qIdx / tot * 100) + '%';
+  $('q-text').textContent      = q.q;
+  $('q-text').classList.remove('fade-up'); void $('q-text').offsetWidth; $('q-text').classList.add('fade-up');
+  $('q-fb').style.display      = 'none';
+  $('q-next').style.display    = 'none';
+  qDone = false;
 
-        function renderMatches(candidates, myProfile) {
-            const matchLoading = document.getElementById('matchLoading');
-            const matchResults = document.getElementById('matchResults');
-            const heading      = document.getElementById('matchHeading');
-            const subtext      = document.getElementById('matchSubtext');
-            const emoji        = document.getElementById('matchEmoji');
+  $('q-opts').innerHTML = '';
+  ['A', 'B', 'C', 'D'].forEach((lt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.innerHTML = `<span class="q-letter">${lt}</span>${q.o[i]}`;
+    btn.onclick   = () => answerQ(i);
+    $('q-opts').appendChild(btn);
+  });
+}
 
-            // Compute scores for each candidate
-            const scored = candidates.map(c => ({
-                user:   c,
-                compat: computeCompatibility(
-                    myProfile.skills,
-                    myProfile.skillLevels,
-                    myProfile.schedule,
-                    c
-                )
-            })).filter(r => r.compat.score > 0)
-               .sort((a,b) => b.compat.score - a.compat.score)
-               .slice(0, 5); // top 5
+// ─── Answer ───────────────────────────────────────────────────────────────
+function answerQ(chosen) {
+  if (qDone) return; qDone = true;
+  const q = qList[qIdx], ok = chosen === q.a;
+  if (qSkillRpt[q.skill]) { qSkillRpt[q.skill].total++; if (ok) qSkillRpt[q.skill].correct++; }
+  if (ok) qScore++;
 
-            // Hide loading shimmer
-            matchLoading.style.display = 'none';
+  document.querySelectorAll('.quiz-opt').forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.a) b.classList.add('correct');
+    else if (i === chosen && !ok) b.classList.add('wrong');
+  });
 
-            if (!scored.length) {
-                emoji.textContent = '😶';
-                heading.textContent = 'No Matches Yet';
-                subtext.textContent = 'Be the first! Invite friends to join and they will show up here automatically.';
-                matchResults.innerHTML += `<div class="no-match">
-                    No named learners found yet.<br>
-                    Matches only appear for users with a real name set on their account. Share the link and come back once others have joined and completed onboarding.
-                </div>`;
-                return;
-            }
+  const fb = $('q-fb');
+  if (ok) {
+    fb.style.cssText = 'display:block;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#34d399;border-radius:12px;padding:12px 16px;font-size:13px;margin-top:14px;line-height:1.5;';
+    fb.innerHTML = '✅ <strong>Correct!</strong> ' + q.e;
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:12px;padding:12px 16px;font-size:13px;margin-top:14px;line-height:1.5;';
+    fb.innerHTML = '❌ <strong>Incorrect.</strong> ' + q.e;
+  }
+  const nx = $('q-next');
+  nx.style.display = 'block';
+  nx.textContent   = qIdx === qList.length - 1 ? '🏁 See Subject Result' : 'Next Question →';
+}
 
-            emoji.textContent  = '🎉';
-            heading.textContent = `${scored.length} Match${scored.length>1?'es':''} Found!`;
-            subtext.textContent = `Based on your skill gaps, skill levels, and schedule overlap — sorted by compatibility.`;
+function nextQ() {
+  qIdx++;
+  if (qIdx >= qList.length) finishSubject();
+  else showQ();
+}
 
-            // Render cards
-            let html = '';
-            scored.forEach((r, i) => {
-                html += renderMatchCard(r.user, r.compat, i, i === 0);
-            });
-            matchResults.innerHTML = html;
-            animateBars();
-        }
-    </script>
+// ─── Subject result screen ────────────────────────────────────────────────
+function finishSubject() {
+  const { skill, subj, lv } = subjectQueue[subjectQueueIdx];
+  const passed = qScore >= 4;
+  totalScore += qScore; totalQs += 5;
+  if (qSkillRpt[skill]) qSkillRpt[skill].passed = passed;
 
-    <!-- ===================== FIREBASE MODULE ===================== -->
-    <script type="module">
-        import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDocs, collection, getDoc }
-                from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  const sc     = qScore >= 4 ? '#10b981' : qScore >= 3 ? '#f59e0b' : '#ef4444';
+  const isLast = subjectQueueIdx === subjectQueue.length - 1;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
-            authDomain: "collabsyncai.firebaseapp.com",
-            projectId: "collabsyncai",
-            storageBucket: "collabsyncai.firebasestorage.app",
-            messagingSenderId: "862378374401",
-            appId: "1:862378374801:web:4438203269261b15011700",
-            measurementId: "G-GV97YDHCBK"
-        };
+  $('quiz-area').innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;margin-bottom:10px;">${passed ? '🎉' : '📚'}</div>
+      <h3 style="font-family:var(--syne);font-weight:900;font-size:20px;margin-bottom:8px;">${subj.label}: ${passed ? 'Passed!' : 'Not Passed'}</h3>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:16px;">You scored ${qScore}/5</div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px;">
+        <div class="res-stat"><span class="res-val" style="color:${sc};">${qScore}/5</span><span class="res-lbl">Score</span></div>
+        <div class="res-stat"><span class="res-val" style="color:${passed ? '#10b981' : '#ef4444'};">${passed ? '✅' : '❌'}</span><span class="res-lbl">${passed ? 'Pass' : 'Fail'}</span></div>
+      </div>
+      ${passed
+        ? (isLast
+            ? `<button onclick="finaliseAllSubjects()" style="padding:12px 32px;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;">🏁 See Final Results</button>`
+            : `<button onclick="nextSubject()" style="padding:12px 32px;border-radius:12px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;font-size:14px;font-weight:700;cursor:pointer;">Next Subject →</button>`)
+        : `<div style="margin-bottom:14px;padding:12px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;font-size:12px;color:#fbbf24;text-align:left;">
+            💡 <strong>Tip:</strong> Review the explanations then retake — you'll get 5 different questions from the pool of 15!
+           </div>
+           <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+             <button onclick="retakeSubject()" style="padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">🔄 Retake ${subj.label} (New Questions)</button>
+             <button onclick="goStep(1)" style="padding:12px 20px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;cursor:pointer;">✏️ Adjust Rating</button>
+           </div>`
+      }
+    </div>`;
+}
 
-        const app  = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db   = getFirestore(app);
+function nextSubject() {
+  subjectQueueIdx++;
+  loadSubject(subjectQueueIdx);
+}
 
-        let currentUser = null;
+function retakeSubject() {
+  const { skill } = subjectQueue[subjectQueueIdx];
+  qSkillRpt[skill] = { correct: 0, total: 0, passed: false };
+  loadSubject(subjectQueueIdx); // pickFresh() auto-avoids previously used questions
+}
 
-        onAuthStateChanged(auth, user => {
-            currentUser = user;
-            if (user) console.log("Logged in →", user.uid);
-            else      console.log("Not signed in");
-        });
+// ─── Final results ────────────────────────────────────────────────────────
+async function finaliseAllSubjects() {
+  $('quiz-area').style.display  = 'none';
+  $('quiz-result').style.display = 'block';
 
-        // ── Save current user's onboard profile ──────────────────────
-        window._firestoreSave = async function(profileData) {
-            if (!currentUser) throw new Error("No authenticated user. Please sign in.");
-            const uid        = currentUser.uid;
-            const displayName= currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
-            const email      = currentUser.email || '';
-            const color      = currentUser.photoURL || null;
+  const allPassed    = Object.values(qSkillRpt).every(v => v.passed);
+  const passedCount  = Object.values(qSkillRpt).filter(v => v.passed).length;
+  const totalSubjects = subjectQueue.length;
 
-            // Save to onboards/{uid}
-            await setDoc(doc(db, "onboards", uid), {
-                ...profileData,
-                uid,
-                displayName,
-                email,
-                updatedAt: new Date().toISOString()
-            }, { merge: true });
+  $('res-icon').textContent    = allPassed ? '🎉' : '📚';
+  $('res-heading').textContent = allPassed
+    ? 'All Subjects Passed! Welcome to StudySphere 🚀'
+    : passedCount + '/' + totalSubjects + ' Subjects Passed';
+  $('res-sub').textContent     = allPassed
+    ? 'Knowledge verified — you\'re in!'
+    : 'Retake failed subjects — you\'ll always get fresh questions.';
 
-            // Also save skills array in format dashboard expects (users/{uid})
-            const formatted = profileData.skills.map(s => ({
-                name:       s,
-                confidence: Math.round((profileData.skillLevels[s] || 50) / 20) // 0-100 → 0-5
-            }));
-            await setDoc(doc(db, "users", uid), {
-                skills:      formatted,
-                displayName,
-                email,
-                updatedAt:   new Date().toISOString()
-            }, { merge: true });
+  const sc = allPassed ? '#10b981' : '#ef4444';
+  $('res-stats').innerHTML = `
+    <div class="res-stat"><span class="res-val" style="color:${sc};">${passedCount}/${totalSubjects}</span><span class="res-lbl">Passed</span></div>
+    <div class="res-stat"><span class="res-val" style="color:${sc};">${allPassed ? '✅' : '❌'}</span><span class="res-lbl">${allPassed ? 'Done' : 'Retry'}</span></div>`;
 
-            console.log("Saved onboard + user skills for:", uid);
-        };
+  const rows = Object.entries(qSkillRpt).map(([s, v]) => {
+    const subj = matchSubject(s), c = v.passed ? '#10b981' : '#ef4444';
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">${subj?.emoji || '📖'}</span>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>${subj?.label || s}</span>
+          <span style="color:${c};font-weight:700;">${v.passed ? '✅ Passed' : '❌ Failed'} (${v.correct}/${v.total})</span>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;">
+          <div style="width:${v.total ? Math.round(v.correct / v.total * 100) : 0}%;height:100%;background:${c};border-radius:2px;transition:width 1s;"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
-        // ── Fetch all OTHER users' onboard profiles for matching ──────
-        window._fetchAllOnboards = async function() {
-            if (!currentUser) throw new Error("Not signed in");
-            const uid   = currentUser.uid;
-            const snap  = await getDocs(collection(db, "onboards"));
-            const results = [];
-            snap.forEach(d => {
-                if (d.id !== uid) {          // exclude self
-                    const data = d.data();
-                    // Only include users with a real display name (not anonymous / email-fallback)
-                    const hasName = data.displayName && data.displayName.trim() &&
-                                    data.displayName !== 'User' &&
-                                    !data.displayName.includes('@');
-                    if (data.onboardCompleted && data.skills?.length && hasName) {
-                        results.push({ ...data, uid: d.id });
-                    }
-                }
-            });
-            return results;
-        };
+  $('res-breakdown').innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Subject Results</div>
+    ${rows}`;
 
-        console.log("Firebase initialized for onboard");
-    </script>
+  if (allPassed) {
+    try { if (typeof window._firestoreSaveQuiz === 'function') await window._firestoreSaveQuiz({ score: passedCount, total: totalSubjects, passed: true, qSkillRpt }); } catch (e) { console.warn(e); }
+    $('res-actions').innerHTML = `<button class="btn btn-primary" style="font-size:15px;padding:13px 36px;" onclick="location.href='dashboard.html'">🚀 Enter StudySphere</button>`;
+  } else {
+    $('res-actions').innerHTML = `
+      <div style="margin-bottom:14px;padding:12px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;font-size:12px;color:#fbbf24;">
+        💡 Only failed subjects need to be retaken. Each retake gives you 5 new questions from a pool of 15!
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" style="padding:12px 28px;" onclick="retakeFailedOnly()">🔄 Retake Failed Subjects (New Questions)</button>
+        <button class="btn btn-outline" style="padding:12px 20px;" onclick="goStep(1)">✏️ Adjust Ratings</button>
+      </div>`;
+  }
+}
 
+function retakeFailedOnly() {
+  $('quiz-result').style.display = 'none';
+  $('quiz-area').style.display   = 'block';
+
+  const failed = subjectQueue.filter(({ skill }) => qSkillRpt[skill] && !qSkillRpt[skill].passed);
+  if (!failed.length) { finaliseAllSubjects(); return; }
+
+  subjectQueue    = failed;
+  subjectQueueIdx = 0;
+  failed.forEach(({ skill }) => { qSkillRpt[skill] = { correct: 0, total: 0, passed: false }; });
+  loadSubject(0);
+}
+</script>
+
+<!-- ═══════════════════════════════ FIREBASE ═══════════════════════════════ -->
+<script type="module">
+import { initializeApp }     from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc }  from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey: "AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+  authDomain: "collabsyncai.firebaseapp.com",
+  projectId: "collabsyncai",
+  storageBucket: "collabsyncai.firebasestorage.app",
+  messagingSenderId: "862378374401",
+  appId: "1:862378374401:web:4438203269261b15011700",
+  measurementId: "G-GV97YDHCBK"
+};
+const app = initializeApp(cfg), auth = getAuth(app), db = getFirestore(app);
+let CU = null;
+onAuthStateChanged(auth, u => CU = u);
+
+window._firestoreSave = async function(p) {
+  if (!CU) return;
+  const name = CU.displayName || CU.email?.split('@')[0] || 'User';
+  await setDoc(doc(db, 'onboards', CU.uid), { ...p, uid: CU.uid, displayName: name, email: CU.email || '', updatedAt: new Date().toISOString() }, { merge: true });
+  const fmt = p.skills.map(s => ({ name: s, confidence: Math.round((p.skillLevels[s] || 50) / 20) }));
+  await setDoc(doc(db, 'users', CU.uid), { skills: fmt, displayName: name, email: CU.email || '', updatedAt: new Date().toISOString() }, { merge: true });
+};
+
+window._firestoreSaveQuiz = async function({ score, total, passed, qSkillRpt }) {
+  if (!CU) return;
+  await setDoc(doc(db, 'onboards', CU.uid), { onboardCompleted: passed, quizScore: score, quizTotal: total, quizPassed: passed, quizSkillReport: qSkillRpt, completedAt: new Date().toISOString() }, { merge: true });
+  if (passed) await setDoc(doc(db, 'users', CU.uid), { onboardPassed: true, quizScore: score, updatedAt: new Date().toISOString() }, { merge: true });
+};
+</script>
 </body>
 </html>
