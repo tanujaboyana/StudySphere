@@ -68,7 +68,7 @@ nav {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(7, 7, 13, 0.85);
+    background: var(--nav-bg, rgba(7,7,13,0.85));
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     height: 64px;
@@ -1335,4 +1335,140 @@ nav {
     .step-line {
         max-width: 30px;
     }
+    .container{
+    max-width:1200px;
+    width:100%;
+    margin:auto;
+    padding:20px;
+}
+}
+.nav-right{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+/* ════════════════════════════════════════
+   LIGHT MODE GLOBAL OVERRIDES
+   ════════════════════════════════════════ */
+/* Set nav-bg for light mode via :root when --bg is light */
+[data-theme="light"],
+html[style*="--bg:#f4f5fa"] {
+html[style*="--bg: #f4f5fa"] {
+    color-scheme: light;
+}
+
+/* Nav in light mode */
+[data-theme="light"] nav,
+html[style*="--bg:#f4f5fa"] nav {
+html[style*="--bg: #f4f5fa"] nav {
+    background: rgba(255,255,255,0.92) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* Nav links */
+[data-theme="light"] .nav-link,
+html[style*="--bg:#f4f5fa"] .nav-link {
+html[style*="--bg: #f4f5fa"] .nav-link {
+    color: #475569 !important;
+}
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active,
+html[style*="--bg:#f4f5fa"] .nav-link.active {
+html[style*="--bg: #f4f5fa"] .nav-link.active {
+    color: #6d28d9 !important;
+    background: rgba(109,40,217,0.08) !important;
+    border-color: rgba(109,40,217,0.25) !important;
+}
+
+/* Cards */
+[data-theme="light"] .card,
+[data-theme="light"] .kpi-card,
+html[style*="--bg:#f4f5fa"] .card,
+html[style*="--bg: #f4f5fa"] .card,
+html[style*="--bg:#f4f5fa"] .kpi-card {
+html[style*="--bg: #f4f5fa"] .kpi-card {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+/* Subject room cards (session page) */
+[data-theme="light"] .subject-room-card,
+html[style*="--bg:#f4f5fa"] .subject-room-card {
+html[style*="--bg: #f4f5fa"] .subject-room-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+[data-theme="light"] .src-title,
+html[style*="--bg:#f4f5fa"] .src-title {
+html[style*="--bg: #f4f5fa"] .src-title {
+    color: #0f172a !important;
+}
+[data-theme="light"] .src-count,
+html[style*="--bg:#f4f5fa"] .src-count {
+html[style*="--bg: #f4f5fa"] .src-count {
+    color: #64748b !important;
+}
+[data-theme="light"] .src-badge.new,
+html[style*="--bg:#f4f5fa"] .src-badge.new {
+html[style*="--bg: #f4f5fa"] .src-badge.new {
+    background: rgba(16,185,129,0.12) !important;
+    color: #059669 !important;
+}
+
+/* Inputs */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select,
+html[style*="--bg:#f4f5fa"] input,
+html[style*="--bg: #f4f5fa"] input,
+html[style*="--bg:#f4f5fa"] textarea {
+html[style*="--bg: #f4f5fa"] textarea {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Chat bubbles */
+[data-theme="light"] .chat-msg .bubble,
+html[style*="--bg:#f4f5fa"] .chat-msg .bubble {
+html[style*="--bg: #f4f5fa"] .chat-msg .bubble {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+/* Whiteboard toolbar */
+[data-theme="light"] .wb-tool-btn,
+html[style*="--bg:#f4f5fa"] .wb-tool-btn {
+html[style*="--bg: #f4f5fa"] .wb-tool-btn {
+    color: #475569 !important;
+}
+
+/* ── Light mode triggered by JS applyTheme (sets inline CSS vars on html) ── */
+/* setProperty adds a space so selector is: --bg: #f4f5fa  */
+html[style*="--bg: #f4f5fa"] nav {
+    background: rgba(255,255,255,0.92) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+html[style*="--bg: #f4f5fa"] .nav-link {
+    color: #475569 !important;
+}
+html[style*="--bg: #f4f5fa"] .nav-link:hover,
+html[style*="--bg: #f4f5fa"] .nav-link.active {
+    color: #6d28d9 !important;
+    background: rgba(109,40,217,0.08) !important;
+    border-color: rgba(109,40,217,0.25) !important;
+}
+html[style*="--bg: #f4f5fa"] .subject-room-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+}
+html[style*="--bg: #f4f5fa"] .src-title {
+    color: #0f172a !important;
+}
+html[style*="--bg: #f4f5fa"] .src-count {
+    color: #64748b !important;
+}
+html[style*="--bg: #f4f5fa"] .card,
+html[style*="--bg: #f4f5fa"] .kpi-card {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important;
 }
