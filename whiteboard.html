@@ -170,8 +170,9 @@
         var v = s === 'light' ? L : D;
         var r = document.documentElement;
         Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
-        r.style.background = v['--bg'];
-        r.style.color = v['--text'];
+        r.setAttribute('data-theme', s);
+        r.style.setProperty('background', v['--bg'], 'important');
+        r.style.setProperty('color', v['--text'], 'important');
     })();
     </script>
 </head>
@@ -183,30 +184,30 @@
 
     <!-- Navbar -->
     <nav id="main-nav">
+        <!-- Logo should navigate to landing page -->
+        <a href="landing.html" class="nav-logo">
+            <div class="nav-logo-icon">🔗</div>
+            StudySphere 
+        </a>
 
-<a href="landing.html" class="nav-logo">
-<div class="nav-logo-icon">🔗</div>StudySphere</a>
+        <div class="nav-links" id="navLinks">
+            <a class="nav-link" href="landing.html">Intro</a>
+            <a class="nav-link" href="dashboard.html">Dashboard</a>
+            <a class="nav-link" href="match.html">Match</a>
+            <a class="nav-link" href="session.html">Session</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+            <a class="nav-link active" href="whiteboard.html">Whiteboard</a>
+            <a class="nav-link" href="resources.html">Resources</a>
+             <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+            <a class="nav-link" href="onboard.html">Onboard</a>
+        </div>
 
-<div class="nav-links">
-<a class="nav-link" href="landing.html">Intro</a>
-<a class="nav-link" href="dashboard.html">Dashboard</a>
-<a class="nav-link" href="match.html">Match</a>
-<a class="nav-link" href="session.html">Session</a>
-<a class="nav-link" href="leaderboard.html">Leaderboard</a>
-<a class="nav-link active" href="whiteboard.html">Whiteboard</a>
-<a class="nav-link" href="resources.html">Resources</a>
-<a class="nav-link" href="onboard.html">Onboard</a>
-</div>
-
-<div class="nav-right">
-<div id="profile-container"></div>
-
-<button class="ham" id="hamBtn" aria-label="Menu">
-<span></span><span></span><span></span>
+        <!-- CTA should also navigate normally 
+        <a href="onboard.html" class="nav-cta">Get Started →</a>  -->
+    <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
 </button>
-</div>
-
-</nav>
+    </nav>
 <div class="mob-drawer" id="mobDrawer">
     <a class="nav-link" href="landing.html">Intro</a>
     <a class="nav-link" href="dashboard.html">Dashboard</a>
@@ -215,6 +216,7 @@
     <a class="nav-link" href="leaderboard.html">Leaderboard</a>
     <a class="nav-link active" href="whiteboard.html">Whiteboard</a>
     <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
     <!-- Content Wrapper -->
@@ -263,58 +265,115 @@
             </div>
         </div>
     </div>
-      <div id="profile-container"
-        style="position: fixed; top: 0px; right: 20px; width: 250px; height: auto; z-index:1000;">
-        <script>
-            fetch('profile.html').then(r=>r.text()).then(html=>{
-    document.getElementById('profile-container').innerHTML=html;
+      <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
 
-    // Logout
-    const lb=document.getElementById('logout-btn');
-    if(lb) lb.addEventListener('click',e=>{
-        e.preventDefault();
-        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
-            .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
-    });
+<!-- ══════════════════════════════════════════════════════════
+     THEME SYSTEM — runs immediately, outside fetch() and
+     outside profile-container so it never gets overwritten
+══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+    const DARK  = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+    const LIGHT = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
 
-    // Dropdown
-    const pb=document.getElementById('profile-btn');
-    const pm=document.getElementById('profile-menu');
-    if(pb&&pm){
-        pb.addEventListener('click',(e)=>{
-            e.stopPropagation();
-            pm.style.display=pm.style.display==='block'?'none':'block';
+    window.applyTheme = function(mode) {
+        const vars = mode === 'dark' ? DARK : LIGHT;
+        const root = document.documentElement;
+        const isLight = mode === 'light';
+
+        // 1. CSS variables
+        Object.keys(vars).forEach(k => root.style.setProperty(k, vars[k]));
+        // 2. data-theme fires [data-theme="light"] CSS rules in stylesheet1.css
+        root.setAttribute('data-theme', mode);
+        // 3. Force bg + text on html & body
+        root.style.setProperty('background', vars['--bg'], 'important');
+        root.style.setProperty('color',      vars['--text'], 'important');
+        document.body.style.setProperty('background', vars['--bg'], 'important');
+        document.body.style.setProperty('color',      vars['--text'], 'important');
+
+        // 4. NAV — solid white in light, dark glass in dark
+        const nav = document.getElementById('main-nav');
+        if (nav) {
+            nav.style.setProperty('background',          isLight ? '#ffffff'                      : 'rgba(7,7,13,0.85)',      'important');
+            nav.style.setProperty('border-bottom-color', isLight ? '#e2e8f0'                      : 'rgba(255,255,255,0.06)', 'important');
+            nav.style.setProperty('box-shadow',          isLight ? '0 1px 12px rgba(0,0,0,0.08)' : 'none',                   'important');
+            nav.style.setProperty('backdrop-filter',     isLight ? 'none'                         : 'blur(20px)',             'important');
+        }
+
+        // 5. Nav links — dark readable text in light mode
+        document.querySelectorAll('.nav-link').forEach(a => {
+            const active = a.classList.contains('active');
+            a.style.setProperty('color',                   isLight ? (active ? '#6d28d9' : '#475569') : '', 'important');
+            a.style.setProperty('-webkit-text-fill-color', isLight ? (active ? '#6d28d9' : '#475569') : '', 'important');
+            a.style.background  = isLight ? (active ? 'rgba(109,40,217,0.12)' : '') : '';
+            a.style.borderColor = isLight ? (active ? 'rgba(109,40,217,0.35)' : 'transparent') : '';
         });
-        document.addEventListener('click',(e)=>{
-            if(!pb.contains(e.target)&&!pm.contains(e.target))
-                pm.style.display='none';
+
+        // 6. Mobile drawer
+        const drawer = document.getElementById('mobDrawer');
+        if (drawer) {
+            drawer.style.setProperty('background',   isLight ? 'rgba(255,255,255,0.98)' : '', 'important');
+            drawer.style.setProperty('border-color', isLight ? '#e2e8f0'                : '', 'important');
+        }
+        document.querySelectorAll('#mobDrawer .nav-link').forEach(a => {
+            a.style.color = isLight ? (a.classList.contains('active') ? '#6d28d9' : '#475569') : '';
         });
-    }
 
-    // Theme
-    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        // 7. Hamburger lines
+        document.querySelectorAll('.ham span').forEach(s => { s.style.background = isLight ? '#475569' : ''; });
 
-    window.applyTheme=function(mode){
-        const vars=mode==='dark'?DARK:LIGHT;
-        const root=document.documentElement;
-        Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-        document.body.style.background=vars['--bg'];
-        document.body.style.color=vars['--text'];
-        const btnD=document.getElementById('btn-dark');
-        const btnL=document.getElementById('btn-light');
-        const lbl=document.getElementById('theme-row-label');
-        if(btnD) btnD.classList.toggle('active',mode==='dark');
-        if(btnL) btnL.classList.toggle('active',mode==='light');
-        if(lbl)  lbl.textContent=mode==='dark'?'🌙 Theme':'☀️ Theme';
-        localStorage.setItem('ss-theme',mode);
+        // 8. Cards
+        document.querySelectorAll('.card,.kpi-card,.subject-room-card').forEach(el => {
+            el.style.background  = isLight ? '#ffffff' : '';
+            el.style.borderColor = isLight ? '#e2e8f0' : '';
+            el.style.color       = isLight ? '#0f172a' : '';
+        });
+
+        // 9. Profile dropdown toggle buttons
+        const btnD = document.getElementById('btn-dark');
+        const btnL = document.getElementById('btn-light');
+        const lbl  = document.getElementById('theme-row-label');
+        if (btnD) btnD.classList.toggle('active', mode === 'dark');
+        if (btnL) btnL.classList.toggle('active', mode === 'light');
+        if (lbl)  lbl.textContent = isLight ? '☀️ Theme' : '🌙 Theme';
+
+        localStorage.setItem('ss-theme', mode);
     };
 
-    window.applyTheme(localStorage.getItem('ss-theme')||'dark');
+    // Apply immediately — no waiting for fetch
+    window.applyTheme(localStorage.getItem('ss-theme') || 'dark');
 
-}).catch(e=>console.error('Profile load failed:',e));
+    // Re-apply after DOM ready (catches nav links)
+    document.addEventListener('DOMContentLoaded', () => {
+        window.applyTheme(localStorage.getItem('ss-theme') || 'dark');
+    });
+})();
 </script>
-    </div>
+
+<!-- Profile fetch — runs AFTER theme is applied above -->
+<script>
+fetch('profile.html').then(r=>r.text()).then(html=>{
+    document.getElementById('profile-container').innerHTML = html;
+
+    const lb = document.getElementById('logout-btn');
+    if (lb) lb.addEventListener('click', e => {
+        e.preventDefault();
+        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
+            .then(({getAuth,signOut}) => signOut(getAuth()).then(() => window.location.href='login.html'));
+    });
+
+    const pb = document.getElementById('profile-btn');
+    const pm = document.getElementById('profile-menu');
+    if (pb && pm) {
+        pb.addEventListener('click', e => { e.stopPropagation(); pm.style.display = pm.style.display==='block' ? 'none' : 'block'; });
+        document.addEventListener('click', e => { if (!pb.contains(e.target) && !pm.contains(e.target)) pm.style.display = 'none'; });
+    }
+
+    // Re-apply so profile Dark/Light buttons reflect current state
+    window.applyTheme(localStorage.getItem('ss-theme') || 'dark');
+
+}).catch(e => console.error('Profile load failed:', e));
+</script>
     <script>
         let wbCtx, wbDrawing = false, wbTool = 'pen', wbColor = '#8b5cf6', brushSz = 3;
         let startX, startY, snapshot;
@@ -514,4 +573,3 @@ onAuthStateChanged(_auth, user => {
 </body>
 
 </html>
-
