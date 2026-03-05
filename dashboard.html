@@ -35,6 +35,7 @@
 </div>
 
 </nav>
+
 <div class="mob-drawer" id="mobDrawer">
     <a class="nav-link" href="landing.html">Intro</a>
     <a class="nav-link active" href="dashboard.html">Dashboard</a>
@@ -45,7 +46,7 @@
     <a class="nav-link" href="resources.html">Resources</a>
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
-<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
+<!--<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>-->
 
 <!-- ════════════════════════════════════════════════════
      VIDEO CALL MODAL  (WebRTC + Firebase Signaling)
@@ -1488,8 +1489,41 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
         mobDrawer.classList.remove('open');
     }));
 </script>
-<script src="notify.js"></script>
+<!-- ══ MOBILE-ONLY: KPI Study Rooms card → scroll to Live Study Rooms ══ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function isMobile() { return window.innerWidth <= 860; }
+
+    function scrollToRoomsSection() {
+        if (!isMobile()) return; // ← desktop: do nothing at all
+
+        // Find the card whose h3 contains "Live Study Rooms"
+        const target = Array.from(document.querySelectorAll('.card'))
+            .find(c => c.querySelector('h3')?.textContent.includes('Live Study Rooms'));
+
+        if (!target) return;
+
+        const navHeight = document.getElementById('main-nav')?.offsetHeight || 56;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 14;
+        window.scrollTo({ top, behavior: 'smooth' });
+
+        // Brief purple glow highlight
+        target.style.transition = 'box-shadow 0.3s';
+        target.style.boxShadow = '0 0 0 3px rgba(109,40,217,0.45)';
+        setTimeout(() => { target.style.boxShadow = ''; }, 1800);
+    }
+
+    // Find the "Active Study Rooms" KPI card (has kpiRooms inside it)
+    const kpiRoomsEl = document.getElementById('kpiRooms');
+    if (kpiRoomsEl) {
+        const kpiCard = kpiRoomsEl.closest('.kpi-card');
+        if (kpiCard) {
+            kpiCard.style.cursor = 'pointer';
+            kpiCard.addEventListener('click', scrollToRoomsSection);
+        }
+    }
+});
+</script>
 </body>
 </html>
-
-
