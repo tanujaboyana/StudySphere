@@ -25,55 +25,13 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #e2e8f0; font-family: var(--inter, sans-serif); min-height: 100vh; }
 
-        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 20px; height:56px; display:flex; align-items:center; gap:12px; transition:background 0.3s, box-shadow 0.3s, border-color 0.3s; }
-        /* ── Light mode nav overrides ── */
-        [data-theme="light"] nav {
-            background: #ffffff !important;
-            backdrop-filter: none !important;
-            border-bottom-color: #e2e8f0 !important;
-            box-shadow: 0 1px 12px rgba(0,0,0,0.08) !important;
-        }
-        [data-theme="light"] .nav-logo {
-            color: #6d28d9 !important;
-            -webkit-text-fill-color: #6d28d9 !important;
-        }
-        [data-theme="light"] .nav-link {
-            color: #475569 !important;
-            -webkit-text-fill-color: #475569 !important;
-        }
-        [data-theme="light"] .nav-link:hover {
-            color: #6d28d9 !important;
-            -webkit-text-fill-color: #6d28d9 !important;
-            background: rgba(109,40,217,0.08) !important;
-        }
-        [data-theme="light"] .nav-link.active {
-            color: #6d28d9 !important;
-            -webkit-text-fill-color: #6d28d9 !important;
-            background: rgba(109,40,217,0.12) !important;
-            border-color: rgba(109,40,217,0.35) !important;
-            font-weight: 600 !important;
-        }
-        [data-theme="light"] .bell-btn {
-            background: #f8fafc !important;
-            border-color: #e2e8f0 !important;
-            color: #475569 !important;
-        }
-        [data-theme="light"] #myNameTag {
-            color: #475569 !important;
-        }
-        [data-theme="light"] .ham span {
-            background: #475569 !important;
-        }
-        [data-theme="light"] .mob-drawer {
-            background: rgba(255,255,255,0.98) !important;
-            border-color: #e2e8f0 !important;
-        }
+        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 20px; height:56px; display:flex; align-items:center; gap:12px; }
 .nav-links { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
 .nav-links::-webkit-scrollbar { display:none; }
-        .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text,#e2e8f0); text-decoration:none; font-family:var(--syne); font-size:15px; }
+        .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:#e2e8f0; text-decoration:none; font-family:var(--syne); font-size:15px; }
         .nav-links { display:flex; gap:2px; flex-wrap:wrap; }
         .nav-link { color:var(--muted); text-decoration:none; font-size:12px; padding:5px 10px; border-radius:6px; transition:all 0.2s; }
-        .nav-link:hover,.nav-link.active { color:var(--text,#e2e8f0); background:var(--surface); }
+        .nav-link:hover,.nav-link.active { color:#e2e8f0; background:var(--surface); }
         .nav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
 
         .content-wrapper { max-width:980px; margin:0 auto; padding:88px 20px 60px; }
@@ -156,158 +114,292 @@
         .connected-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:14px; }
         .connected-chip { background:var(--surface); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px; }
         .connected-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:white; flex-shrink:0; }
-    /* ── Hamburger button ── */
-.ham { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface); margin-left:auto; flex-shrink:0; }
-.ham span { display:block; width:20px; height:2px; background:#e2e8f0; border-radius:2px; transition:all 0.3s; }
-.ham.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-.ham.open span:nth-child(2) { opacity:0; }
-.ham.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
 
-/* ── Mobile drawer ── */
-.mob-drawer { display:none; position:fixed; top:56px; left:0; right:0; background:rgba(10,10,15,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:16px; flex-direction:column; gap:6px; z-index:199; transform:translateY(-110%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-.mob-drawer.open { transform:translateY(0); }
-.mob-drawer .nav-link { display:block; padding:10px 14px; font-size:14px; border:1px solid var(--border); border-radius:8px; }
+        /* ── SEARCH BAR ── */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 14px;
+            transition: all 0.25s;
+            width: 200px;
+        }
+        .search-input-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(109,40,217,0.15);
+            width: 260px;
+        }
+        .search-input-wrap svg { flex-shrink:0; opacity:0.5; }
+        #userSearchInput {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-family: var(--inter);
+            width: 100%;
+            min-width: 0;
+        }
+        #userSearchInput::placeholder { color: var(--muted); }
+        #searchClearBtn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1;
+            padding: 0;
+            display: none;
+            flex-shrink: 0;
+        }
+        #searchClearBtn:hover { color: #e2e8f0; }
 
-/* ── Tablet (≤860px) ── */
-@media (max-width: 860px) {
-    .content-wrapper { padding-top: 66px; }
-    .heading-lg { font-size: 24px; }
-    .connector { gap: 10px; }
-    .conn-line { min-width: 20px; }
-    .connected-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-}
+        /* Search Dropdown */
+        #searchDropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: min(360px, 92vw);
+            background: var(--card);
+            border: 1px solid rgba(109,40,217,0.35);
+            border-radius: 14px;
+            z-index: 600;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            overflow: hidden;
+        }
+        #searchDropdown.visible { display: block; animation: dropIn 0.18s ease; }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+        .search-drop-header {
+            padding: 10px 14px;
+            font-size: 11px;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        #searchResults { max-height: 340px; overflow-y: auto; padding: 8px; }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: 1px solid transparent;
+        }
+        .search-result-item:hover { background: var(--surface); border-color: var(--border); }
+        .search-av {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 13px; color: white; flex-shrink: 0;
+        }
+        .search-info { flex: 1; min-width: 0; }
+        .search-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+        .search-score { font-size: 10px; font-weight: 700; }
+        .search-action { flex-shrink: 0; }
+        .search-empty { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 13px; }
 
-/* ── Mobile (≤640px) ── */
-@media (max-width: 640px) {
-    .nav-links { display: none; }
-    .ham { display: flex; }
-    .mob-drawer { display: flex; }
-    #myNameTag { display: none; }
-    .bell-btn { padding: 6px 10px; font-size: 12px; }
+        /* search result card removed — invite is inline in dropdown */
 
-    .content-wrapper { padding: 66px 12px 48px; }
+        /* ── MATCHES MODAL ── */
+        @keyframes modalBgIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes modalIn   { from { opacity:0; transform:translate(-50%,-48%) scale(0.95); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
 
-    .heading-lg { font-size: 22px; }
+        .modal-drag-handle {
+            width: 40px; height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            margin: 10px auto 0;
+            flex-shrink: 0;
+        }
 
-    .match-hero { padding: 18px 14px; border-radius: 14px; }
-    .match-hero > div:first-child { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .match-hero > div:first-child > span { align-self: flex-start; font-size: 11px; padding: 6px 14px; }
+        .modal-tab {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.18s;
+            font-family: var(--inter);
+        }
+        .modal-tab:hover { border-color: var(--accent); color: var(--glow); }
+        .modal-tab.active { background: rgba(109,40,217,0.18); border-color: rgba(109,40,217,0.5); color: var(--glow); }
 
-    .connector { flex-direction: column; align-items: center; gap: 12px; margin-top: 16px; }
-    .conn-line { width: 2px; height: 40px; min-width: unset; background: linear-gradient(180deg, var(--accent), var(--teal)); }
-    .conn-line::after { top:50%; left:50%; transform:translate(-50%,-50%); }
-    .connector > div:not(.conn-line) { width: 100%; text-align: center !important; min-width: unset; }
-    .connector > div:not(.conn-line) .user-bubble { margin: 0 auto 8px; }
-    .connector > div:not(.conn-line) > div:last-child { text-align: center !important; }
+        .modal-match-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 10px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: all 0.18s;
+            margin-bottom: 6px;
+        }
+        .modal-match-row:hover { background: var(--surface); border-color: var(--border); }
+        .modal-score-ring {
+            width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 11px; border: 2.5px solid;
+            flex-shrink: 0; text-align: center; line-height: 1.2;
+        }
 
-    .match-hero > div:last-child { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .match-hero > div:last-child > div { margin-left: 0 !important; font-size: 11px; }
-    .match-hero .btn { width: 100%; justify-content: center; }
+        /* ── Hamburger button ── */
+        .ham { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface); margin-left:auto; flex-shrink:0; }
+        .ham span { display:block; width:20px; height:2px; background:#e2e8f0; border-radius:2px; transition:all 0.3s; }
+        .ham.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+        .ham.open span:nth-child(2) { opacity:0; }
+        .ham.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
 
-    .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+        /* ── Mobile drawer ── */
+        .mob-drawer { display:none; position:fixed; top:56px; left:0; right:0; background:rgba(10,10,15,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:16px; flex-direction:column; gap:6px; z-index:199; transform:translateY(-110%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .mob-drawer.open { transform:translateY(0); }
+        .mob-drawer .nav-link { display:block; padding:10px 14px; font-size:14px; border:1px solid var(--border); border-radius:8px; }
 
-    .match-card { padding: 12px; border-radius: 12px; }
-    .score-ring { width: 44px; height: 44px; font-size: 10px; }
+        /* ── Tablet (≤860px) ── */
+        @media (max-width: 860px) {
+            .content-wrapper { padding-top: 66px; }
+            .heading-lg { font-size: 24px; }
+            .connector { gap: 10px; }
+            .conn-line { min-width: 20px; }
+            .connected-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            /* Modal full-screen on tablet */
+            #matchesModalBox { width: min(580px, 96vw); max-height: 86vh; }
+        }
 
-    .double-bar { flex-wrap: wrap; gap: 4px; }
-    .bar-label { width: auto; font-size: 9px; }
+        /* ── Mobile (≤640px) ── */
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .ham { display: flex; }
+            .mob-drawer { display: flex; }
+            #myNameTag { display: none; }
+            #followerCountBadge { display: none !important; }
+            .bell-btn { padding: 6px 10px; font-size: 12px; }
 
-    #invitePanel { position:fixed; top:auto; bottom:0; right:0; left:0; width:100% !important; max-height:80vh; border-radius:16px 16px 0 0; border-bottom:none; }
+            .content-wrapper { padding: 66px 12px 48px; }
+            .heading-lg { font-size: 20px; }
 
-    #toast { width: calc(100% - 32px); white-space: normal; text-align: center; font-size: 12px; }
+            /* ── Header controls: stack search full-width, then buttons row ── */
+            #headerControls {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 8px;
+            }
+            .search-wrapper { width: 100%; }
+            .search-input-wrap { width: 100% !important; }
+            .search-input-wrap:focus-within { width: 100% !important; }
+            #headerBtns { width: 100%; }
+            #matchesModalBtn { flex: 1; justify-content: center; }
+            #headerBtns .btn-ghost:last-child { flex: 1; justify-content: center; }
+            #searchDropdown {
+                right: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                border-radius: 16px 16px 0 0;
+                max-height: 60vh;
+            }
 
-    .connected-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .connected-chip { padding: 10px 8px; gap: 8px; }
-    .chip { font-size: 10px; padding: 2px 8px; }
-    .warn-box { font-size: 12px; padding: 10px 14px; }
-    .avail-match { font-size: 11px; }
-}
+            /* Match hero */
+            .match-hero { padding: 16px 14px; border-radius: 14px; }
+            .match-hero > div:first-child { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .match-hero > div:first-child > span { align-self: flex-start; font-size: 11px; padding: 6px 14px; }
+            .connector { flex-direction: column; align-items: center; gap: 12px; margin-top: 16px; }
+            .conn-line { width: 2px; height: 40px; min-width: unset; background: linear-gradient(180deg, var(--accent), var(--teal)); }
+            .conn-line::after { top:50%; left:50%; transform:translate(-50%,-50%); }
+            .connector > div:not(.conn-line) { width: 100%; text-align: center !important; min-width: unset; }
+            .connector > div:not(.conn-line) .user-bubble { margin: 0 auto 8px; }
+            .connector > div:not(.conn-line) > div:last-child { text-align: center !important; }
+            .match-hero > div:last-child { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .match-hero > div:last-child > div { margin-left: 0 !important; font-size: 11px; }
+            .match-hero .btn { width: 100%; justify-content: center; }
 
-/* ── Very small (≤380px) ── */
-@media (max-width: 380px) {
-    .connected-grid { grid-template-columns: 1fr; }
-    .match-card > div { flex-direction: column; align-items: flex-start; }
-    .score-ring { margin-bottom: 6px; }
-    .match-card .btn-sm { width: 100%; justify-content: center; margin-top: 6px; }
-    .heading-lg { font-size: 20px; }
-}
+            .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+            .match-card { padding: 12px; border-radius: 12px; }
+            .score-ring { width: 44px; height: 44px; font-size: 10px; }
+            .double-bar { flex-wrap: wrap; gap: 4px; }
+            .bar-label { width: auto; font-size: 9px; }
 
-/* ── Light mode nav overrides ── */
-[data-theme="light"] nav {
-    background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    box-shadow: 0 1px 12px rgba(0,0,0,0.08) !important;
-    backdrop-filter: none !important;
-}
-[data-theme="light"] .nav-logo {
-    color: #1e1b4b !important;
-}
-[data-theme="light"] .nav-link {
-    color: #475569 !important;
-}
-[data-theme="light"] .nav-link:hover,
-[data-theme="light"] .nav-link.active {
-    color: #6d28d9 !important;
-    background: rgba(109,40,217,0.1) !important;
-}
-[data-theme="light"] .bell-btn {
-    background: #f1f5f9 !important;
-    border-color: #e2e8f0 !important;
-    color: #475569 !important;
-}
-[data-theme="light"] .mob-drawer {
-    background: rgba(255,255,255,0.98) !important;
-    border-color: #e2e8f0 !important;
-}
-[data-theme="light"] .mob-drawer .nav-link {
-    color: #475569 !important;
-    border-color: #e2e8f0 !important;
-}
-[data-theme="light"] .ham span { background: #475569 !important; }
-[data-theme="light"] body { background: #f4f5fa !important; color: #0f172a !important; }
-[data-theme="light"] .card,
-[data-theme="light"] .match-card {
-    background: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    color: #0f172a !important;
-}
-[data-theme="light"] .match-hero {
-    background: linear-gradient(135deg,rgba(109,40,217,0.07),rgba(8,145,178,0.04)) !important;
-    border-color: rgba(109,40,217,0.2) !important;
-    color: #0f172a !important;
-}
-[data-theme="light"] .connected-chip {
-    background: #f8fafc !important;
-    border-color: rgba(16,185,129,0.3) !important;
-    color: #0f172a !important;
-}
-[data-theme="light"] .invite-item {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-    color: #0f172a !important;
-}
-[data-theme="light"] #invitePanel {
-    background: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
-}
-[data-theme="light"] .warn-box { background: rgba(245,158,11,0.06) !important; }
-[data-theme="light"] #toast {
-    background: rgba(255,255,255,0.97) !important;
-    border-color: #e2e8f0 !important;
-    color: #0f172a !important;
-}
-[data-theme="light"] .section-tag { background: rgba(109,40,217,0.1) !important; }
-[data-theme="light"] .progress-bar { background: rgba(0,0,0,0.08) !important; }
-[data-theme="light"] .btn-ghost {
-    border-color: #e2e8f0 !important;
-    color: #475569 !important;
-}
-[data-theme="light"] .btn-ghost:hover {
-    border-color: #6d28d9 !important;
-    color: #6d28d9 !important;
-}
-</style>
+            /* Invite panel bottom sheet */
+            #invitePanel { position:fixed; top:auto; bottom:0; right:0; left:0; width:100% !important; max-height:80vh; border-radius:16px 16px 0 0; border-bottom:none; }
+
+            #toast { width: calc(100% - 32px); white-space: normal; text-align: center; font-size: 12px; }
+
+            .connected-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .connected-chip { padding: 10px 8px; gap: 8px; }
+            .chip { font-size: 10px; padding: 2px 8px; }
+            .warn-box { font-size: 12px; padding: 10px 14px; }
+            .avail-match { font-size: 11px; }
+
+            /* Compat breakdown */
+            #compatCard { padding: 16px; }
+            .compat-label { flex-direction: column; gap: 2px; }
+
+            /* Modal — bottom sheet on mobile */
+            #matchesModal {
+                display: none;
+                align-items: flex-end;
+                justify-content: stretch;
+            }
+            #matchesModal.modal-open {
+                display: flex !important;
+            }
+            #matchesModalBox {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                width: 100% !important;
+                max-height: 88vh;
+                border-radius: 20px 20px 0 0 !important;
+                animation: modalSlideUp 0.28s cubic-bezier(0.34,1.2,0.64,1) !important;
+            }
+            @keyframes modalSlideUp {
+                from { transform: translateY(60px); opacity: 0; }
+                to   { transform: translateY(0);    opacity: 1; }
+            }
+            #modalDragHandle { display: block !important; }
+            .modal-tab { font-size: 10px; padding: 4px 10px; }
+            .modal-match-row { padding: 10px 8px; }
+            .modal-score-ring { width: 40px; height: 40px; font-size: 10px; }
+
+            /* Search result items */
+            .search-result-item { padding: 10px 8px; gap: 10px; }
+            #searchResults { max-height: 260px; }
+        }
+
+        /* ── Very small (≤420px) ── */
+        @media (max-width: 420px) {
+            .connected-grid { grid-template-columns: 1fr; }
+            .match-card > div { flex-direction: column; align-items: flex-start; }
+            .score-ring { margin-bottom: 6px; }
+            .match-card .btn-sm { width: 100%; justify-content: center; margin-top: 6px; }
+            .heading-lg { font-size: 18px; }
+            .modal-match-row > div:last-child .btn { width: 100%; justify-content: center; margin-top: 4px; }
+            .modal-match-row { flex-wrap: wrap; }
+            #matchesModalBox { border-radius: 16px 16px 0 0 !important; }
+            .search-name { font-size: 12px; }
+            .search-meta { font-size: 9px; }
+        }
+    </style>
     <script>
     (function() {
         var s = localStorage.getItem('ss-theme') || 'dark';
@@ -316,7 +408,6 @@
         var v = s === 'light' ? L : D;
         var r = document.documentElement;
         Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
-        r.setAttribute('data-theme', s);
         r.style.background = v['--bg'];
         r.style.color = v['--text'];
     })();
@@ -324,7 +415,7 @@
 </head>
 <body>
 
-<nav id="main-nav">
+<nav>
     <a href="landing.html" class="nav-logo">🔗 StudySphere</a>
     <div class="nav-links">
         <a class="nav-link" href="landing.html">Intro</a>
@@ -344,97 +435,13 @@
         <button class="bell-btn" onclick="togglePanel()">
             🔔 Invites
             <span id="bellCount" class="bell-count" style="display:none;">0</span>
-            <button class="ham" id="hamBtn" aria-label="Menu">
-        <span></span><span></span><span></span>
+        </button>
+        <button class="ham" id="hamBtn" aria-label="Menu">
+            <span></span><span></span><span></span>
         </button>
     </div>
 </nav>
-<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:9999;"></div>
 
-<script>
-fetch('profile.html').then(r=>r.text()).then(html=>{
-    document.getElementById('profile-container').innerHTML=html;
-
-    // Logout
-    const lb=document.getElementById('logout-btn');
-    if(lb) lb.addEventListener('click',e=>{
-        e.preventDefault();
-        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
-            .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
-    });
-
-    // Dropdown
-    const pb=document.getElementById('profile-btn');
-    const pm=document.getElementById('profile-menu');
-    if(pb&&pm){
-        pb.addEventListener('click',(e)=>{
-            e.stopPropagation();
-            pm.style.display=pm.style.display==='block'?'none':'block';
-        });
-        document.addEventListener('click',(e)=>{
-            if(!pb.contains(e.target)&&!pm.contains(e.target))
-                pm.style.display='none';
-        });
-    }
-
-    // Theme
-    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-
-    window.applyTheme=function(mode){
-        const vars=mode==='dark'?DARK:LIGHT;
-        const root=document.documentElement;
-        const isLight=mode==='light';
-        // 1. CSS vars on :root
-        Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-        // 2. data-theme attribute fires all [data-theme="light"] CSS rules
-        root.setAttribute('data-theme',mode);
-        // 3. Force bg + color on html & body
-        root.style.setProperty('background',vars['--bg'],'important');
-        root.style.setProperty('color',vars['--text'],'important');
-        document.body.style.setProperty('background',vars['--bg'],'important');
-        document.body.style.setProperty('color',vars['--text'],'important');
-        // 4. NAV — solid white in light mode
-        const nav=document.getElementById('main-nav');
-        if(nav){
-            nav.style.setProperty('background', isLight?'#ffffff':'rgba(7,7,13,0.85)', 'important');
-            nav.style.setProperty('border-bottom-color', isLight?'#e2e8f0':'rgba(255,255,255,0.06)', 'important');
-            nav.style.setProperty('box-shadow', isLight?'0 1px 12px rgba(0,0,0,0.08)':'none', 'important');
-            nav.style.setProperty('backdrop-filter', isLight?'none':'blur(20px)', 'important');
-        }
-        // 5. Nav links — dark slate in light, clear in dark
-        document.querySelectorAll('.nav-link').forEach(a=>{
-            const isActive=a.classList.contains('active');
-            a.style.setProperty('color', isLight?(isActive?'#6d28d9':'#475569'):'', 'important');
-            a.style.setProperty('-webkit-text-fill-color', isLight?(isActive?'#6d28d9':'#475569'):'', 'important');
-            if(isLight){
-                a.style.background=isActive?'rgba(109,40,217,0.12)':'';
-                a.style.borderColor=isActive?'rgba(109,40,217,0.35)':'transparent';
-            } else {
-                a.style.background='';
-                a.style.borderColor='';
-            }
-        });
-        // 6. Cards
-        document.querySelectorAll('.card,.kpi-card,.subject-room-card,.room-live-card,.activity-item,.partner-chip,.onboard-panel,.onboard-container').forEach(el=>{
-            el.style.background=isLight?'#ffffff':'';
-            el.style.borderColor=isLight?'#e2e8f0':'';
-            el.style.color=isLight?'#0f172a':'';
-        });
-        // 7. Profile toggle buttons
-        const btnD=document.getElementById('btn-dark');
-        const btnL=document.getElementById('btn-light');
-        const lbl=document.getElementById('theme-row-label');
-        if(btnD) btnD.classList.toggle('active',mode==='dark');
-        if(btnL) btnL.classList.toggle('active',mode==='light');
-        if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
-        localStorage.setItem('ss-theme',mode);
-    };
-
-    window.applyTheme(localStorage.getItem('ss-theme')||'dark');
-
-}).catch(e=>console.error('Profile load failed:',e));
-</script>
 <div class="mob-drawer" id="mobDrawer">
     <a class="nav-link" href="landing.html">Intro</a>
     <a class="nav-link" href="dashboard.html">Dashboard</a>
@@ -485,7 +492,56 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
                     Matched from <strong style="color:var(--glow);">onboards → skillLevels</strong> — partners who cover your exact weak skills
                 </p>
             </div>
-            <button class="btn btn-ghost" onclick="rerunMatch()">🔄 Refresh</button>
+            <!-- Search + Refresh row -->
+            <div id="headerControls" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <!-- ── SEARCH BAR ── -->
+                <div class="search-wrapper" id="searchWrapper">
+                    <div class="search-input-wrap">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="userSearchInput" placeholder="Search users…" autocomplete="off" />
+                        <button id="searchClearBtn" title="Clear search">×</button>
+                    </div>
+                    <!-- Dropdown -->
+                    <div id="searchDropdown">
+                        <div class="search-drop-header" id="searchDropHeader">Results</div>
+                        <div id="searchResults"></div>
+                    </div>
+                </div>
+                <div id="headerBtns" style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn btn-ghost" id="matchesModalBtn" onclick="toggleMatchesModal()" style="position:relative;border-color:rgba(109,40,217,0.4);color:var(--glow);">
+                        🎯 Matches
+                        <span id="matchesModalBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;align-items:center;justify-content:center;pointer-events:none;"></span>
+                    </button>
+                    <button class="btn btn-ghost" onclick="rerunMatch()">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── COMPLEMENTARY MATCHES MODAL ── -->
+        <div id="matchesModal" style="display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);animation:modalBgIn 0.2s ease;" onclick="closeMatchesModalOutside(event)">
+            <div id="matchesModalBox" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(640px,94vw);max-height:82vh;background:var(--card);border:1px solid rgba(109,40,217,0.35);border-radius:20px;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,0.7);animation:modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1);">
+                <!-- Mobile drag handle -->
+                <div style="display:none;" id="modalDragHandle" class="modal-drag-handle"></div>
+                <!-- Header -->
+                <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                    <div>
+                        <div style="font-family:var(--syne);font-weight:800;font-size:17px;margin-bottom:2px;">🎯 Complementary Matches</div>
+                        <div style="font-size:11px;color:var(--muted);">Partners whose skills directly fill your gaps</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span id="modalMatchCount" style="font-size:12px;color:var(--glow);font-weight:600;background:rgba(109,40,217,0.12);border:1px solid rgba(109,40,217,0.25);padding:3px 10px;border-radius:999px;"></span>
+                        <button onclick="closeMatchesModal()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='var(--muted)'">×</button>
+                    </div>
+                </div>
+                <!-- Filter tabs -->
+                <div style="padding:10px 22px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;overflow-x:auto;scrollbar-width:none;">
+                    <button class="modal-tab active" onclick="filterModalMatches('all',this)">All</button>
+                </div>
+                <!-- List -->
+                <div id="modalMatchList" style="overflow-y:auto;padding:14px 16px;flex:1;-webkit-overflow-scrolling:touch;"></div>
+            </div>
         </div>
 
         <div id="noOnboardWarn" style="display:none;" class="warn-box">
@@ -513,34 +569,9 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
             No complementary matches found. Ask others to complete onboarding.
         </div>
 
-        <!-- My Skills + Match List -->
-        <div class="grid-2" style="margin-bottom:24px;">
-
-            <div class="card" style="padding:24px;">
-                <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:4px;">🧪 Your Onboard Skills</h3>
-                <p style="font-size:12px;color:var(--muted);margin-bottom:6px;">
-                    From <code style="color:var(--glow);">onboards → skillLevels</code>
-                    · <a href="onboard.html" style="color:var(--glow);">update</a>
-                </p>
-                <div id="myAvailSummary" style="margin-bottom:16px;"></div>
-                <div id="mySkillsPanel">
-                    <div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></div>
-                </div>
-            </div>
-
-            <div class="card" style="padding:24px;">
-                <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:16px;">
-                    🎯 Complementary Matches
-                    <span id="matchCountBadge" style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px;"></span>
-                </h3>
-                <div id="matchList">
-                    <div class="empty">
-                        <div class="spinner" style="margin:0 auto 10px;"></div>
-                        Calculating matches...
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- match count badge kept hidden for badge logic -->
+        <span id="matchCountBadge" style="display:none;"></span>
+        <div id="matchList" style="display:none;"></div>
 
         <!-- Compat Breakdown -->
         <div id="compatCard" class="card" style="padding:24px;display:none;margin-bottom:24px;">
@@ -584,8 +615,8 @@ let mySkills      = [];
 let myAvailability= [];
 let allOnboards   = [];
 let matchResults  = [];
-let connectedUids = new Set(); // UIDs of accepted/mutual connections
-let pendingUids   = new Set(); // UIDs we've already sent an invite to
+let connectedUids = new Set();
+let pendingUids   = new Set();
 let unsubInvites  = null;
 let unsubFollowers= null;
 let unsubSentInvites = null;
@@ -636,12 +667,12 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('pageLoading').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
 
-    renderMySkills();
-    renderMyAvailability();
+    initSearch(); // ← init search after data is loaded
+
     runMatch();
     listenInvites();
     listenSentInvites();
-    listenFollowers(); // live-watch followers from dashboard social writes
+    listenFollowers();
 });
 
 // ── LOAD ALL ONBOARDS ─────────────────────────────────────────────────
@@ -666,7 +697,7 @@ async function loadAllOnboards() {
     allOnboards = await Promise.all(promises);
 }
 
-// ── LIVE: watch followers subcollection so match list updates when an invite is accepted ──
+// ── LIVE: watch followers ──────────────────────────────────────────────
 function listenFollowers() {
     if (unsubFollowers) unsubFollowers();
     unsubFollowers = onSnapshot(
@@ -674,15 +705,11 @@ function listenFollowers() {
         snap => {
             const prev = new Set(connectedUids);
             connectedUids = new Set(snap.docs.map(d => d.id));
-
-            // If a new connection appeared, re-render match list & connected section
             if (snap.docs.length !== prev.size || [...connectedUids].some(id => !prev.has(id))) {
                 renderMatchList(matchResults);
                 renderBestMatch(matchResults.find(r => !connectedUids.has(r.user.uid)));
                 renderConnectedPartners();
             }
-
-            // Update follower count badge in nav
             const el = document.getElementById('followerCountNum');
             const badge = document.getElementById('followerCountBadge');
             if (el) el.textContent = snap.size;
@@ -691,14 +718,14 @@ function listenFollowers() {
     );
 }
 
-// ── LIVE: watch sent invites (so Invite button changes to "Pending") ──
+// ── LIVE: watch sent invites ───────────────────────────────────────────
 function listenSentInvites() {
     if (unsubSentInvites) unsubSentInvites();
     unsubSentInvites = onSnapshot(
         query(collection(db,'invites'), where('fromUid','==',currentUid), where('status','==','pending')),
         snap => {
             pendingUids = new Set(snap.docs.map(d => d.data().toUid));
-            renderMatchList(matchResults); // refresh button states
+            renderMatchList(matchResults);
         }
     );
 }
@@ -709,37 +736,29 @@ function computeCompat(theirData) {
     const mySubjectSet    = new Set([...mySkills,         ...Object.keys(mySkillLevels)]);
     const theirSubjectSet = new Set([...theirData.skills, ...Object.keys(theirLevels)]);
     const allSubjects     = new Set([...mySubjectSet, ...theirSubjectSet]);
-
     if (!allSubjects.size) return { score: 0, breakdown: [], availOverlap: [] };
-
     let total = 0;
     const breakdown = [];
-
     allSubjects.forEach(subj => {
         const me   = mySkillLevels[subj]   ?? (mySubjectSet.has(subj)    ? 50 : null);
         const them = theirLevels[subj]      ?? (theirSubjectSet.has(subj) ? 50 : null);
         if (me === null && them === null) return;
-
         const meVal   = me   ?? 50;
         const themVal = them ?? 50;
         const diff    = Math.abs(meVal - themVal);
         const stronger = Math.max(meVal, themVal);
         const cs = (diff / 100) * (stronger / 100) * 100;
         total += cs;
-
         const direction = meVal > themVal ? 'you_teach'
                         : themVal > meVal ? 'they_teach'
                         : 'equal';
         breakdown.push({ subj, me: meVal, them: themVal, cs: Math.round(cs), direction });
     });
-
     breakdown.sort((a, b) => b.cs - a.cs);
-
     const availOverlap = getAvailOverlap(myAvailability, theirData.availability);
     const availBonus   = availOverlap.length > 0 ? 5 : 0;
     const raw   = allSubjects.size > 0 ? total / allSubjects.size : 0;
     const score = Math.min(99, Math.round(raw * 1.8 + availBonus));
-
     return { score, breakdown, availOverlap };
 }
 
@@ -761,30 +780,129 @@ function runMatch() {
         })
         .filter(r => r.score > 0)
         .sort((a, b) => b.score - a.score);
-
-    // Best match = highest score non-connected user
     const topUnconnected = matchResults.find(r => !connectedUids.has(r.user.uid));
     renderBestMatch(topUnconnected || matchResults[0]);
     renderMatchList(matchResults);
     renderConnectedPartners();
+    // refresh modal badge count
+    const total = matchResults.filter(r => !connectedUids.has(r.user.uid)).length;
+    const badge = document.getElementById('matchesModalBadge');
+    if (badge) { badge.textContent = total; badge.style.display = total > 0 ? 'flex' : 'none'; }
+    // if modal is open, re-render its list too
+    const modal = document.getElementById('matchesModal');
+    if (modal && (modal.classList.contains('modal-open') || modal.style.display === 'block')) renderModalMatchList();
 }
 
-// ── CONNECTED PARTNERS SECTION ────────────────────────────────────────
+// ── MATCHES MODAL ─────────────────────────────────────────────────────
+let modalFilter = 'all';
+
+window.toggleMatchesModal = function() {
+    const modal = document.getElementById('matchesModal');
+    const isOpen = modal.classList.contains('modal-open') || modal.style.display === 'block';
+    if (!isOpen) {
+        renderModalMatchList();
+        modal.style.display = 'block';
+        modal.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+    } else {
+        closeMatchesModal();
+    }
+};
+
+window.closeMatchesModal = function() {
+    const modal = document.getElementById('matchesModal');
+    modal.style.display = 'none';
+    modal.classList.remove('modal-open');
+    document.body.style.overflow = '';
+};
+
+window.closeMatchesModalOutside = function(e) {
+    if (e.target === document.getElementById('matchesModal')) closeMatchesModal();
+};
+
+window.filterModalMatches = function(filter, btn) {
+    modalFilter = filter;
+    document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderModalMatchList();
+};
+
+function renderModalMatchList() {
+    const el = document.getElementById('modalMatchList');
+
+    let filtered = matchResults.filter(r => !connectedUids.has(r.user.uid));
+    if (modalFilter === 'high') filtered = filtered.filter(r => r.score >= 75);
+    else if (modalFilter === 'mid') filtered = filtered.filter(r => r.score >= 50 && r.score < 75);
+
+    const badge = document.getElementById('matchesModalBadge');
+    const total = matchResults.filter(r => !connectedUids.has(r.user.uid)).length;
+    if (total > 0) {
+        badge.textContent = total;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+    document.getElementById('modalMatchCount').textContent =
+        filtered.length + ' match' + (filtered.length !== 1 ? 'es' : '');
+
+    if (!filtered.length) {
+        el.innerHTML = `<div class="empty"><span class="e">🔍</span>No matches in this filter.</div>`;
+        return;
+    }
+
+    el.innerHTML = filtered.slice(0, 20).map(r => {
+        const u = r.user;
+        const isPending = pendingUids.has(u.uid);
+        const color = r.score >= 75 ? '#10b981' : r.score >= 50 ? '#f59e0b' : '#9ca3af';
+
+        const theyTeach = r.breakdown.filter(b => b.direction === 'they_teach').slice(0, 2).map(b => b.subj).join(', ');
+        const youTeach  = r.breakdown.filter(b => b.direction === 'you_teach').slice(0, 2).map(b => b.subj).join(', ');
+
+        let actionBtn;
+        if (isPending) {
+            actionBtn = `<button class="btn btn-ghost btn-sm" disabled style="opacity:0.55;cursor:default;white-space:nowrap;font-size:11px;">⏳ Pending</button>`;
+        } else {
+            actionBtn = `<button class="btn btn-primary btn-sm" style="white-space:nowrap;font-size:11px;"
+                onclick="sendInviteFromModal('${u.uid}','${escAttr(u.name)}',${r.score})">
+                🤝 Invite
+            </button>`;
+        }
+
+        return `<div class="modal-match-row">
+            <div class="modal-score-ring" style="border-color:${color};color:${color};">${r.score}%</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:700;margin-bottom:2px;">${u.name}</div>
+                <div style="font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap;">
+                    ${u.university ? `<span>🏫 ${u.university}</span>` : ''}
+                    ${u.xp     ? `<span>⚡${u.xp}XP</span>` : ''}
+                    ${u.streak ? `<span>🔥${u.streak}d</span>` : ''}
+                    ${r.availOverlap.length ? `<span style="color:var(--teal-glow);">🗓 ${r.availOverlap.length} shared slot${r.availOverlap.length>1?'s':''}</span>` : ''}
+                </div>
+                ${theyTeach ? `<div style="font-size:10px;color:var(--green-glow);">📈 Can teach you: <strong>${theyTeach}</strong></div>` : ''}
+                ${youTeach  ? `<div style="font-size:10px;color:var(--teal-glow);">📚 You can teach: <strong>${youTeach}</strong></div>` : ''}
+                <div class="progress-bar" style="margin-top:6px;">
+                    <div class="progress-fill" style="width:${r.score}%;background:${color};"></div>
+                </div>
+            </div>
+            <div style="flex-shrink:0;">${actionBtn}</div>
+        </div>`;
+    }).join('');
+}
+
+window.sendInviteFromModal = async function(uid, name, score) {
+    await window.sendInvite(uid, name, score);
+    renderModalMatchList();
+};
+
+
 function renderConnectedPartners() {
     const section = document.getElementById('connectedSection');
     const grid    = document.getElementById('connectedGrid');
     const count   = document.getElementById('connectedCount');
-
     const connectedMatches = matchResults.filter(r => connectedUids.has(r.user.uid));
-
-    if (!connectedMatches.length) {
-        section.style.display = 'none';
-        return;
-    }
-
+    if (!connectedMatches.length) { section.style.display = 'none'; return; }
     section.style.display = 'block';
     count.textContent = connectedMatches.length + ' partner' + (connectedMatches.length !== 1 ? 's' : '');
-
     grid.innerHTML = connectedMatches.map(r => {
         const u = r.user;
         return `<div class="connected-chip">
@@ -798,69 +916,20 @@ function renderConnectedPartners() {
     }).join('');
 }
 
-// ── MY SKILLS PANEL ───────────────────────────────────────────────────
-function renderMySkills() {
-    const el = document.getElementById('mySkillsPanel');
-    const allMySkills = new Set([...mySkills, ...Object.keys(mySkillLevels)]);
-
-    if (!allMySkills.size) {
-        el.innerHTML = `<div class="empty"><span class="e">📝</span>No skills found.<br><a href="onboard.html" style="color:var(--glow);">Complete onboarding →</a></div>`;
-        return;
-    }
-
-    const entries = [...allMySkills].map(s => [s, mySkillLevels[s] ?? 50]);
-    entries.sort((a, b) => b[1] - a[1]);
-
-    el.innerHTML = entries.map(([subj, val]) => {
-        const color = val >= 70 ? '#10b981' : val >= 50 ? '#f59e0b' : '#ef4444';
-        const label = val >= 70 ? '💪 Strong' : val >= 50 ? '📚 Learning' : '⚠️ Weak';
-        return `
-        <div style="margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:5px;">
-                <span style="text-transform:capitalize;">${subj}</span>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:10px;color:${color};">${label}</span>
-                    <span style="font-weight:700;color:${color};">${val}%</span>
-                </div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:${val}%;background:${color};"></div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function renderMyAvailability() {
-    const el = document.getElementById('myAvailSummary');
-    if (!myAvailability.length) { el.innerHTML=''; return; }
-    const slots = myAvailability.slice(0,4).map(a =>
-        `<span class="chip chip-avail">${a.day} ${a.slot}</span>`
-    ).join('');
-    el.innerHTML = `<div style="margin-bottom:12px;font-size:12px;color:var(--muted);">🗓 Your availability: ${slots}${myAvailability.length>4?` +${myAvailability.length-4} more`:''}</div>`;
-}
-
 // ── BEST MATCH HERO ───────────────────────────────────────────────────
 function renderBestMatch(top) {
     const hero  = document.getElementById('bestMatchHero');
     const noMsg = document.getElementById('noMatchMsg');
-
-    if (!top || top.score === 0) {
-        hero.style.display  = 'none';
-        noMsg.style.display = 'block';
-        return;
-    }
+    if (!top || top.score === 0) { hero.style.display = 'none'; noMsg.style.display = 'block'; return; }
     noMsg.style.display = 'none';
     hero.style.display  = 'block';
-
     const u           = top.user;
     const isConnected = connectedUids.has(u.uid);
     const theyTeachMe = top.breakdown.filter(b => b.direction === 'they_teach').slice(0, 3);
     const iTeachThem  = top.breakdown.filter(b => b.direction === 'you_teach').slice(0, 3);
-
     const availHTML = top.availOverlap.length
         ? `<div class="avail-match">🗓 <strong>Shared availability:</strong> ${top.availOverlap.map(a=>`<span class="chip chip-avail">${a.day} ${a.slot}</span>`).join('')}</div>`
         : '';
-
     const actionBtn = isConnected
         ? `<span class="follower-badge">✅ Connected · Now following each other</span>
            <a href="dashboard.html" class="btn btn-ghost btn-sm">View on Dashboard →</a>`
@@ -869,7 +938,7 @@ function renderBestMatch(top) {
                🤝 Send Study Invite to ${u.name}
            </button>
            <button class="btn btn-ghost btn-sm" onclick="showCompat('${u.uid}')">📊 Full Breakdown</button>`;
-
+           <button style="item-align:right;" onclick="match.html">close</button>
     hero.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
             <div>
@@ -882,7 +951,7 @@ function renderBestMatch(top) {
                     complement yours. A perfect teaching pair.
                 </p>
             </div>
-            <span style="background:${isConnected?'rgba(16,185,129,0.2)':'rgba(16,185,129,0.2)'};color:var(--green-glow);font-size:13px;padding:8px 20px;border-radius:999px;font-weight:600;align-self:flex-start;">
+            <span style="background:rgba(16,185,129,0.2);color:var(--green-glow);font-size:13px;padding:8px 20px;border-radius:999px;font-weight:600;align-self:flex-start;">
                 ${isConnected ? '✅ Study Partner' : 'Stable Match ✓'}
             </span>
         </div>
@@ -922,28 +991,22 @@ function renderMatchList(results) {
     const unconnectedCount = results.filter(r => !connectedUids.has(r.user.uid)).length;
     document.getElementById('matchCountBadge').textContent =
         unconnectedCount ? `${unconnectedCount} found` : '';
-
     if (!results.length) {
         el.innerHTML = `<div class="empty"><span class="e">🔍</span>No matches yet.<br>Ask others to complete onboarding!</div>`;
         return;
     }
-
     el.innerHTML = results.slice(0, 12).map(r => {
         const u           = r.user;
         const isConnected = connectedUids.has(u.uid);
         const isPending   = pendingUids.has(u.uid);
         const color       = r.score >= 75 ? '#10b981' : r.score >= 50 ? '#f59e0b' : '#9ca3af';
-
         const theyTeach = r.breakdown.filter(b => b.direction === 'they_teach')
             .slice(0, 2).map(b => `${b.subj}(${b.them}%)`).join(', ');
         const youTeach  = r.breakdown.filter(b => b.direction === 'you_teach')
             .slice(0, 2).map(b => `${b.subj}(${b.me}%)`).join(', ');
-
         const availBadge = r.availOverlap.length
             ? `<span style="font-size:10px;color:var(--teal-glow);">🗓 ${r.availOverlap.length} shared slot${r.availOverlap.length>1?'s':''}</span>`
             : '';
-
-        // Action button — changes based on connection state
         let actionBtn;
         if (isConnected) {
             actionBtn = `<span class="chip chip-connected" style="white-space:nowrap;">✅ Partner</span>`;
@@ -954,7 +1017,6 @@ function renderMatchList(results) {
                 onclick="event.stopPropagation();sendInvite('${u.uid}','${(u.name).replace(/'/g,"\\'")}',${r.score})"
                 style="white-space:nowrap;">Invite</button>`;
         }
-
         return `
         <div class="match-card ${isConnected?'connected':''}" id="mc-${u.uid}" onclick="selectMatch('${u.uid}')">
             <div style="display:flex;align-items:center;gap:12px;">
@@ -995,19 +1057,16 @@ window.selectMatch = function(uid) {
 window.showCompat = function(uid) {
     const result = matchResults.find(r => r.user.uid === uid);
     if (!result) return;
-
     const u  = result.user;
     const bd = result.breakdown.slice(0, 10);
     const el = document.getElementById('compatDetails');
     const isConnected = connectedUids.has(uid);
-
     const actionBtn = isConnected
         ? `<span class="follower-badge">✅ Study Partner · Following each other</span>`
         : `<button class="btn btn-primary btn-sm"
                onclick="sendInvite('${u.uid}','${(u.name).replace(/'/g,"\\'")}',${result.score})">
                🤝 Invite ${u.name}
            </button>`;
-
     el.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
             <div>
@@ -1063,7 +1122,6 @@ window.showCompat = function(uid) {
                 ${result.availOverlap.map(a => `<span class="chip chip-avail">${a.day} · ${a.slot}</span>`).join('')}
             </div>
         </div>` : `<div style="margin-top:14px;font-size:12px;color:var(--muted);">🗓 No overlapping availability slots found.</div>`}`;
-
     document.getElementById('compatCard').style.display = 'block';
     document.getElementById('compatCard').scrollIntoView({ behavior:'smooth', block:'nearest' });
 };
@@ -1072,7 +1130,6 @@ window.showCompat = function(uid) {
 window.sendInvite = async function(toUid, toName, score) {
     if (!currentUid) return;
     if (connectedUids.has(toUid)) { showToast('✅ Already connected with ' + toName); return; }
-
     const existQ = query(
         collection(db, 'invites'),
         where('fromUid', '==', currentUid),
@@ -1081,14 +1138,12 @@ window.sendInvite = async function(toUid, toName, score) {
     );
     const ex = await getDocs(existQ);
     if (!ex.empty) { showToast(`⚠️ Already sent an invite to ${toName}`); return; }
-
     const sorted       = Object.entries(mySkillLevels).sort((a,b)=>b[1]-a[1]);
     const myStrong     = sorted.filter(([,v])=>v>=65).slice(0,3).map(([k])=>k).join(', ');
     const myWeak       = sorted.filter(([,v])=>v<50 ).slice(0,3).map(([k])=>k).join(', ');
     const theirEntry   = allOnboards.find(o=>o.uid===toUid);
     const overlap      = theirEntry ? getAvailOverlap(myAvailability, theirEntry.availability) : [];
     const sharedSlots  = overlap.map(a=>`${a.day} ${a.slot}`).join(', ');
-
     await addDoc(collection(db, 'invites'), {
         fromUid:       currentUid,
         fromName:      myUserData.name || 'Someone',
@@ -1102,98 +1157,46 @@ window.sendInvite = async function(toUid, toName, score) {
         status:        'pending',
         createdAt:     serverTimestamp()
     });
-
     showToast(`✅ Invite sent to ${toName}!`);
 };
 
-// ══════════════════════════════════════════════════════════════════════
-// ACCEPT / DECLINE INVITES
-// When ACCEPTED: write mutual follow to BOTH users' social subcollections
-// This is the key integration: dashboard.html watchSocial() will pick it up live
-// ══════════════════════════════════════════════════════════════════════
+// ── ACCEPT / DECLINE INVITES ──────────────────────────────────────────
 window.respondInvite = async function(inviteId, status, fromUid, fromName, fromData) {
     try {
-        // 1. Update invite status
-        await updateDoc(doc(db, 'invites', inviteId), {
-            status,
-            respondedAt: serverTimestamp()
-        });
-
+        await updateDoc(doc(db, 'invites', inviteId), { status, respondedAt: serverTimestamp() });
         if (status === 'accepted') {
-            // ── 2. Get both users' profile data for the follow docs ──
             const [mySnap, theirSnap] = await Promise.all([
                 getDoc(doc(db, 'users', currentUid)),
                 getDoc(doc(db, 'users', fromUid))
             ]);
             const myData    = mySnap.exists()    ? mySnap.data()    : {};
             const theirData = theirSnap.exists() ? theirSnap.data() : {};
-
             const myName    = myData.displayName    || myData.name    || myUserData?.name    || 'User';
             const theirDataName = theirData.displayName || theirData.name || fromName || 'User';
-
-            // ── 3. Write MUTUAL follow to Firestore social subcollections ──
-            // I follow them
             await setDoc(doc(db, 'social', currentUid, 'following', fromUid), {
-                displayName: theirDataName,
-                email:       theirData.email       || '',
-                color:       theirData.color        || '#4d94ff',
-                subject:     theirData.subject      || fromData?.subject || 'Studying',
-                subjects:    theirData.subjects     || [],
-                matchScore:  fromData?.compatScore  || 0,
-                matched:     true,
-                followedAt:  serverTimestamp()
+                displayName: theirDataName, email: theirData.email||'', color: theirData.color||'#4d94ff',
+                subject: theirData.subject||fromData?.subject||'Studying', subjects: theirData.subjects||[],
+                matchScore: fromData?.compatScore||0, matched: true, followedAt: serverTimestamp()
             });
-
-            // They follow me
             await setDoc(doc(db, 'social', fromUid, 'following', currentUid), {
-                displayName: myName,
-                email:       myData.email    || '',
-                color:       myData.color    || '#6a4dff',
-                subject:     myData.subject  || 'Studying',
-                subjects:    myData.subjects || [],
-                matchScore:  fromData?.compatScore || 0,
-                matched:     true,
-                followedAt:  serverTimestamp()
+                displayName: myName, email: myData.email||'', color: myData.color||'#6a4dff',
+                subject: myData.subject||'Studying', subjects: myData.subjects||[],
+                matchScore: fromData?.compatScore||0, matched: true, followedAt: serverTimestamp()
             });
-
-            // I appear in their followers
             await setDoc(doc(db, 'social', fromUid, 'followers', currentUid), {
-                displayName: myName,
-                email:       myData.email   || '',
-                color:       myData.color   || '#6a4dff',
-                subject:     myData.subject || 'Studying',
-                matchScore:  fromData?.compatScore || 0,
-                matched:     true,
-                followedAt:  serverTimestamp()
+                displayName: myName, email: myData.email||'', color: myData.color||'#6a4dff',
+                subject: myData.subject||'Studying', matchScore: fromData?.compatScore||0, matched: true, followedAt: serverTimestamp()
             });
-
-            // They appear in my followers
             await setDoc(doc(db, 'social', currentUid, 'followers', fromUid), {
-                displayName: theirDataName,
-                email:       theirData.email       || '',
-                color:       theirData.color        || '#4d94ff',
-                subject:     theirData.subject      || 'Studying',
-                matchScore:  fromData?.compatScore  || 0,
-                matched:     true,
-                followedAt:  serverTimestamp()
+                displayName: theirDataName, email: theirData.email||'', color: theirData.color||'#4d94ff',
+                subject: theirData.subject||'Studying', matchScore: fromData?.compatScore||0, matched: true, followedAt: serverTimestamp()
             });
-
-            // ── 4. Update matchedCount on both user docs ──
             try {
-                await updateDoc(doc(db,'users',currentUid), {
-                    matchedCount: (myData.matchedCount||0) + 1,
-                    matchedThisWeek: (myData.matchedThisWeek||0) + 1
-                });
-                await updateDoc(doc(db,'users',fromUid), {
-                    matchedCount: (theirData.matchedCount||0) + 1,
-                    matchedThisWeek: (theirData.matchedThisWeek||0) + 1
-                });
-            } catch(e) { console.warn('matchedCount update failed (non-critical):', e); }
-
+                await updateDoc(doc(db,'users',currentUid), { matchedCount: (myData.matchedCount||0)+1, matchedThisWeek: (myData.matchedThisWeek||0)+1 });
+                await updateDoc(doc(db,'users',fromUid),    { matchedCount: (theirData.matchedCount||0)+1, matchedThisWeek: (theirData.matchedThisWeek||0)+1 });
+            } catch(e) { console.warn('matchedCount update failed:', e); }
             showToast(`🎉 Accepted! You and ${fromName} are now study partners & following each other.`);
             document.getElementById('invitePanel').style.display = 'none';
-
-            // connectedUids will auto-update via listenFollowers() snapshot
         } else {
             showToast(`❌ Declined ${fromName}'s invite.`);
         }
@@ -1206,35 +1209,21 @@ window.respondInvite = async function(inviteId, status, fromUid, fromName, fromD
 // ── REAL-TIME INCOMING INVITES ────────────────────────────────────────
 function listenInvites() {
     if (unsubInvites) unsubInvites();
-
-    const q = query(
-        collection(db, 'invites'),
-        where('toUid',  '==', currentUid),
-        where('status', '==', 'pending')
-    );
+    const q = query(collection(db, 'invites'), where('toUid','==',currentUid), where('status','==','pending'));
     unsubInvites = onSnapshot(q, snap => {
         const invites = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderInvites(invites);
         const count = document.getElementById('bellCount');
-        if (invites.length) {
-            count.textContent   = invites.length;
-            count.style.display = 'flex';
-        } else {
-            count.style.display = 'none';
-        }
+        if (invites.length) { count.textContent = invites.length; count.style.display = 'flex'; }
+        else { count.style.display = 'none'; }
     });
-
-    // My sent invites accepted → notify me
     onSnapshot(
         query(collection(db,'invites'), where('fromUid','==',currentUid), where('status','==','accepted')),
         snap => {
             snap.docChanges().forEach(ch => {
-                if (ch.type === 'added' || ch.type === 'modified') {
+                if (ch.type === 'modified') {
                     const d = ch.doc.data();
-                    // Only toast on changes, not initial load
-                    if (ch.type === 'modified') {
-                        showToast(`🎉 ${d.toName} accepted your invite! Now following each other.`);
-                    }
+                    showToast(`🎉 ${d.toName} accepted your invite! Now following each other.`);
                 }
             });
         }
@@ -1243,10 +1232,7 @@ function listenInvites() {
 
 function renderInvites(invites) {
     const el = document.getElementById('inviteList');
-    if (!invites.length) {
-        el.innerHTML = `<div class="empty"><span class="e">🎉</span>No pending invites!</div>`;
-        return;
-    }
+    if (!invites.length) { el.innerHTML = `<div class="empty"><span class="e">🎉</span>No pending invites!</div>`; return; }
     el.innerHTML = invites.map(inv => `
         <div class="invite-item">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -1273,6 +1259,137 @@ function renderInvites(invites) {
         </div>`).join('');
 }
 
+// ════════════════════════════════════════════════════════════════════
+// ── SEARCH FUNCTIONALITY ──────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+function initSearch() {
+    const input    = document.getElementById('userSearchInput');
+    const dropdown = document.getElementById('searchDropdown');
+    const clearBtn = document.getElementById('searchClearBtn');
+
+    let searchDebounce = null;
+
+    input.addEventListener('input', () => {
+        const q = input.value.trim();
+        clearBtn.style.display = q.length ? 'block' : 'none';
+        clearTimeout(searchDebounce);
+        if (!q) { dropdown.classList.remove('visible'); return; }
+        searchDebounce = setTimeout(() => performSearch(q), 180);
+    });
+
+    input.addEventListener('focus', () => {
+        if (input.value.trim()) performSearch(input.value.trim());
+    });
+
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        clearBtn.style.display = 'none';
+        dropdown.classList.remove('visible');
+        input.focus();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+        const wrapper = document.getElementById('searchWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            dropdown.classList.remove('visible');
+        }
+    });
+
+    // Keyboard: Escape closes
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { dropdown.classList.remove('visible'); input.blur(); }
+    });
+}
+
+function performSearch(query) {
+    const dropdown = document.getElementById('searchDropdown');
+    const results  = document.getElementById('searchResults');
+    const header   = document.getElementById('searchDropHeader');
+    const q = query.toLowerCase();
+
+    // Search across allOnboards (users with onboard data)
+    const matched = allOnboards.filter(u =>
+        u.name.toLowerCase().includes(q) ||
+        (u.university && u.university.toLowerCase().includes(q)) ||
+        Object.keys(u.skillLevels).some(sk => sk.toLowerCase().includes(q))
+    );
+
+    header.textContent = matched.length
+        ? `${matched.length} user${matched.length !== 1 ? 's' : ''} found`
+        : 'No results';
+
+    if (!matched.length) {
+        results.innerHTML = `<div class="search-empty">😶 No users match "<strong>${escHtml(query)}</strong>"<br><span style="font-size:11px;">Try a name, university, or subject</span></div>`;
+        dropdown.classList.add('visible');
+        return;
+    }
+
+    // Sort matched by compat score descending
+    const withScores = matched.map(u => {
+        const existing = matchResults.find(r => r.user.uid === u.uid);
+        const score = existing ? existing.score : computeCompat(u).score;
+        return { u, score };
+    }).sort((a,b) => b.score - a.score);
+
+    results.innerHTML = withScores.slice(0, 8).map(({ u, score }) => {
+        const isConnected = connectedUids.has(u.uid);
+        const isPending   = pendingUids.has(u.uid);
+        const color = score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : '#9ca3af';
+        let actionBtn;
+        if (isConnected) {
+            actionBtn = `<span class="chip chip-connected" style="font-size:10px;white-space:nowrap;">✅ Partner</span>`;
+        } else if (isPending) {
+            actionBtn = `<button class="btn btn-ghost btn-sm" disabled style="opacity:0.55;font-size:11px;cursor:default;white-space:nowrap;padding:5px 10px;">⏳ Pending</button>`;
+        } else {
+            actionBtn = `<button class="btn btn-primary btn-sm" style="font-size:11px;white-space:nowrap;padding:5px 12px;"
+                onclick="event.stopPropagation();sendInviteFromSearch('${u.uid}','${escAttr(u.name)}',${score})">
+                🤝 Invite
+            </button>`;
+        }
+        const topSkills = Object.entries(u.skillLevels).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k])=>k).join(', ');
+        return `
+        <div class="search-result-item" style="cursor:default;">
+            <div class="search-av" style="background:${avatarGrad(u.uid)};">${initials(u.name)}</div>
+            <div class="search-info">
+                <div class="search-name">${highlightMatch(u.name, query)}</div>
+                <div class="search-meta">
+                    ${u.university ? `🏫 ${u.university}` : ''}${topSkills ? (u.university?` · `:'')+`📚 ${topSkills}` : ''}${u.xp ? ` · ⚡${u.xp}XP` : ''}
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+                <span class="search-score" style="color:${isConnected?'#10b981':color};font-size:12px;font-weight:800;">${score}% match</span>
+                ${actionBtn}
+            </div>
+        </div>`;
+    }).join('');
+
+    dropdown.classList.add('visible');
+}
+
+function highlightMatch(text, query) {
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return escHtml(text);
+    return escHtml(text.slice(0, idx))
+        + `<mark style="background:rgba(109,40,217,0.3);color:var(--glow);border-radius:2px;">${escHtml(text.slice(idx, idx+query.length))}</mark>`
+        + escHtml(text.slice(idx + query.length));
+}
+
+window.sendInviteFromSearch = async function(uid, name, score) {
+    await window.sendInvite(uid, name, score);
+    // Refresh dropdown so button state updates
+    const input = document.getElementById('userSearchInput');
+    if (input.value.trim()) performSearch(input.value.trim());
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+    return String(s).replace(/'/g,"\\'");
+}
+
 // ── UI HELPERS ────────────────────────────────────────────────────────
 window.togglePanel = function() {
     const p = document.getElementById('invitePanel');
@@ -1294,6 +1411,7 @@ function showToast(msg) {
 }
 window.showToast = showToast;
 </script>
+
 <script>
     const hamBtn = document.getElementById('hamBtn');
     const mobDrawer = document.getElementById('mobDrawer');
@@ -1312,7 +1430,6 @@ window.showToast = showToast;
 </script>
 
 <script type="module">
-// Update profile avatar with real user name after Firebase auth
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 const _app = initializeApp({
@@ -1330,7 +1447,6 @@ onAuthStateChanged(_auth, user => {
     const initial = name[0].toUpperCase();
     const colors = ['#6a4dff','#4d94ff','#00c9a7','#f59e0b','#10b981','#ef4444'];
     const color = colors[(user.uid?.charCodeAt(0)||0) % colors.length];
-    // Wait for profile to be injected then update avatar
     const update = () => {
         const av = document.getElementById('profile-avatar');
         if (av) { av.textContent = initial; av.style.background = color; }
