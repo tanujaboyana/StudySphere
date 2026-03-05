@@ -104,6 +104,18 @@
     .nav-cta { font-size: 11px !important; padding: 5px 10px !important; }
 }
 </style>
+    <script>
+    (function() {
+        var s = localStorage.getItem('ss-theme') || 'dark';
+        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var v = s === 'light' ? L : D;
+        var r = document.documentElement;
+        Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.style.background = v['--bg'];
+        r.style.color = v['--text'];
+    })();
+    </script>
 </head>
 
 <body>
