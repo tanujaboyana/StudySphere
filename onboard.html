@@ -43,6 +43,7 @@
         var v = s === 'light' ? L : D;
         var r = document.documentElement;
         Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.setAttribute('data-theme', s);
         r.style.background = v['--bg'];
         r.style.color = v['--text'];
     })();
@@ -62,6 +63,7 @@
         <a class="nav-link" href="leaderboard.html">Leaderboard</a>
         <a class="nav-link" href="whiteboard.html">Whiteboard</a>
         <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="pomodoro.html">Pomodoro</a>
         <a class="nav-link active" href="onboard.html">Onboard</a>
     </div>
 </nav>
@@ -100,15 +102,47 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     window.applyTheme=function(mode){
         const vars=mode==='dark'?DARK:LIGHT;
         const root=document.documentElement;
+        const isLight=mode==='light';
         Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-        document.body.style.background=vars['--bg'];
-        document.body.style.color=vars['--text'];
+        root.setAttribute('data-theme',mode);
+        root.style.setProperty('background',vars['--bg'],'important');
+        root.style.setProperty('color',vars['--text'],'important');
+        document.body.style.setProperty('background',vars['--bg'],'important');
+        document.body.style.setProperty('color',vars['--text'],'important');
+        // Nav
+        const nav=document.getElementById('main-nav');
+        if(nav){
+            nav.style.background=isLight?'rgba(255,255,255,0.95)':'rgba(7,7,13,0.85)';
+            nav.style.borderBottomColor=isLight?'#e2e8f0':'rgba(255,255,255,0.06)';
+        }
+        document.querySelectorAll('.nav-link').forEach(a=>{
+            a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#475569'):'';
+        });
+        // Cards + panels
+        document.querySelectorAll('.card,.onboard-panel,.onboard-container').forEach(el=>{
+            el.style.background=isLight?'#ffffff':'';
+            el.style.borderColor=isLight?'#e2e8f0':'';
+            el.style.color=isLight?'#0f172a':'';
+        });
+        // Inputs — key fix for light mode visibility
+        document.querySelectorAll('input[type="text"],input[type="range"],textarea,select').forEach(el=>{
+            el.style.background=isLight?'#f8fafc':'';
+            el.style.borderColor=isLight?'#e2e8f0':'';
+            el.style.color=isLight?'#0f172a':'';
+        });
+        // Skill input placeholder color via style injection
+        const styleId='_theme_style';
+        let styleEl=document.getElementById(styleId);
+        if(!styleEl){styleEl=document.createElement('style');styleEl.id=styleId;document.head.appendChild(styleEl);}
+        styleEl.textContent=isLight
+            ?'#skillInput::placeholder{color:#94a3b8!important;} #skillInput{color:#0f172a!important;background:#f8fafc!important;border-color:#e2e8f0!important;} .onboard-panel{background:#ffffff!important;color:#0f172a!important;} .step-dot{border-color:#e2e8f0!important;color:#475569!important;} .step-dot.active{border-color:#6d28d9!important;color:#6d28d9!important;} .step-line{background:#e2e8f0!important;} .quiz-opt{background:rgba(0,0,0,0.04)!important;border-color:#e2e8f0!important;color:#0f172a!important;} .sched-cell{background:rgba(0,0,0,0.03)!important;border-color:#e2e8f0!important;}'
+            :'#skillInput::placeholder{color:rgba(255,255,255,0.3)!important;}';
         const btnD=document.getElementById('btn-dark');
         const btnL=document.getElementById('btn-light');
         const lbl=document.getElementById('theme-row-label');
         if(btnD) btnD.classList.toggle('active',mode==='dark');
         if(btnL) btnL.classList.toggle('active',mode==='light');
-        if(lbl)  lbl.textContent=mode==='dark'?'🌙 Theme':'☀️ Theme';
+        if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
         localStorage.setItem('ss-theme',mode);
     };
 
@@ -145,7 +179,7 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
         <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Type a skill and press Enter</p>
         <div id="skillsDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;"></div>
         <input type="text" id="skillInput" placeholder="e.g. Python, Java, Maths, Chemistry…"
-            style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:white;outline:none;margin-bottom:20px;">
+            style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);outline:none;margin-bottom:20px;">
         <button class="btn btn-primary" style="width:100%;padding:12px;font-size:15px;" onclick="goStep(1)">Continue → Step 2</button>
      </div>
 
@@ -563,7 +597,7 @@ function addSkill() {
 function removeSkill(i) { delete skillLevels[skills[i]]; skills.splice(i, 1); renderSkills(); }
 function renderSkills() {
   $('skillsDisplay').innerHTML = skills.map((s, i) => `
-    <div style="background:rgba(109,40,217,0.15);color:var(--glow);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;">
+    <div style="background:rgba(109,40,217,0.15);border:1px solid rgba(109,40,217,0.3);color:var(--text);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;">
       ${s}<span style="cursor:pointer;font-weight:bold;" onclick="removeSkill(${i})">×</span>
     </div>`).join('');
 }
@@ -973,4 +1007,3 @@ onAuthStateChanged(_auth, user => {
 
 </body>
 </html>
-
