@@ -134,12 +134,59 @@
     .feature-item { padding: 16px !important; }
     .content { padding: 0 14px !important; }
 }
+
+/* ── Light theme navbar overrides ── */
+html[data-theme="light"] #main-nav,
+body.theme-light #main-nav {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] #main-nav .nav-link,
+body.theme-light #main-nav .nav-link {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] #main-nav .nav-logo,
+body.theme-light #main-nav .nav-logo {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] #main-nav .ham span,
+body.theme-light #main-nav .ham span {
+    background: #0f172a !important;
+}
+
+html[data-theme="light"] #main-nav .ham,
+body.theme-light #main-nav .ham {
+    border-color: #e2e8f0 !important;
+    background: rgba(0,0,0,0.04) !important;
+}
+
+/* Selector-free approach: CSS variable driven navbar */
+#main-nav {
+    background: var(--nav-bg, rgba(7,7,13,0.9)) !important;
+    border-bottom: 1px solid var(--border) !important;
+    backdrop-filter: blur(20px);
+}
+
+#main-nav .nav-link {
+    color: var(--nav-text, #e2e8f0) !important;
+}
+
+#main-nav .nav-logo {
+    color: var(--nav-text, #e2e8f0) !important;
+}
+
+#main-nav .ham span {
+    background: var(--nav-text, #e2e8f0) !important;
+}
 </style>
     <script>
     (function() {
         var s = localStorage.getItem('ss-theme') || 'dark';
-        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'rgba(7,7,13,0.92)','--nav-text':'#e2e8f0'};
+        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'#ffffff','--nav-text':'#0f172a'};
         var v = s === 'light' ? L : D;
         var r = document.documentElement;
         Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
@@ -166,6 +213,7 @@
             <a class="nav-link" href="leaderboard.html">Leaderboard</a>
             <a class="nav-link" href="whiteboard.html">Whiteboard</a>
             <a class="nav-link" href="resources.html">Resources</a>
+             <a class="nav-link" href="pomodoro.html">Pomodoro</a>
             <a class="nav-link" href="onboard.html">Onboard</a>
         </div>
 
@@ -204,8 +252,8 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     }
 
     // Theme
-    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'rgba(7,7,13,0.92)','--nav-text':'#e2e8f0'};
+    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'#ffffff','--nav-text':'#0f172a'};
 
     window.applyTheme=function(mode){
         const vars=mode==='dark'?DARK:LIGHT;
@@ -234,6 +282,7 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     <a class="nav-link" href="leaderboard.html">Leaderboard</a>
     <a class="nav-link" href="whiteboard.html">Whiteboard</a>
     <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
 
@@ -804,4 +853,3 @@ onAuthStateChanged(_auth, user => {
 </body>
 
 </html>
-
