@@ -6,6 +6,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intro page</title>
     <link rel="stylesheet" href="stylesheet1.css">
+    <style>
+/* ── Nav CTA: shrink on mobile ── */
+.nav-cta {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+    #main-nav {
+        height: 56px;
+        padding: 0 14px;
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+    #main-nav .nav-links { display: none !important; }
+    .nav-cta {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+    }
+
+    .content-wrapper { padding-top: 68px !important; }
+
+    /* Hero: stack */
+    .hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+    }
+    .hero-right { display: none !important; }
+
+    .hero-title { font-size: clamp(2rem, 7vw, 3.2rem) !important; }
+    .hero-desc  { font-size: 14px !important; }
+
+    .hero-actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    .hero-actions a {
+        width: 100% !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-stats { gap: 16px !important; flex-wrap: wrap !important; }
+
+    /* Problem / Solution */
+    .grid-2 { grid-template-columns: 1fr !important; gap: 16px !important; }
+
+    /* Features */
+    .grid-3 { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+
+    /* Personas */
+    .grid-4 { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+
+    /* How it works steps: collapse 3-col to single */
+    div[style*="grid-template-columns:1fr 60px 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    div[style*="grid-template-columns:1fr 60px 1fr"] > div:nth-child(2) {
+        display: none !important;
+    }
+    /* Hide the empty placeholder divs in alternating steps */
+    div[style*="grid-template-columns:1fr 60px 1fr"] > div:empty {
+        display: none !important;
+    }
+
+    /* Tech pills */
+    .tech-section > .content > div {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: center !important;
+    }
+
+    /* CTA buttons */
+    .cta-section div[style*="display:flex;gap:14px"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .cta-section div[style*="display:flex;gap:14px"] a {
+        text-align: center !important;
+    }
+
+    .heading-lg { font-size: clamp(1.6rem, 5vw, 2.6rem) !important; }
+    section { padding: 60px 0 !important; }
+    .hero-section { padding: 80px 0 40px !important; }
+}
+
+@media (max-width: 540px) {
+    .grid-3 { grid-template-columns: 1fr !important; }
+    .grid-4 { grid-template-columns: 1fr !important; }
+
+    .hero-stat-val { font-size: 1.6rem !important; }
+    .feature-item  { padding: 16px !important; }
+    .content       { padding: 0 14px !important; }
+
+    .nav-cta { font-size: 11px !important; padding: 5px 10px !important; }
+}
+</style>
 </head>
 
 <body>
