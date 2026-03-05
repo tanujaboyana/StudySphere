@@ -25,7 +25,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #e2e8f0; font-family: var(--inter, sans-serif); min-height: 100vh; }
 
-        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 20px; height:56px; display:flex; align-items:center; gap:12px; }
+.nav-links { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+.nav-links::-webkit-scrollbar { display:none; }
         .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:#e2e8f0; text-decoration:none; font-family:var(--syne); font-size:15px; }
         .nav-links { display:flex; gap:2px; flex-wrap:wrap; }
         .nav-link { color:var(--muted); text-decoration:none; font-size:12px; padding:5px 10px; border-radius:6px; transition:all 0.2s; }
@@ -83,7 +85,7 @@
         .bell-btn:hover { border-color:var(--accent); color:var(--glow); }
         .bell-count { position:absolute; top:-5px; right:-5px; background:var(--red); color:#fff; width:18px; height:18px; border-radius:50%; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 
-        #invitePanel { position:fixed; top:58px; right:20px; width:340px; background:var(--card); border:1px solid var(--border); border-radius:16px; z-index:500; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.6); max-height:74vh; overflow-y:auto; }
+        #invitePanel { position:fixed; top:58px; right:20px; width:min(340px, calc(100vw - 24px)); background:var(--card); border:1px solid var(--border); border-radius:16px; z-index:500; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.6); max-height:74vh; overflow-y:auto; }
         .invite-item { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:8px; }
 
         .compat-row { margin-bottom:12px; }
@@ -112,7 +114,82 @@
         .connected-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:14px; }
         .connected-chip { background:var(--surface); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px; }
         .connected-av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:white; flex-shrink:0; }
-    </style>
+    /* ── Hamburger button ── */
+.ham { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface); margin-left:auto; flex-shrink:0; }
+.ham span { display:block; width:20px; height:2px; background:#e2e8f0; border-radius:2px; transition:all 0.3s; }
+.ham.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity:0; }
+.ham.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile drawer ── */
+.mob-drawer { display:none; position:fixed; top:56px; left:0; right:0; background:rgba(10,10,15,0.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:16px; flex-direction:column; gap:6px; z-index:199; transform:translateY(-110%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+.mob-drawer.open { transform:translateY(0); }
+.mob-drawer .nav-link { display:block; padding:10px 14px; font-size:14px; border:1px solid var(--border); border-radius:8px; }
+
+/* ── Tablet (≤860px) ── */
+@media (max-width: 860px) {
+    .content-wrapper { padding-top: 66px; }
+    .heading-lg { font-size: 24px; }
+    .connector { gap: 10px; }
+    .conn-line { min-width: 20px; }
+    .connected-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+
+/* ── Mobile (≤640px) ── */
+@media (max-width: 640px) {
+    .nav-links { display: none; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+    #myNameTag { display: none; }
+    .bell-btn { padding: 6px 10px; font-size: 12px; }
+
+    .content-wrapper { padding: 66px 12px 48px; }
+
+    .heading-lg { font-size: 22px; }
+
+    .match-hero { padding: 18px 14px; border-radius: 14px; }
+    .match-hero > div:first-child { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .match-hero > div:first-child > span { align-self: flex-start; font-size: 11px; padding: 6px 14px; }
+
+    .connector { flex-direction: column; align-items: center; gap: 12px; margin-top: 16px; }
+    .conn-line { width: 2px; height: 40px; min-width: unset; background: linear-gradient(180deg, var(--accent), var(--teal)); }
+    .conn-line::after { top:50%; left:50%; transform:translate(-50%,-50%); }
+    .connector > div:not(.conn-line) { width: 100%; text-align: center !important; min-width: unset; }
+    .connector > div:not(.conn-line) .user-bubble { margin: 0 auto 8px; }
+    .connector > div:not(.conn-line) > div:last-child { text-align: center !important; }
+
+    .match-hero > div:last-child { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .match-hero > div:last-child > div { margin-left: 0 !important; font-size: 11px; }
+    .match-hero .btn { width: 100%; justify-content: center; }
+
+    .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+
+    .match-card { padding: 12px; border-radius: 12px; }
+    .score-ring { width: 44px; height: 44px; font-size: 10px; }
+
+    .double-bar { flex-wrap: wrap; gap: 4px; }
+    .bar-label { width: auto; font-size: 9px; }
+
+    #invitePanel { position:fixed; top:auto; bottom:0; right:0; left:0; width:100% !important; max-height:80vh; border-radius:16px 16px 0 0; border-bottom:none; }
+
+    #toast { width: calc(100% - 32px); white-space: normal; text-align: center; font-size: 12px; }
+
+    .connected-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .connected-chip { padding: 10px 8px; gap: 8px; }
+    .chip { font-size: 10px; padding: 2px 8px; }
+    .warn-box { font-size: 12px; padding: 10px 14px; }
+    .avail-match { font-size: 11px; }
+}
+
+/* ── Very small (≤380px) ── */
+@media (max-width: 380px) {
+    .connected-grid { grid-template-columns: 1fr; }
+    .match-card > div { flex-direction: column; align-items: flex-start; }
+    .score-ring { margin-bottom: 6px; }
+    .match-card .btn-sm { width: 100%; justify-content: center; margin-top: 6px; }
+    .heading-lg { font-size: 20px; }
+}
+</style>
 </head>
 <body>
 
@@ -136,9 +213,21 @@
         <button class="bell-btn" onclick="togglePanel()">
             🔔 Invites
             <span id="bellCount" class="bell-count" style="display:none;">0</span>
+            <button class="ham" id="hamBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
         </button>
     </div>
 </nav>
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link active" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
 
 <!-- INVITE PANEL -->
 <div id="invitePanel">
@@ -987,6 +1076,22 @@ function showToast(msg) {
     window._tt = setTimeout(() => t.classList.remove('show'), 3500);
 }
 window.showToast = showToast;
+</script>
+<script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    if (hamBtn && mobDrawer) {
+        hamBtn.addEventListener('click', () => {
+            hamBtn.classList.toggle('open');
+            mobDrawer.classList.toggle('open');
+        });
+        mobDrawer.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                hamBtn.classList.remove('open');
+                mobDrawer.classList.remove('open');
+            });
+        });
+    }
 </script>
 </body>
 </html>
