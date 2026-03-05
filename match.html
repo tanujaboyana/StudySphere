@@ -25,13 +25,55 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #e2e8f0; font-family: var(--inter, sans-serif); min-height: 100vh; }
 
-        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 20px; height:56px; display:flex; align-items:center; gap:12px; }
+        nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(10,10,15,0.93); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 20px; height:56px; display:flex; align-items:center; gap:12px; transition:background 0.3s, box-shadow 0.3s, border-color 0.3s; }
+        /* ── Light mode nav overrides ── */
+        [data-theme="light"] nav {
+            background: #ffffff !important;
+            backdrop-filter: none !important;
+            border-bottom-color: #e2e8f0 !important;
+            box-shadow: 0 1px 12px rgba(0,0,0,0.08) !important;
+        }
+        [data-theme="light"] .nav-logo {
+            color: #6d28d9 !important;
+            -webkit-text-fill-color: #6d28d9 !important;
+        }
+        [data-theme="light"] .nav-link {
+            color: #475569 !important;
+            -webkit-text-fill-color: #475569 !important;
+        }
+        [data-theme="light"] .nav-link:hover {
+            color: #6d28d9 !important;
+            -webkit-text-fill-color: #6d28d9 !important;
+            background: rgba(109,40,217,0.08) !important;
+        }
+        [data-theme="light"] .nav-link.active {
+            color: #6d28d9 !important;
+            -webkit-text-fill-color: #6d28d9 !important;
+            background: rgba(109,40,217,0.12) !important;
+            border-color: rgba(109,40,217,0.35) !important;
+            font-weight: 600 !important;
+        }
+        [data-theme="light"] .bell-btn {
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+            color: #475569 !important;
+        }
+        [data-theme="light"] #myNameTag {
+            color: #475569 !important;
+        }
+        [data-theme="light"] .ham span {
+            background: #475569 !important;
+        }
+        [data-theme="light"] .mob-drawer {
+            background: rgba(255,255,255,0.98) !important;
+            border-color: #e2e8f0 !important;
+        }
 .nav-links { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
 .nav-links::-webkit-scrollbar { display:none; }
-        .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:#e2e8f0; text-decoration:none; font-family:var(--syne); font-size:15px; }
+        .nav-logo { display:flex; align-items:center; gap:8px; font-weight:700; color:var(--text,#e2e8f0); text-decoration:none; font-family:var(--syne); font-size:15px; }
         .nav-links { display:flex; gap:2px; flex-wrap:wrap; }
         .nav-link { color:var(--muted); text-decoration:none; font-size:12px; padding:5px 10px; border-radius:6px; transition:all 0.2s; }
-        .nav-link:hover,.nav-link.active { color:#e2e8f0; background:var(--surface); }
+        .nav-link:hover,.nav-link.active { color:var(--text,#e2e8f0); background:var(--surface); }
         .nav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
 
         .content-wrapper { max-width:980px; margin:0 auto; padding:88px 20px 60px; }
@@ -189,6 +231,82 @@
     .match-card .btn-sm { width: 100%; justify-content: center; margin-top: 6px; }
     .heading-lg { font-size: 20px; }
 }
+
+/* ── Light mode nav overrides ── */
+[data-theme="light"] nav {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08) !important;
+    backdrop-filter: none !important;
+}
+[data-theme="light"] .nav-logo {
+    color: #1e1b4b !important;
+}
+[data-theme="light"] .nav-link {
+    color: #475569 !important;
+}
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active {
+    color: #6d28d9 !important;
+    background: rgba(109,40,217,0.1) !important;
+}
+[data-theme="light"] .bell-btn {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+[data-theme="light"] .mob-drawer {
+    background: rgba(255,255,255,0.98) !important;
+    border-color: #e2e8f0 !important;
+}
+[data-theme="light"] .mob-drawer .nav-link {
+    color: #475569 !important;
+    border-color: #e2e8f0 !important;
+}
+[data-theme="light"] .ham span { background: #475569 !important; }
+[data-theme="light"] body { background: #f4f5fa !important; color: #0f172a !important; }
+[data-theme="light"] .card,
+[data-theme="light"] .match-card {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+[data-theme="light"] .match-hero {
+    background: linear-gradient(135deg,rgba(109,40,217,0.07),rgba(8,145,178,0.04)) !important;
+    border-color: rgba(109,40,217,0.2) !important;
+    color: #0f172a !important;
+}
+[data-theme="light"] .connected-chip {
+    background: #f8fafc !important;
+    border-color: rgba(16,185,129,0.3) !important;
+    color: #0f172a !important;
+}
+[data-theme="light"] .invite-item {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+[data-theme="light"] #invitePanel {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+[data-theme="light"] .warn-box { background: rgba(245,158,11,0.06) !important; }
+[data-theme="light"] #toast {
+    background: rgba(255,255,255,0.97) !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+[data-theme="light"] .section-tag { background: rgba(109,40,217,0.1) !important; }
+[data-theme="light"] .progress-bar { background: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .btn-ghost {
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+[data-theme="light"] .btn-ghost:hover {
+    border-color: #6d28d9 !important;
+    color: #6d28d9 !important;
+}
 </style>
     <script>
     (function() {
@@ -198,6 +316,7 @@
         var v = s === 'light' ? L : D;
         var r = document.documentElement;
         Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.setAttribute('data-theme', s);
         r.style.background = v['--bg'];
         r.style.color = v['--text'];
     })();
@@ -205,7 +324,7 @@
 </head>
 <body>
 
-<nav>
+<nav id="main-nav">
     <a href="landing.html" class="nav-logo">🔗 StudySphere</a>
     <div class="nav-links">
         <a class="nav-link" href="landing.html">Intro</a>
@@ -230,7 +349,7 @@
         </button>
     </div>
 </nav>
-<!-- <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:9999;"></div> -->
+<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:9999;"></div>
 
 <script>
 fetch('profile.html').then(r=>r.text()).then(html=>{
@@ -265,15 +384,50 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     window.applyTheme=function(mode){
         const vars=mode==='dark'?DARK:LIGHT;
         const root=document.documentElement;
+        const isLight=mode==='light';
+        // 1. CSS vars on :root
         Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-        document.body.style.background=vars['--bg'];
-        document.body.style.color=vars['--text'];
+        // 2. data-theme attribute fires all [data-theme="light"] CSS rules
+        root.setAttribute('data-theme',mode);
+        // 3. Force bg + color on html & body
+        root.style.setProperty('background',vars['--bg'],'important');
+        root.style.setProperty('color',vars['--text'],'important');
+        document.body.style.setProperty('background',vars['--bg'],'important');
+        document.body.style.setProperty('color',vars['--text'],'important');
+        // 4. NAV — solid white in light mode
+        const nav=document.getElementById('main-nav');
+        if(nav){
+            nav.style.setProperty('background', isLight?'#ffffff':'rgba(7,7,13,0.85)', 'important');
+            nav.style.setProperty('border-bottom-color', isLight?'#e2e8f0':'rgba(255,255,255,0.06)', 'important');
+            nav.style.setProperty('box-shadow', isLight?'0 1px 12px rgba(0,0,0,0.08)':'none', 'important');
+            nav.style.setProperty('backdrop-filter', isLight?'none':'blur(20px)', 'important');
+        }
+        // 5. Nav links — dark slate in light, clear in dark
+        document.querySelectorAll('.nav-link').forEach(a=>{
+            const isActive=a.classList.contains('active');
+            a.style.setProperty('color', isLight?(isActive?'#6d28d9':'#475569'):'', 'important');
+            a.style.setProperty('-webkit-text-fill-color', isLight?(isActive?'#6d28d9':'#475569'):'', 'important');
+            if(isLight){
+                a.style.background=isActive?'rgba(109,40,217,0.12)':'';
+                a.style.borderColor=isActive?'rgba(109,40,217,0.35)':'transparent';
+            } else {
+                a.style.background='';
+                a.style.borderColor='';
+            }
+        });
+        // 6. Cards
+        document.querySelectorAll('.card,.kpi-card,.subject-room-card,.room-live-card,.activity-item,.partner-chip,.onboard-panel,.onboard-container').forEach(el=>{
+            el.style.background=isLight?'#ffffff':'';
+            el.style.borderColor=isLight?'#e2e8f0':'';
+            el.style.color=isLight?'#0f172a':'';
+        });
+        // 7. Profile toggle buttons
         const btnD=document.getElementById('btn-dark');
         const btnL=document.getElementById('btn-light');
         const lbl=document.getElementById('theme-row-label');
         if(btnD) btnD.classList.toggle('active',mode==='dark');
         if(btnL) btnL.classList.toggle('active',mode==='light');
-        if(lbl)  lbl.textContent=mode==='dark'?'🌙 Theme':'☀️ Theme';
+        if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
         localStorage.setItem('ss-theme',mode);
     };
 
@@ -1189,4 +1343,3 @@ onAuthStateChanged(_auth, user => {
 
 </body>
 </html>
-
