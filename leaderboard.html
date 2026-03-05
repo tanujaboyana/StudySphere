@@ -168,6 +168,135 @@
             transition: all 0.3s;
         }
         #toast.show { transform: translateY(0); opacity: 1; }
+        /* Hamburger button */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile drawer */
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(10,10,15,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 99;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    nav {
+        padding: 10px 16px;
+        gap: 10px;
+        height: 56px;
+    }
+
+    .nav-links { display: none; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    .content-wrapper { padding: 72px 14px 40px; }
+
+    .heading-lg { font-size: 22px; }
+
+    /* My rank banner: stack on mobile */
+    #myRankBanner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+    #myRankBanner > div[style*="text-align:right"] {
+        text-align: left !important;
+    }
+
+    /* Podium: stack all 3 vertically */
+    .podium {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .podium-slot {
+        height: auto !important;
+        padding: 14px 12px;
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        gap: 12px;
+    }
+    .podium-avatar {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 16px !important;
+        flex-shrink: 0;
+    }
+
+    /* Tabs: scroll horizontally */
+    #lbContent > div:first-child {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+
+    /* Rank rows */
+    .rank-row { gap: 8px; padding: 8px 10px; }
+
+    /* Bottom grid: single column */
+    .grid-2 { grid-template-columns: 1fr; gap: 16px; }
+
+    /* Toast: bottom center */
+    #toast {
+        right: 50%;
+        transform: translateX(50%) translateY(80px);
+        white-space: normal;
+        text-align: center;
+        width: calc(100% - 32px);
+    }
+    #toast.show {
+        transform: translateX(50%) translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .content-wrapper { padding: 66px 10px 40px; }
+    .heading-lg { font-size: 20px; }
+    .lb-tab { padding: 6px 12px; font-size: 11px; }
+    .rank-avatar { width: 30px; height: 30px; font-size: 12px; }
+}
     </style>
 </head>
 
@@ -189,6 +318,20 @@
              
         </div>
         <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
+        <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link active" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
     </nav>
 
     <div id="toast"></div>
@@ -816,5 +959,17 @@
             })
             .catch(err => console.error('Profile load failed:', err));
     </script>
+    <script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
+</script>
 </body>
 </html>
