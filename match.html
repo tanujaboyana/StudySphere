@@ -190,6 +190,18 @@
     .heading-lg { font-size: 20px; }
 }
 </style>
+    <script>
+    (function() {
+        var s = localStorage.getItem('ss-theme') || 'dark';
+        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var v = s === 'light' ? L : D;
+        var r = document.documentElement;
+        Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.style.background = v['--bg'];
+        r.style.color = v['--text'];
+    })();
+    </script>
 </head>
 <body>
 
@@ -218,6 +230,57 @@
         </button>
     </div>
 </nav>
+<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:9999;"></div>
+
+<script>
+fetch('profile.html').then(r=>r.text()).then(html=>{
+    document.getElementById('profile-container').innerHTML=html;
+
+    // Logout
+    const lb=document.getElementById('logout-btn');
+    if(lb) lb.addEventListener('click',e=>{
+        e.preventDefault();
+        import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
+            .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
+    });
+
+    // Dropdown
+    const pb=document.getElementById('profile-btn');
+    const pm=document.getElementById('profile-menu');
+    if(pb&&pm){
+        pb.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            pm.style.display=pm.style.display==='block'?'none':'block';
+        });
+        document.addEventListener('click',(e)=>{
+            if(!pb.contains(e.target)&&!pm.contains(e.target))
+                pm.style.display='none';
+        });
+    }
+
+    // Theme
+    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+
+    window.applyTheme=function(mode){
+        const vars=mode==='dark'?DARK:LIGHT;
+        const root=document.documentElement;
+        Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
+        document.body.style.background=vars['--bg'];
+        document.body.style.color=vars['--text'];
+        const btnD=document.getElementById('btn-dark');
+        const btnL=document.getElementById('btn-light');
+        const lbl=document.getElementById('theme-row-label');
+        if(btnD) btnD.classList.toggle('active',mode==='dark');
+        if(btnL) btnL.classList.toggle('active',mode==='light');
+        if(lbl)  lbl.textContent=mode==='dark'?'🌙 Theme':'☀️ Theme';
+        localStorage.setItem('ss-theme',mode);
+    };
+
+    window.applyTheme(localStorage.getItem('ss-theme')||'dark');
+
+}).catch(e=>console.error('Profile load failed:',e));
+</script>
 <div class="mob-drawer" id="mobDrawer">
     <a class="nav-link" href="landing.html">Intro</a>
     <a class="nav-link" href="dashboard.html">Dashboard</a>
@@ -1093,5 +1156,36 @@ window.showToast = showToast;
         });
     }
 </script>
+
+<script type="module">
+// Update profile avatar with real user name after Firebase auth
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+const _app = initializeApp({
+    apiKey:"AIzaSyAgmy0go1YLZFUf5c8nEOWDWm-wRkdIvqQ",
+    authDomain:"collabsyncai.firebaseapp.com",
+    projectId:"collabsyncai",
+    storageBucket:"collabsyncai.firebasestorage.app",
+    messagingSenderId:"862378374401",
+    appId:"1:862378374401:web:4438203269261b15011700"
+}, 'profile-updater');
+const _auth = getAuth(_app);
+onAuthStateChanged(_auth, user => {
+    if (!user) return;
+    const name = user.displayName || user.email?.split('@')[0] || 'U';
+    const initial = name[0].toUpperCase();
+    const colors = ['#6a4dff','#4d94ff','#00c9a7','#f59e0b','#10b981','#ef4444'];
+    const color = colors[(user.uid?.charCodeAt(0)||0) % colors.length];
+    // Wait for profile to be injected then update avatar
+    const update = () => {
+        const av = document.getElementById('profile-avatar');
+        if (av) { av.textContent = initial; av.style.background = color; }
+    };
+    update();
+    setTimeout(update, 500);
+    setTimeout(update, 1500);
+});
+</script>
+
 </body>
 </html>
