@@ -20,6 +20,147 @@
             z-index: 1;
             /* behind everything else */
         }
+        @media (max-width: 768px) {
+    .wb-toolbar {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px;
+    }
+
+    .wb-tool-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    #wb-canvas {
+        max-height: 400px;
+    }
+
+    #main-nav {
+        padding: 0 12px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .wb-toolbar {
+        gap: 4px;
+        padding: 8px;
+    }
+
+    .wb-tool-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    #wb-canvas {
+        max-height: 300px;
+    }
+
+    #brushSize {
+        width: 60px;
+    }
+}
+/* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+}
+.mob-drawer .nav-link.active,
+.mob-drawer .nav-link:hover {
+    color: #e2e8f0;
+    background: rgba(255,255,255,0.05);
+}
+
+@media (max-width: 768px) {
+    #main-nav { height: 56px; flex-wrap: nowrap; gap: 10px; }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    #profile-container { right: 58px !important; width: auto !important; }
+    .content-wrapper { padding-top: 68px !important; }
+
+    /* Toolbar: horizontal scroll on mobile */
+    .wb-toolbar {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        gap: 5px !important;
+        padding: 10px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .wb-toolbar::-webkit-scrollbar { display: none; }
+
+    /* Brush size input */
+    #brushSize { width: 70px !important; }
+
+    /* Canvas height */
+    #wb-canvas { height: 45vh !important; }
+
+    .heading-lg { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
+}
+
+@media (max-width: 480px) {
+    #wb-canvas { height: 38vh !important; }
+
+    /* Page header: tighter */
+    .wb-page .content > div:first-child { margin-bottom: 12px !important; }
+
+    /* Tool buttons: smaller */
+    .wb-tool-btn { padding: 5px 8px !important; font-size: 10px !important; }
+
+    /* Color swatches: slightly smaller */
+    .wb-color { width: 20px !important; height: 20px !important; }
+}
     </style>
 </head>
 
@@ -50,8 +191,21 @@
 
         <!-- CTA should also navigate normally 
         <a href="onboard.html" class="nav-cta">Get Started →</a>  -->
+    <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
     </nav>
-
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link active" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <div id="page-whiteboard" class="page">
@@ -93,7 +247,7 @@
                     </div>
 
                     <canvas id="wb-canvas" width="1200" height="600"
-                        style="background:#0b0b16;border-radius:14px;border:1px solid var(--border);cursor:crosshair;display:block;width:100%;max-height:580px;"></canvas>
+    style="background:#0b0b16;border-radius:14px;border:1px solid var(--border);cursor:crosshair;display:block;width:100%;height:50vh;touch-action:none;"></canvas>
                 </div>
             </div>
         </div>
@@ -203,6 +357,56 @@
             });
 
             canvas.addEventListener('mouseleave', () => { wbDrawing = false; wbCtx.beginPath(); });
+            // Touch support
+function getTouchPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    return {
+        x: (t.clientX - r.left) * (canvas.width / r.width),
+        y: (t.clientY - r.top) * (canvas.height / r.height)
+    };
+}
+
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const pos = getTouchPos(e);
+    wbDrawing = true;
+    startX = pos.x;
+    startY = pos.y;
+    snapshot = wbCtx.getImageData(0, 0, canvas.width, canvas.height);
+    wbCtx.beginPath();
+    wbCtx.moveTo(startX, startY);
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!wbDrawing) return;
+    const pos = getTouchPos(e);
+    if (wbTool === 'pen' || wbTool === 'eraser') {
+        wbCtx.strokeStyle = wbTool === 'eraser' ? '#0b0b16' : wbColor;
+        wbCtx.lineWidth = wbTool === 'eraser' ? 24 : brushSz;
+        wbCtx.lineCap = 'round';
+        wbCtx.lineTo(pos.x, pos.y);
+        wbCtx.stroke();
+    } else {
+        wbCtx.putImageData(snapshot, 0, 0);
+        wbCtx.strokeStyle = wbColor;
+        wbCtx.lineWidth = brushSz;
+        wbCtx.beginPath();
+        if (wbTool === 'line') { wbCtx.moveTo(startX, startY); wbCtx.lineTo(pos.x, pos.y); wbCtx.stroke(); }
+        if (wbTool === 'rect') { wbCtx.strokeRect(startX, startY, pos.x - startX, pos.y - startY); }
+        if (wbTool === 'circle') {
+            const r2 = Math.sqrt((pos.x - startX) ** 2 + (pos.y - startY) ** 2);
+            wbCtx.arc(startX, startY, r2, 0, Math.PI * 2);
+            wbCtx.stroke();
+        }
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+    wbDrawing = false;
+    wbCtx.beginPath();
+});
         }
 
         function setTool(t, el) {
@@ -236,6 +440,18 @@
         }
         initWB();
     </script>
+    <script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
+</script>
 </body>
 
 </html>
