@@ -76,6 +76,151 @@
         .msg-new { animation: fadeUp 0.2s ease; }
 
         .section-divider { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); margin: 4px 0 12px; }
+        /* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+}
+.mob-drawer .nav-link.active,
+.mob-drawer .nav-link:hover {
+    color: #e2e8f0;
+    background: rgba(255,255,255,0.05);
+}
+
+@media (max-width: 860px) {
+
+    /* Nav */
+    #main-nav { height: 56px; padding: 0 14px; flex-wrap: nowrap; gap: 10px; }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    #profile-container { right: 58px !important; width: auto !important; }
+    .content-wrapper { padding-top: 68px !important; padding-left: 12px !important; padding-right: 12px !important; }
+
+    /* Subject room grid: 2 columns */
+    .subject-rooms-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    /* Custom room: stack */
+    #customRoomWrap { flex-direction: column !important; gap: 8px !important; }
+    #customRoomWrap button { width: 100% !important; }
+
+    /* Topic bar: wrap */
+    #topicBar { gap: 8px !important; }
+    #topicBar button { font-size: 10px !important; padding: 4px 8px !important; }
+
+    /* Mood buttons: wrap */
+    .card div[style*="display:flex;gap:6px"] {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
+
+    /* Session layout: stack */
+    .session-layout {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    /* Chat window: shorter on tablet */
+    .chat-window { height: 460px !important; }
+
+    /* Sidebar: 2-col grid on tablet */
+    .session-layout > div:last-child {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .heading-lg { font-size: clamp(1.6rem, 5vw, 2.4rem) !important; }
+}
+
+@media (max-width: 540px) {
+
+    /* Subject rooms: single column */
+    .subject-rooms-grid { grid-template-columns: 1fr !important; }
+
+    /* Chat: full height feel */
+    .chat-window { height: 400px !important; }
+
+    /* Chat footer: stack */
+    .chat-footer {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+    .chat-footer button { width: 100% !important; }
+    .chat-input { width: 100% !important; box-sizing: border-box !important; }
+
+    /* Sidebar: single column */
+    .session-layout > div:last-child {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Topic bar: column */
+    #topicBar { flex-direction: column !important; align-items: flex-start !important; }
+    #topicBar button[onclick="leaveRoom()"] { margin-left: 0 !important; width: 100% !important; }
+
+    /* Toast */
+    #toast {
+        left: 16px !important;
+        right: 16px !important;
+        transform: translateX(0) translateY(60px) !important;
+        white-space: normal !important;
+        text-align: center !important;
+    }
+
+    /* Subject card: horizontal layout */
+    .subject-room-card { display: flex; align-items: center; gap: 12px; padding: 14px !important; }
+    .src-emoji { margin-bottom: 0 !important; font-size: 22px !important; }
+}
     </style>
 </head>
 <body>
@@ -95,8 +240,21 @@
         <a class="nav-link" href="pomodoro.html">Pomodoro</a>
         <a class="nav-link" href="onboard.html">Onboard</a>
     </div>
+    <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
 </nav>
-
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link active" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
 <div class="content-wrapper">
  <div id="page-session" class="page">
   <div class="session-page">
@@ -274,10 +432,6 @@ const SUBJECT_ROOMS = [
     { id:'room-chemistry',        emoji:'⚗️', label:'Chemistry',         grad:'linear-gradient(135deg,rgba(16,185,129,0.12),rgba(8,145,178,0.08))' },
     { id:'room-biology',          emoji:'🧬', label:'Biology',           grad:'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(77,148,255,0.08))' },
     { id:'room-computer-science', emoji:'💻', label:'Computer Science',  grad:'linear-gradient(135deg,rgba(77,148,255,0.15),rgba(16,185,129,0.08))' },
-    { id:'room-history',          emoji:'📜', label:'History',           grad:'linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.08))' },
-    { id:'room-economics',        emoji:'📊', label:'Economics',         grad:'linear-gradient(135deg,rgba(16,185,129,0.12),rgba(245,158,11,0.08))' },
-    { id:'room-literature',       emoji:'📖', label:'Literature',        grad:'linear-gradient(135deg,rgba(139,92,246,0.15),rgba(236,72,153,0.08))' },
-    { id:'room-psychology',       emoji:'🧠', label:'Psychology',        grad:'linear-gradient(135deg,rgba(236,72,153,0.12),rgba(109,40,217,0.08))' },
     { id:'room-statistics',       emoji:'📉', label:'Statistics',        grad:'linear-gradient(135deg,rgba(14,165,233,0.15),rgba(16,185,129,0.08))' },
     { id:'room-law',              emoji:'⚖️', label:'Law',               grad:'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(109,40,217,0.08))' },
     { id:'room-medicine',         emoji:'🏥', label:'Medicine',          grad:'linear-gradient(135deg,rgba(239,68,68,0.12),rgba(16,185,129,0.08))' },
@@ -286,9 +440,6 @@ const SUBJECT_ROOMS = [
     { id:'room-geography',        emoji:'🌍', label:'Geography',         grad:'linear-gradient(135deg,rgba(8,145,178,0.15),rgba(16,185,129,0.08))' },
     { id:'room-philosophy',       emoji:'🤔', label:'Philosophy',        grad:'linear-gradient(135deg,rgba(109,40,217,0.15),rgba(139,92,246,0.08))' },
     { id:'room-data-science',     emoji:'🤖', label:'Data Science & AI', grad:'linear-gradient(135deg,rgba(77,148,255,0.18),rgba(109,40,217,0.1))' },
-    { id:'room-languages',        emoji:'🗣️', label:'Languages',         grad:'linear-gradient(135deg,rgba(236,72,153,0.12),rgba(245,158,11,0.08))' },
-    { id:'room-art-design',       emoji:'🎨', label:'Art & Design',      grad:'linear-gradient(135deg,rgba(236,72,153,0.15),rgba(245,158,11,0.08))' },
-    { id:'room-sociology',        emoji:'🏘️', label:'Sociology',         grad:'linear-gradient(135deg,rgba(16,185,129,0.12),rgba(236,72,153,0.08))' },
 ];
 
 // ── State ─────────────────────────────────────────────────────────────
@@ -852,6 +1003,18 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
         document.addEventListener('click',e=>{ if(!pb.contains(e.target)&&!pm.contains(e.target)) pm.style.display='none'; });
     }
 }).catch(e=>console.error('Profile load failed:',e));
+</script>
+<script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
 </script>
 </body>
 </html>
