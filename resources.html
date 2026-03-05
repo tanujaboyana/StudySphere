@@ -145,6 +145,148 @@
             color: var(--teal-glow); margin-bottom: 20px;
             display: flex; align-items: center; gap: 10px;
         }
+        /* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile drawer ── */
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+
+    /* Nav */
+    #main-nav { height: 56px; padding: 0 14px; gap: 10px; flex-wrap: nowrap; }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    #profile-container { right: 58px !important; width: auto !important; }
+
+    /* Content */
+    .content-wrapper { padding-top: 68px !important; padding-left: 12px !important; padding-right: 12px !important; }
+
+    /* Page header: stack */
+    .res-page .content > div:first-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    #uploadBtn { width: 100%; text-align: center; }
+
+    /* Notice banner */
+    .notice-banner { font-size: 11px; padding: 10px 14px; }
+
+    /* Search + filters */
+    .search-wrap { max-width: 100% !important; width: 100% !important; }
+
+    /* Filter pills: scroll horizontally */
+    .search-wrap + div {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        padding-bottom: 4px;
+        width: 100%;
+    }
+    .search-wrap + div::-webkit-scrollbar { display: none; }
+
+    /* Sort row */
+    #resultsLabel + select,
+    #sortSelect { font-size: 11px !important; }
+
+    /* Resource grid: 2 columns */
+    .grid-3 { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+
+    /* Modal: full width */
+    .modal-box {
+        max-width: calc(100vw - 32px) !important;
+        padding: 22px 18px !important;
+        border-radius: 14px !important;
+    }
+
+    /* Type selector pills in modal */
+    .modal-box .form-group > div { gap: 6px !important; }
+
+    /* Platform chips */
+    .platform-chips { gap: 4px !important; }
+    .platform-chip { font-size: 10px !important; padding: 2px 8px !important; }
+}
+
+@media (max-width: 540px) {
+
+    /* Grid: single column */
+    .grid-3 { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+    .heading-lg { font-size: 22px !important; }
+
+    /* Search + filter bar: stack */
+    .res-page .content > div:nth-child(3) {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    /* Sort row: stack */
+    .res-page .content > div:nth-child(4) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+    }
+    #sortSelect { width: 100% !important; }
+
+    /* Toast: full width */
+    #resToast {
+        left: 16px !important;
+        right: 16px !important;
+        transform: translateX(0) translateY(80px) !important;
+        white-space: normal !important;
+        text-align: center !important;
+    }
+    #resToast.show { transform: translateX(0) translateY(0) !important; }
+
+    /* Card action menu */
+    .res-card-actions { right: 0 !important; min-width: 120px !important; }
+}
     </style>
 </head>
 <body>
@@ -166,7 +308,21 @@
             <a class="nav-link" href="pomodoro.html">Pomodoro</a>
             <a class="nav-link" href="onboard.html">Onboard</a>
         </div>
+        <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
     </nav>
+    <div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link active" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
 
     <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
 
@@ -678,5 +834,17 @@
             })
             .catch(err => console.error('Profile load failed:', err));
     </script>
+    <script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
+</script>
 </body>
 </html>
