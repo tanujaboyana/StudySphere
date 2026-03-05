@@ -203,25 +203,25 @@ body.theme-light #main-nav .ham {
 
     <!-- Navbar -->
     <nav id="main-nav">
-        <a href="landing.html" class="nav-logo"><div class="nav-logo-icon">🔗</div>StudySphere</a>
-
-        <div class="nav-links" id="navLinks">
-            <a class="nav-link active" href="landing.html">Intro</a>
-            <a class="nav-link" href="dashboard.html">Dashboard</a>
-            <a class="nav-link" href="match.html">Match</a>
-            <a class="nav-link" href="session.html">Session</a>
-            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-            <a class="nav-link" href="whiteboard.html">Whiteboard</a>
-            <a class="nav-link" href="resources.html">Resources</a>
-            <a class="nav-link" href="onboard.html">Onboard</a>
-        </div>
-
-        <!-- CTA should also navigate normally 
-        <a href="login.html" class="nav-cta">Get Started →</a>  -->
-        <button class="ham" id="hamBtn" aria-label="Menu">
-    <span></span><span></span><span></span>
+<a href="landing.html" class="nav-logo">
+<div class="nav-logo-icon">🔗</div>StudySphere</a>
+<div class="nav-links">
+<a class="nav-link active" href="landing.html">Intro</a>
+<a class="nav-link" href="dashboard.html">Dashboard</a>
+<a class="nav-link" href="match.html">Match</a>
+<a class="nav-link" href="session.html">Session</a>
+<a class="nav-link" href="leaderboard.html">Leaderboard</a>
+<a class="nav-link" href="whiteboard.html">Whiteboard</a>
+<a class="nav-link" href="resources.html">Resources</a>
+<a class="nav-link" href="onboard.html">Onboard</a>
+</div>
+<div class="nav-right">
+<div id="profile-container"></div>
+<button class="ham" id="hamBtn" aria-label="Menu">
+<span></span><span></span><span></span>
 </button>
-    </nav>
+</div>
+</nav>
 <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:9999;"></div>
 
 <script>
@@ -281,7 +281,6 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     <a class="nav-link" href="leaderboard.html">Leaderboard</a>
     <a class="nav-link" href="whiteboard.html">Whiteboard</a>
     <a class="nav-link" href="resources.html">Resources</a>
-    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
 
@@ -852,4 +851,5 @@ onAuthStateChanged(_auth, user => {
 </body>
 
 </html>
+
 
