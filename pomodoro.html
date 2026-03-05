@@ -92,6 +92,143 @@
             .pomo-layout { grid-template-columns: 1fr; }
             .pomo-tabs { flex-wrap: wrap; }
         }
+        /* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+    #main-nav { height: 56px; padding: 0 14px; flex-wrap: nowrap; gap: 10px; }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    .content-wrapper { padding-top: 68px !important; }
+
+    /* Layout already collapses at 768px via existing rule,
+       but reinforce and improve it */
+    .pomo-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    /* Timer card: tighter padding */
+    .timer-card { padding: 24px 18px !important; }
+
+    /* Tabs: scrollable row */
+    .pomo-tabs {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding-bottom: 4px;
+    }
+    .pomo-tabs::-webkit-scrollbar { display: none; }
+    .pomo-tab { white-space: nowrap; padding: 7px 14px !important; font-size: 12px !important; }
+
+    /* Ring: slightly smaller */
+    .ring-timer-wrap {
+        width: 190px !important;
+        height: 190px !important;
+    }
+    .ring-timer-wrap svg { width: 190px !important; height: 190px !important; }
+    .timer-display { font-size: 42px !important; }
+
+    /* Controls: tighter */
+    .pomo-controls { gap: 10px !important; margin-bottom: 18px !important; }
+    .ctrl-btn { width: 44px !important; height: 44px !important; font-size: 16px !important; }
+    .ctrl-btn.play { width: 58px !important; height: 58px !important; font-size: 22px !important; }
+
+    /* Task input: stack on very narrow */
+    .task-input-row { gap: 6px !important; }
+
+    /* Sidebar: full width cards in a row on tablet */
+    .pomo-sidebar {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+    }
+
+    /* Sound grid: 2 cols already fine, keep as-is */
+    .heading-lg { font-size: clamp(1.6rem, 5vw, 2.4rem) !important; }
+}
+
+@media (max-width: 540px) {
+    /* Sidebar: single column */
+    .pomo-sidebar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .timer-card { padding: 18px 12px !important; }
+
+    .ring-timer-wrap {
+        width: 170px !important;
+        height: 170px !important;
+    }
+    .ring-timer-wrap svg { width: 170px !important; height: 170px !important; }
+    .timer-display { font-size: 36px !important; }
+
+    /* Task input row: stack */
+    .task-input-row { flex-direction: column !important; }
+    .task-input-row button { width: 100% !important; }
+
+    /* Toast: full width */
+    .pomo-toast {
+        left: 16px !important;
+        right: 16px !important;
+        transform: translateX(0) translateY(-20px) !important;
+        white-space: normal !important;
+        text-align: center !important;
+    }
+    .pomo-toast.show { transform: translateX(0) translateY(0) !important; }
+
+    /* Sound grid: 2 cols still fine on small */
+    .sound-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
     </style>
 </head>
 <body>
@@ -117,8 +254,21 @@
             <a class="nav-link active" href="pomodoro.html">Pomodoro</a>
             <a class="nav-link" href="onboard.html">Onboard</a>
         </div>
+        <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
     </nav>
-
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link active" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
     <div class="content-wrapper">
         <div id="page-pomodoro" class="page">
             <div class="pomo-page">
@@ -527,5 +677,17 @@ const alertSound = new Audio("https://assets.mixkit.co/active_storage/sfx/105/10
         // Init
         updateDisplay();
     </script>
+    <script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
+</script>
 </body>
 </html>
