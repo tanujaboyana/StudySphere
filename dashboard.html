@@ -5,11 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StudySphere</title>
     <link rel="stylesheet" href="stylesheet1.css">
-  
+    <script>
+    (function() {
+        var s = localStorage.getItem('ss-theme') || 'dark';
+        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+        var v = s === 'light' ? L : D;
+        var r = document.documentElement;
+        Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.style.background = v['--bg'];
+        r.style.color = v['--text'];
+    })();
+    </script>
 </head>
 <body>
 <canvas id="canvas"></canvas>
 <div class="scanlines"></div>
+
+<!--<nav id="main-nav">
+    <a href="landing.html" class="nav-logo"><div class="nav-logo-icon">🔗</div>StudySphere</a>
+    <div class="nav-links">
+        <a class="nav-link" href="landing.html">Intro</a>
+        <a class="nav-link active" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="match.html">Match</a>
+        <a class="nav-link" href="session.html">Session</a>
+        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+        <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="onboard.html">Onboard</a>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
+</nav>-->
 
 <nav id="main-nav">
 
@@ -74,7 +102,7 @@
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-       <div id="vcStatus" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;padding:4px 12px;font-size:11px;color:#22c55e;font-weight:600;">🔴 WebRTC Live</div>
+      <div id="vcStatus" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;padding:4px 12px;font-size:11px;color:#22c55e;font-weight:600;">🔴 WebRTC Live</div>
       <button onclick="hangUp()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);border-radius:12px;padding:6px 14px;font-size:12px;cursor:pointer;">✕ Close</button>
     </div>
   </div>
@@ -1465,17 +1493,92 @@ document.addEventListener('keydown',e=>{
 <script>
 fetch('profile.html').then(r=>r.text()).then(html=>{
     document.getElementById('profile-container').innerHTML=html;
+
+    // Logout
     const lb=document.getElementById('logout-btn');
     if(lb) lb.addEventListener('click',e=>{
         e.preventDefault();
         import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
             .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
     });
-    const pb=document.getElementById('profile-btn'),pm=document.getElementById('profile-menu');
+
+    // Dropdown
+    const pb=document.getElementById('profile-btn');
+    const pm=document.getElementById('profile-menu');
     if(pb&&pm){
-        pb.addEventListener('click',()=>{ pm.style.display=pm.style.display==='block'?'none':'block'; });
-        document.addEventListener('click',e=>{ if(!pb.contains(e.target)&&!pm.contains(e.target))pm.style.display='none'; });
+        pb.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            pm.style.display=pm.style.display==='block'?'none':'block';
+        });
+        document.addEventListener('click',(e)=>{
+            if(!pb.contains(e.target)&&!pm.contains(e.target))
+                pm.style.display='none';
+        });
     }
+
+    // Theme
+    const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+    const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+
+    window.applyTheme=function(mode){
+        const vars=mode==='dark'?DARK:LIGHT;
+        const root=document.documentElement;
+        const body=document.body;
+
+        // 1. Set all CSS variables
+        Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
+
+        // 2. Set data-theme attribute for CSS selector rules
+        root.setAttribute('data-theme', mode);
+
+        // 3. Force background/color directly on html + body (belt AND suspenders)
+        root.style.setProperty('background', vars['--bg'], 'important');
+        root.style.setProperty('color', vars['--text'], 'important');
+        body.style.setProperty('background', vars['--bg'], 'important');
+        body.style.setProperty('color', vars['--text'], 'important');
+
+        // 4. Directly paint all cards
+        const isLight = mode==='light';
+        document.querySelectorAll('.kpi-card,.card,.subject-room-card,.room-live-card,.partner-chip,.activity-item').forEach(el=>{
+            el.style.background = isLight ? '#ffffff' : '';
+            el.style.borderColor = isLight ? '#e2e8f0' : '';
+            el.style.color       = isLight ? '#0f172a' : '';
+        });
+
+        // 5. Nav
+        const nav=document.getElementById('main-nav');
+        if(nav){
+            nav.style.background=isLight?'rgba(255,255,255,0.92)':'rgba(7,7,13,0.85)';
+            nav.style.borderBottomColor=isLight?'#e2e8f0':'rgba(255,255,255,0.06)';
+        }
+
+        // 6. Nav links
+        document.querySelectorAll('.nav-link').forEach(a=>{
+            a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#475569'):'';
+        });
+
+        // 7. KPI values (colored numbers)
+        document.querySelectorAll('.kpi-value').forEach(el=>{ el.style.color=''; });
+
+        // 8. Section tags
+        document.querySelectorAll('.section-tag,.kpi-label,.kpi-delta').forEach(el=>{
+            el.style.color = isLight ? '#64748b' : '';
+        });
+
+        // 9. Toggle button active states
+        const btnD=document.getElementById('btn-dark');
+        const btnL=document.getElementById('btn-light');
+        const lbl=document.getElementById('theme-row-label');
+        if(btnD) btnD.classList.toggle('active',mode==='dark');
+        if(btnL) btnL.classList.toggle('active',mode==='light');
+        if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
+
+        // 10. Persist
+        localStorage.setItem('ss-theme',mode);
+    };
+
+    window.applyTheme(localStorage.getItem('ss-theme')||'dark');
+
 }).catch(e=>console.error('Profile load failed:',e));
 </script>
 <script>
@@ -1490,45 +1593,5 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
         mobDrawer.classList.remove('open');
     }));
 </script>
-<!-- ══ MOBILE-ONLY: KPI Study Rooms card → scroll to Live Study Rooms ══ -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    function isMobile() { return window.innerWidth <= 860; }
-
-    function scrollToRoomsSection() {
-        if (!isMobile()) return; // ← desktop: do nothing at all
-
-        // Find the card whose h3 contains "Live Study Rooms"
-        const target = Array.from(document.querySelectorAll('.card'))
-            .find(c => c.querySelector('h3')?.textContent.includes('Live Study Rooms'));
-
-        if (!target) return;
-
-        const navHeight = document.getElementById('main-nav')?.offsetHeight || 56;
-        const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 14;
-        window.scrollTo({ top, behavior: 'smooth' });
-
-        // Brief purple glow highlight
-        target.style.transition = 'box-shadow 0.3s';
-        target.style.boxShadow = '0 0 0 3px rgba(109,40,217,0.45)';
-        setTimeout(() => { target.style.boxShadow = ''; }, 1800);
-    }
-
-    // Find the "Active Study Rooms" KPI card (has kpiRooms inside it)
-    const kpiRoomsEl = document.getElementById('kpiRooms');
-    if (kpiRoomsEl) {
-        const kpiCard = kpiRoomsEl.closest('.kpi-card');
-        if (kpiCard) {
-            kpiCard.style.cursor = 'pointer';
-            kpiCard.addEventListener('click', scrollToRoomsSection);
-        }
-    }
-});
-</script>
 </body>
 </html>
-
-
-
-
