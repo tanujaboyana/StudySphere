@@ -6,6 +6,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intro page</title>
     <link rel="stylesheet" href="stylesheet1.css">
+    <style>
+/* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+    #main-nav { height: 56px; padding: 0 14px; flex-wrap: nowrap; gap: 10px; }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    .content-wrapper { padding-top: 68px !important; }
+
+    /* Hero: stack */
+    .hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+    }
+    .hero-right { display: none !important; }
+
+    .hero-title { font-size: clamp(2rem, 7vw, 3.5rem) !important; }
+    .hero-desc  { font-size: 14px !important; }
+
+    .hero-actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    .hero-actions a { width: 100% !important; text-align: center !important; }
+
+    .hero-stats {
+        gap: 16px !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* Problem/Solution grid */
+    .grid-2 { grid-template-columns: 1fr !important; gap: 16px !important; }
+
+    /* Features */
+    .grid-3 { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+
+    /* How it works steps: stack */
+    .content > div > div[style*="grid-template-columns:1fr 60px 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    .content > div > div[style*="grid-template-columns:1fr 60px 1fr"] > div:nth-child(2) {
+        display: none !important;
+    }
+
+    /* Personas */
+    .grid-4 { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+
+    /* CTA buttons */
+    .cta-section div[style*="display:flex;gap:14px"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .cta-section div[style*="display:flex;gap:14px"] a {
+        text-align: center !important;
+    }
+
+    /* Tech pills: wrap */
+    .tech-section > .content > div {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: center !important;
+    }
+
+    .heading-lg { font-size: clamp(1.6rem, 5vw, 2.8rem) !important; }
+
+    /* Sections: reduce padding */
+    section { padding: 60px 0 !important; }
+    .hero-section { padding: 80px 0 40px !important; }
+}
+
+@media (max-width: 540px) {
+    .grid-3 { grid-template-columns: 1fr !important; }
+    .grid-4 { grid-template-columns: 1fr !important; }
+    .hero-stats { justify-content: space-between !important; }
+    .hero-stat-val { font-size: 1.6rem !important; }
+    .feature-item { padding: 16px !important; }
+    .content { padding: 0 14px !important; }
+}
+</style>
 </head>
 
 <body>
@@ -35,7 +164,21 @@
 
         <!-- CTA should also navigate normally 
         <a href="login.html" class="nav-cta">Get Started →</a>  -->
+        <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
     </nav>
+    <div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link active" href="landing.html">Intro</a>
+    <a class="nav-link" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
@@ -558,6 +701,18 @@
 
         </div>
     </div>
+    <script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
+</script>
 </body>
 
 </html>
