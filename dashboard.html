@@ -22,7 +22,20 @@
         <a class="nav-link" href="resources.html">Resources</a>
         <a class="nav-link" href="onboard.html">Onboard</a>
     </div>
+    <button class="ham" id="hamBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+</button>
 </nav>
+<div class="mob-drawer" id="mobDrawer">
+    <a class="nav-link" href="landing.html">Intro</a>
+    <a class="nav-link active" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="match.html">Match</a>
+    <a class="nav-link" href="session.html">Session</a>
+    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+    <a class="nav-link" href="resources.html">Resources</a>
+    <a class="nav-link" href="onboard.html">Onboard</a>
+</div>
 <div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>
 
 <!-- ════════════════════════════════════════════════════
@@ -427,6 +440,205 @@
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .msg-new{animation:fadeUp 0.2s ease;}
 .vc-btn-off{background:rgba(239,68,68,0.2)!important;border-color:rgba(239,68,68,0.5)!important;color:#f87171!important;}
+/* ── Hamburger ── */
+.ham {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.ham span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; }
+.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile drawer ── */
+.mob-drawer {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: rgba(7,7,13,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+}
+.mob-drawer.open { transform: translateY(0); }
+.mob-drawer .nav-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+}
+.mob-drawer .nav-link.active,
+.mob-drawer .nav-link:hover { color: #e2e8f0; background: var(--surface); }
+
+@media (max-width: 860px) {
+
+    /* ── Nav ── */
+    #main-nav {
+        height: 56px;
+        padding: 0 14px;
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+    #main-nav .nav-links { display: none !important; }
+    .ham { display: flex; }
+    .mob-drawer { display: flex; }
+
+    /* Profile button: pull left of hamburger */
+    #profile-container {
+        position: fixed !important;
+        top: 4px !important;
+        right: 60px !important;
+        width: auto !important;
+    }
+
+    /* ── Page wrapper ── */
+    .content-wrapper { padding-top: 68px !important; padding-left: 12px !important; padding-right: 12px !important; }
+
+    /* ── Dashboard header ── */
+    .dash-page .content > div:first-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+    /* ── KPI grid → 2 columns ── */
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    /* ── Main grid → single column ── */
+    .grid-2 { grid-template-columns: 1fr !important; gap: 14px !important; }
+
+    /* ── Skill bars ── */
+    #skillBars { flex-direction: column !important; gap: 10px !important; }
+
+    /* ── Study partners ── */
+    #studyPartnersGrid { gap: 8px !important; }
+
+    /* ── Streak grid → 1 column ── */
+    #streakGrid { grid-template-columns: 1fr !important; }
+
+    /* ── Cards ── */
+    .card { padding: 16px !important; }
+
+    /* ── Activity items ── */
+    .activity-item { padding: 8px 10px !important; gap: 8px !important; }
+
+    /* ── Room cards ── */
+    .room-live-card { flex-wrap: wrap; gap: 8px !important; }
+    .room-live-card > button { width: 100% !important; margin-top: 4px; }
+
+    /* ── Create/join room panels ── */
+    #createRoomPanel input,
+    #createRoomPanel select,
+    #createRoomPanel button { width: 100% !important; box-sizing: border-box !important; }
+    #createRoomPanel > div:last-child { flex-direction: column !important; }
+}
+
+@media (max-width: 540px) {
+
+    /* KPI → 1 column on very small screens */
+    .kpi-grid { grid-template-columns: 1fr 1fr !important; }
+
+    .heading-lg { font-size: 22px !important; }
+
+    /* DM chat window → full-width bottom sheet */
+    #chatWindow {
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 72vh !important;
+        border-radius: 16px 16px 0 0 !important;
+        transform: translateY(30px) !important;
+    }
+
+    /* Room chat modal → full screen */
+    #roomChatModal {
+        width: 100vw !important;
+        height: 100dvh !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        flex-direction: column !important;
+    }
+    #roomChatModal > div:first-child {
+        width: 100% !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        padding: 10px 12px !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    #rmMembersList { flex-direction: row !important; flex-wrap: wrap !important; max-height: 70px !important; }
+
+    /* Video modal → full screen */
+    #videoModal {
+        width: 100vw !important;
+        height: 100dvh !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+    }
+    #localVideo {
+        width: 100px !important;
+        height: 74px !important;
+        bottom: 86px !important;
+        right: 12px !important;
+    }
+    #videoModal > div:nth-child(3) { gap: 10px !important; padding: 12px 8px !important; }
+    #videoModal > div:nth-child(3) button { width: 44px !important; height: 44px !important; font-size: 16px !important; }
+    #videoModal > div:nth-child(3) button:nth-child(4) { width: 54px !important; height: 54px !important; }
+
+    /* Social modal → full screen */
+    #socialModal {
+        width: 100vw !important;
+        height: 100dvh !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        max-height: 100dvh !important;
+    }
+
+    /* Incoming call toast */
+    #incomingCallToast {
+        left: 16px !important;
+        right: 16px !important;
+        transform: translateX(0) translateY(80px) !important;
+        min-width: unset !important;
+    }
+    #incomingCallToast.show { transform: translateX(0) translateY(0) !important; }
+}
 </style>
 
 <!-- ═══ FIREBASE MODULE ═══ -->
@@ -1254,6 +1466,18 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
         document.addEventListener('click',e=>{ if(!pb.contains(e.target)&&!pm.contains(e.target))pm.style.display='none'; });
     }
 }).catch(e=>console.error('Profile load failed:',e));
+</script>
+<script>
+    const hamBtn = document.getElementById('hamBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    hamBtn.addEventListener('click', () => {
+        hamBtn.classList.toggle('open');
+        mobDrawer.classList.toggle('open');
+    });
+    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        hamBtn.classList.remove('open');
+        mobDrawer.classList.remove('open');
+    }));
 </script>
 </body>
 </html>
