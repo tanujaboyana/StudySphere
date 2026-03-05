@@ -313,8 +313,6 @@
     <div class="kpi-grid">
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div></div>
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div><div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div></div>
-      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Group Mood Score</span><span style="font-size:22px;">🧠</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMood">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMoodSub">Loading…</div></div>
-      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Match Compatibility</span><span style="font-size:22px;">🎯</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMatch">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMatchSub">Loading…</div></div>
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">People Matched</span><span style="font-size:22px;">👥</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div></div>
       <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Followers</span><span style="font-size:22px;">👤</span></div>
@@ -387,17 +385,17 @@
       <div class="card" style="padding:24px;">
         <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:18px;">🔥 Streaks & Weekly Goals</h3>
         <div id="streakGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1;">Loading streaks…</div></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Study Hours Goal</span><span id="goalHoursPct">—</span></div>
+        <!-- <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Study Hours Goal</span><span id="goalHoursPct">—</span></div>
         <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalHoursBar" style="width:0%;transition:width 1s;"></div></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Peer Teachings</span><span id="goalTeachPct">—</span></div>
         <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalTeachBar" style="width:0%;transition:width 1s;"></div></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Quiz Score Avg</span><span id="goalQuizPct">—</span></div>
         <div class="progress-bar"><div class="progress-fill" id="goalQuizBar" style="width:0%;transition:width 1s;"></div></div>
-      </div>
+      </div> -->
     </div>
 
-    <!-- ACTIVITY FEED -->
-    <div class="card" style="padding:24px;margin-top:20px;">
+     <!-- ACTIVITY FEED -->
+    <!-- <div class="card" style="padding:24px;margin-top:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">📡 Live Activity Feed</h3>
         <span style="font-size:11px;color:var(--muted);">Updates in real-time</span>
@@ -408,7 +406,7 @@
    </div>
   </div>
  </div>
-</div>
+</div> -->
 
 <!-- SOCIAL MODAL -->
 <div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
@@ -1595,3 +1593,4 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
 </script>
 </body>
 </html>
+
