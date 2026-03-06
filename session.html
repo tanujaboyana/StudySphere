@@ -5,7 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Session - StudySphere</title>
     <link rel="stylesheet" href="stylesheet1.css">
+    <script>
+    (function() {
+        var s = localStorage.getItem('ss-theme') || 'dark';
+        var D = {'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'rgba(7,7,13,0.92)','--nav-text':'#e2e8f0','--nav-border':'rgba(255,255,255,0.08)'};
+        var L = {'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9','--nav-bg':'#ffffff','--nav-text':'#0f172a','--nav-border':'#e2e8f0'};
+        var v = s === 'light' ? L : D;
+        var r = document.documentElement;
+        Object.keys(v).forEach(function(k){ r.style.setProperty(k, v[k]); });
+        r.style.background = v['--bg'];
+        r.style.color = v['--text'];
+    })();
+    </script>
     <style>
+        /* ══════════════════════════════════════
+           LIGHT THEME NAVBAR OVERRIDES
+        ══════════════════════════════════════ */
+        #main-nav {
+            background: var(--nav-bg, rgba(7,7,13,0.92)) !important;
+            border-bottom: 1px solid var(--nav-border, rgba(255,255,255,0.08)) !important;
+        }
+        #main-nav .nav-link {
+            color: var(--nav-text, #e2e8f0) !important;
+        }
+        #main-nav .nav-logo {
+            color: var(--nav-text, #e2e8f0) !important;
+        }
+        #main-nav .nav-link.active {
+            color: var(--accent) !important;
+        }
+        #main-nav .ham span {
+            background: var(--nav-text, #e2e8f0) !important;
+        }
+        #main-nav .ham {
+            border-color: var(--nav-border, rgba(255,255,255,0.1)) !important;
+        }
+
         /* ══════════════════════════════════════
            MOBILE-FIRST BASE RESETS
         ══════════════════════════════════════ */
@@ -193,17 +228,79 @@
         .ham.open span:nth-child(2) { opacity: 0; }
         .ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        .mob-drawer {
-            display: none; position: fixed; top: 56px; left: 0; right: 0;
-            background: rgba(7,7,13,0.98); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 14px; flex-direction: column; gap: 6px;
-            z-index: 999; transform: translateY(-110%); transition: transform 0.3s ease;
-            max-height: calc(100vh - 56px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+        /* ── Side Drawer Overlay ── */
+        .mob-drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 998;
+            backdrop-filter: blur(3px);
+            transition: opacity 0.3s ease;
+            opacity: 0;
         }
-        .mob-drawer.open { transform: translateY(0); }
-        .mob-drawer .nav-link { display: block; padding: 12px 14px; font-size: 15px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--muted); text-decoration: none; -webkit-tap-highlight-color: transparent; }
-        .mob-drawer .nav-link.active, .mob-drawer .nav-link:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+        .mob-drawer-overlay.open { opacity: 1; }
+
+        /* ── Side Drawer (slides in from RIGHT) ── */
+        .mob-drawer {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 280px;
+            height: 100dvh;
+            background: rgba(7,7,13,0.98);
+            backdrop-filter: blur(24px);
+            border-left: 1px solid rgba(255,255,255,0.08);
+            padding: 72px 14px 24px;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 999;
+            transform: translateX(110%);
+            transition: transform 0.32s cubic-bezier(.34,1.2,.64,1);
+            box-shadow: -24px 0 60px rgba(0,0,0,0.7);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mob-drawer.open { transform: translateX(0); }
+        .mob-drawer .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mob-drawer .nav-link.active,
+        .mob-drawer .nav-link:hover { color: #e2e8f0; background: rgba(109,40,217,0.12); border-color: rgba(109,40,217,0.35); }
+        .mob-drawer .nav-link.active { color: white; background: rgba(109,40,217,0.18); }
+
+        /* Close button inside drawer */
+        .mob-drawer-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .mob-drawer-close:hover { background: rgba(255,255,255,0.14); color: white; }
 
         /* ══════════════════════════════════════
            TABLET (≤860px)
@@ -213,6 +310,7 @@
             #main-nav .nav-links { display: none !important; }
             .ham { display: flex; }
             .mob-drawer { display: flex; }
+            .mob-drawer-overlay { display: block; }
             #profile-container { right: 58px !important; top: 10px; }
             .content-wrapper { padding-top: 68px !important; padding-left: 14px !important; padding-right: 14px !important; }
             .subject-rooms-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
@@ -230,47 +328,32 @@
             #profile-container { right: 54px !important; }
             .content-wrapper { padding-left: 12px !important; padding-right: 12px !important; }
             .heading-lg { font-size: clamp(1.4rem, 6vw, 2rem) !important; }
-
-            /* Rooms — 2 col grid */
             .subject-rooms-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
             .subject-room-card { padding: 12px !important; }
             .src-emoji { font-size: 22px !important; margin-bottom: 6px !important; }
             .src-title { font-size: 12px !important; }
-
-            /* Custom room — stacked */
             #customRoomWrap { flex-direction: column !important; gap: 8px !important; }
             #customRoomWrap button { width: 100% !important; padding: 12px !important; font-size: 14px !important; }
-
-            /* Topic bar — stacked */
             #topicBar { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; padding: 12px !important; }
             #topicBar .dot { display: none; }
             #topicBar > span:first-of-type { display: none; }
             #topicBar button[onclick="leaveRoom()"] { margin-left: 0 !important; width: 100% !important; text-align: center !important; padding: 10px !important; font-size: 13px !important; }
             #aiToggleBtn { width: 100% !important; padding: 10px !important; font-size: 13px !important; text-align: center !important; border-radius: 8px !important; }
             #memberCountBadge { display: none !important; }
-
-            /* Chat */
             .chat-window { height: 420px !important; border-radius: 12px !important; }
             .chat-footer { padding: 10px !important; gap: 8px !important; }
             .chat-footer button { padding: 10px 14px !important; font-size: 13px !important; white-space: nowrap; flex-shrink: 0; }
             .chat-header { padding: 10px 12px !important; }
             #aiModeBadge span:last-child { display: none; }
-
-            /* Sidebar panels stacked */
             .session-layout > div:last-child { grid-template-columns: 1fr !important; }
-
-            /* Mood poll 2×2 */
             .mood-poll-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
             .mood-vote-btn { padding: 12px 6px !important; min-height: 88px !important; }
             .mvb-emoji { font-size: 24px !important; }
             .mvb-label { font-size: 11px !important; }
             .mvb-pct   { font-size: 13px !important; }
-
-            /* Toast — full-width */
             #toast { left: 12px !important; right: 12px !important; transform: translateX(0) translateY(60px) !important; white-space: normal !important; text-align: center !important; font-size: 13px !important; bottom: 16px !important; }
-
-            /* AI banner */
             #aiStatusBanner { font-size: 12px !important; padding: 10px 12px !important; }
+            .mob-drawer { width: 100vw !important; border-left: none !important; }
         }
 
         /* ══════════════════════════════════════
@@ -319,16 +402,24 @@
     </div>
 </nav>
 
+<!-- Side Drawer Overlay -->
+<div class="mob-drawer-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
+
+<!-- Side Drawer -->
 <div class="mob-drawer" id="mobDrawer">
-    <a class="nav-link" href="landing.html">Intro</a>
-    <a class="nav-link" href="dashboard.html">Dashboard</a>
-    <a class="nav-link" href="match.html">Match</a>
-    <a class="nav-link active" href="session.html">Session</a>
-    <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-    <a class="nav-link" href="whiteboard.html">Whiteboard</a>
-    <a class="nav-link" href="resources.html">Resources</a>
-    <a class="nav-link" href="pomodoro.html">Pomodoro</a>
-    <a class="nav-link" href="onboard.html">Onboard</a>
+    <button class="mob-drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+    <div style="margin-bottom:10px;padding:0 4px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Navigation</div>
+    </div>
+    <a class="nav-link" href="landing.html">🏠 Intro</a>
+    <a class="nav-link" href="dashboard.html">📊 Dashboard</a>
+    <a class="nav-link" href="match.html">🎯 Match</a>
+    <a class="nav-link active" href="session.html">🚀 Session</a>
+    <a class="nav-link" href="leaderboard.html">🏆 Leaderboard</a>
+    <a class="nav-link" href="whiteboard.html">🖌️ Whiteboard</a>
+    <a class="nav-link" href="resources.html">📚 Resources</a>
+    <a class="nav-link" href="pomodoro.html">⏱️ Pomodoro</a>
+    <a class="nav-link" href="onboard.html">✨ Onboard</a>
 </div>
 
 <div class="content-wrapper">
@@ -573,12 +664,22 @@ function buildProfileWidget(user){
             <a class="profile-dropdown-link" href="onboard.html">🧬 Edit Profile</a>
             <a class="profile-dropdown-link" href="leaderboard.html">🏆 Leaderboard</a>
             <hr>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:8px;margin-bottom:4px;">
+                <span id="theme-row-label" style="font-size:13px;color:rgba(255,255,255,0.6);">🌙 Theme</span>
+                <div style="display:flex;gap:4px;">
+                    <button id="btn-dark" onclick="window.applyTheme('dark')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.08);color:#e2e8f0;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;">Dark</button>
+                    <button id="btn-light" onclick="window.applyTheme('light')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.08);color:#e2e8f0;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;">Light</button>
+                </div>
+            </div>
+            <hr>
             <button class="profile-signout-btn" id="profileSignOut">🚪 Sign out</button>
         </div></div>`;
     const btn=$('profileAvatarBtn'),menu=$('profileDropdown');
     btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.toggle('open');});
     document.addEventListener('click',e=>{if(!container.contains(e.target))menu.classList.remove('open');});
     $('profileSignOut').addEventListener('click',()=>signOut(auth).then(()=>window.location.href='login.html'));
+    // Sync active button state
+    window.applyTheme(localStorage.getItem('ss-theme')||'dark');
 }
 function buildProfileLoggedOut(){
     $('profile-container').innerHTML=`<a href="login.html" style="font-size:12px;color:var(--glow);padding:6px 14px;border:1px solid rgba(109,40,217,0.4);border-radius:8px;text-decoration:none;white-space:nowrap;">Log in</a>`;
@@ -934,21 +1035,78 @@ window.addEventListener('beforeunload',()=>{
     if(unsubMsgs)unsubMsgs();if(unsubRoom)unsubRoom();if(unsubPresence)unsubPresence();
     roomCountUnsubs.forEach(u=>u());removePresence();
 });
+
+/* ════ THEME SYSTEM ════ */
+const DARK_VARS={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+const LIGHT_VARS={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
+window.applyTheme=function(mode){
+    const vars=mode==='dark'?DARK_VARS:LIGHT_VARS;
+    const root=document.documentElement, body=document.body;
+    Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
+    root.setAttribute('data-theme',mode);
+    root.style.setProperty('background',vars['--bg'],'important');
+    root.style.setProperty('color',vars['--text'],'important');
+    body.style.setProperty('background',vars['--bg'],'important');
+    body.style.setProperty('color',vars['--text'],'important');
+    const isLight=mode==='light';
+    /* Nav bar */
+    const nav=document.getElementById('main-nav');
+    if(nav){
+        nav.style.background=isLight?'#ffffff':'rgba(7,7,13,0.92)';
+        nav.style.borderBottomColor=isLight?'#e2e8f0':'rgba(255,255,255,0.08)';
+        nav.querySelectorAll('.nav-link').forEach(a=>{a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#0f172a'):'';});
+        const logo=nav.querySelector('.nav-logo');
+        if(logo)logo.style.color=isLight?'#0f172a':'';
+        nav.querySelectorAll('.ham span').forEach(s=>{s.style.background=isLight?'#0f172a':'#e2e8f0';});
+        const ham=nav.querySelector('.ham');
+        if(ham){ham.style.borderColor=isLight?'#e2e8f0':'rgba(255,255,255,0.1)';ham.style.background=isLight?'rgba(0,0,0,0.04)':'rgba(255,255,255,0.05)';}
+    }
+    /* Cards */
+    document.querySelectorAll('.card').forEach(el=>{
+        el.style.background=isLight?'#ffffff':'';
+        el.style.borderColor=isLight?'#e2e8f0':'';
+        el.style.color=isLight?'#0f172a':'';
+    });
+    /* Theme button active states */
+    const btnD=document.getElementById('btn-dark'),btnL=document.getElementById('btn-light'),lbl=document.getElementById('theme-row-label');
+    if(btnD){btnD.style.background=mode==='dark'?'rgba(109,40,217,0.3)':'rgba(255,255,255,0.08)';btnD.style.borderColor=mode==='dark'?'rgba(109,40,217,0.6)':'rgba(255,255,255,0.12)';btnD.style.color=mode==='dark'?'#c4b5fd':'#e2e8f0';}
+    if(btnL){btnL.style.background=mode==='light'?'rgba(109,40,217,0.3)':'rgba(255,255,255,0.08)';btnL.style.borderColor=mode==='light'?'rgba(109,40,217,0.6)':'rgba(255,255,255,0.12)';btnL.style.color=mode==='light'?'#c4b5fd':'#e2e8f0';}
+    if(lbl)lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
+    localStorage.setItem('ss-theme',mode);
+};
+window.applyTheme(localStorage.getItem('ss-theme')||'dark');
 </script>
 
+<!-- ════ HAMBURGER / SIDE DRAWER LOGIC ════ -->
 <script>
-    const hamBtn=document.getElementById('hamBtn');
-    const mobDrawer=document.getElementById('mobDrawer');
-    hamBtn.addEventListener('click',()=>{hamBtn.classList.toggle('open');mobDrawer.classList.toggle('open');});
-    mobDrawer.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{hamBtn.classList.remove('open');mobDrawer.classList.remove('open');}));
-    // Close drawer on outside tap
-    document.addEventListener('click',e=>{
-        if(mobDrawer.classList.contains('open')&&!mobDrawer.contains(e.target)&&!hamBtn.contains(e.target)){
-            hamBtn.classList.remove('open');mobDrawer.classList.remove('open');
-        }
-    });
-    // Prevent body scroll when drawer open
-    new MutationObserver(()=>{document.body.style.overflow=mobDrawer.classList.contains('open')?'hidden':'';}).observe(mobDrawer,{attributes:true,attributeFilter:['class']});
+const hamBtn     = document.getElementById('hamBtn');
+const mobDrawer  = document.getElementById('mobDrawer');
+const mobOverlay = document.getElementById('mobOverlay');
+
+function openDrawer() {
+    hamBtn.classList.add('open');
+    mobDrawer.classList.add('open');
+    mobOverlay.style.display = 'block';
+    requestAnimationFrame(() => mobOverlay.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+    hamBtn.classList.remove('open');
+    mobDrawer.classList.remove('open');
+    mobOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { mobOverlay.style.display = 'none'; }, 320);
+}
+
+hamBtn.addEventListener('click', () => {
+    if (mobDrawer.classList.contains('open')) closeDrawer();
+    else openDrawer();
+});
+
+mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 </script>
 </body>
 </html>
