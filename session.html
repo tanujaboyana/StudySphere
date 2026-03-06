@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Session - StudySphere</title>
     <link rel="stylesheet" href="stylesheet1.css">
+    <!-- PeerJS for WebRTC video calling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
     <script>
     (function() {
         var s = localStorage.getItem('ss-theme') || 'dark';
@@ -25,28 +27,231 @@
             background: var(--nav-bg, rgba(7,7,13,0.92)) !important;
             border-bottom: 1px solid var(--nav-border, rgba(255,255,255,0.08)) !important;
         }
-        #main-nav .nav-link {
-            color: var(--nav-text, #e2e8f0) !important;
-        }
-        #main-nav .nav-logo {
-            color: var(--nav-text, #e2e8f0) !important;
-        }
-        #main-nav .nav-link.active {
-            color: var(--accent) !important;
-        }
-        #main-nav .ham span {
-            background: var(--nav-text, #e2e8f0) !important;
-        }
-        #main-nav .ham {
-            border-color: var(--nav-border, rgba(255,255,255,0.1)) !important;
-        }
+        #main-nav .nav-link { color: var(--nav-text, #e2e8f0) !important; }
+        #main-nav .nav-logo { color: var(--nav-text, #e2e8f0) !important; }
+        #main-nav .nav-link.active { color: var(--accent) !important; }
+        #main-nav .ham span { background: var(--nav-text, #e2e8f0) !important; }
+        #main-nav .ham { border-color: var(--nav-border, rgba(255,255,255,0.1)) !important; }
 
-        /* ══════════════════════════════════════
-           MOBILE-FIRST BASE RESETS
-        ══════════════════════════════════════ */
         *, *::before, *::after { box-sizing: border-box; }
         html { -webkit-text-size-adjust: 100%; }
         body { overflow-x: hidden; }
+
+        /* ══════════════════════════════════════
+           VIDEO CALL STYLES
+        ══════════════════════════════════════ */
+        #videoCallModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(12px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            overflow: hidden;
+        }
+        #videoCallModal.open { display: flex; }
+
+        /* Modal top bar */
+        .vc-topbar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: rgba(7,7,13,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .vc-topbar-left { display: flex; align-items: center; gap: 12px; }
+        .vc-live-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 1.2s infinite;
+            flex-shrink: 0;
+        }
+        .vc-title { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+        .vc-subtitle { font-size: 11px; color: rgba(255,255,255,0.35); }
+        .vc-topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        /* Video grid */
+        #videoGrid {
+            flex: 1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            padding: 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            align-content: start;
+        }
+
+        .video-tile {
+            position: relative;
+            background: #0d0d1a;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.3s;
+        }
+        .video-tile.speaking { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.3); }
+        .video-tile video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #000;
+            display: block;
+        }
+        .video-tile .vt-name {
+            position: absolute;
+            bottom: 10px; left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #e2e8f0;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            backdrop-filter: blur(6px);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .video-tile .vt-name .mic-icon { font-size: 10px; }
+        .video-tile .vt-avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: 800; color: #fff;
+        }
+        .video-tile .vt-camoff-label {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .video-tile .vt-status-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 9px; padding: 2px 8px;
+            border-radius: 20px; font-weight: 700;
+        }
+        .video-tile .vt-status-badge.you {
+            background: rgba(109,40,217,0.3);
+            color: #c4b5fd;
+            border: 1px solid rgba(109,40,217,0.5);
+        }
+        .video-tile .vt-status-badge.peer {
+            background: rgba(34,197,94,0.15);
+            color: #86efac;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+
+        /* Control bar */
+        .vc-controls {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: rgba(7,7,13,0.95);
+            border-top: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .vc-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.07);
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 11px; font-weight: 600;
+            transition: all 0.2s;
+            min-width: 64px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .vc-btn .vc-btn-icon { font-size: 20px; line-height: 1; }
+        .vc-btn:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.2); }
+        .vc-btn:active { transform: scale(0.94); }
+        .vc-btn.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.4); color: #86efac; }
+        .vc-btn.muted  { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+        .vc-btn.camoff { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+        .vc-btn.end    { background: rgba(239,68,68,0.2);  border-color: rgba(239,68,68,0.5); color: #f87171; min-width: 80px; }
+        .vc-btn.end:hover { background: rgba(239,68,68,0.35); }
+
+        /* "Start Video Call" button in topicBar */
+        #vcLaunchBtn {
+            background: rgba(34,197,94,0.12);
+            border: 1px solid rgba(34,197,94,0.35);
+            color: #22c55e;
+            border-radius: 9px; padding: 5px 12px;
+            font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            display: flex; align-items: center; gap: 5px;
+        }
+        #vcLaunchBtn:hover { background: rgba(34,197,94,0.22); }
+        #vcLaunchBtn.incall {
+            background: rgba(239,68,68,0.12);
+            border-color: rgba(239,68,68,0.35);
+            color: #f87171;
+        }
+        #vcStatusDot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #22c55e;
+            display: none;
+            animation: pulse 1.2s infinite;
+        }
+        #vcStatusDot.on { display: inline-block; }
+
+        /* Incoming call overlay on tile */
+        .vc-connecting {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 14px;
+        }
+        .vc-connecting-dots { display: flex; gap: 5px; }
+        .vc-connecting-dots span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #8b5cf6;
+            animation: vcDot 1.2s ease-in-out infinite;
+        }
+        .vc-connecting-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .vc-connecting-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes vcDot { 0%,80%,100%{transform:scale(0.6);opacity:0.3;}40%{transform:scale(1);opacity:1;} }
+
+        /* VC notification toast */
+        #vcToast {
+            position: fixed; bottom: 90px; left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: rgba(34,197,94,0.15);
+            border: 1px solid rgba(34,197,94,0.4);
+            color: #86efac;
+            padding: 10px 20px; border-radius: 10px;
+            font-size: 13px; font-weight: 600;
+            z-index: 9998; opacity: 0;
+            transition: all 0.3s; pointer-events: none;
+            white-space: nowrap;
+        }
+        #vcToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Permission denied message */
+        #vcPermissionMsg {
+            display: none;
+            padding: 20px; text-align: center;
+            font-size: 13px; color: #f87171;
+        }
 
         /* ── Subject room cards ── */
         .subject-rooms-grid {
@@ -67,14 +272,7 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-        .subject-room-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--card-grad);
-            opacity: 0;
-            transition: opacity 0.22s;
-        }
+        .subject-room-card::before { content: ''; position: absolute; inset: 0; background: var(--card-grad); opacity: 0; transition: opacity 0.22s; }
         .subject-room-card:hover  { border-color: rgba(109,40,217,0.45); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(109,40,217,0.12); }
         .subject-room-card:hover::before { opacity: 1; }
         .subject-room-card:active { transform: scale(0.97); opacity: 0.9; }
@@ -120,40 +318,17 @@
         /* ══════════════════════════════════════
            MOOD POLL
         ══════════════════════════════════════ */
-        .mood-poll-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 14px;
-        }
+        .mood-poll-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
         .mood-vote-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            padding: 10px 4px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.04);
-            cursor: pointer;
-            transition: all 0.22s;
-            position: relative;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            min-height: 80px;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 10px 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04); cursor: pointer; transition: all 0.22s;
+            position: relative; overflow: hidden;
+            -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 80px;
         }
         .mood-vote-btn:active { transform: scale(0.95); }
-        .mood-vote-btn.selected {
-            border-color: rgba(109,40,217,0.7);
-            background: rgba(109,40,217,0.15);
-            box-shadow: 0 0 14px rgba(109,40,217,0.2);
-        }
-        .mood-vote-btn .mvb-fill {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 0%;
-            border-radius: 0 0 12px 12px;
-            transition: height 0.6s cubic-bezier(.4,0,.2,1); z-index: 0;
-        }
+        .mood-vote-btn.selected { border-color: rgba(109,40,217,0.7); background: rgba(109,40,217,0.15); box-shadow: 0 0 14px rgba(109,40,217,0.2); }
+        .mood-vote-btn .mvb-fill { position: absolute; bottom: 0; left: 0; right: 0; height: 0%; border-radius: 0 0 12px 12px; transition: height 0.6s cubic-bezier(.4,0,.2,1); z-index: 0; }
         .mood-vote-btn > * { position: relative; z-index: 1; }
         .mvb-emoji  { font-size: 22px; line-height: 1; }
         .mvb-label  { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.3px; }
@@ -164,12 +339,7 @@
         .mood-mask { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(.4,0,.2,1), background 0.5s; }
 
         .mood-voters { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
-        .mood-voter-av {
-            width: 18px; height: 18px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 9px; font-weight: 800; color: #fff;
-            border: 1.5px solid #111118; margin-left: -4px;
-        }
+        .mood-voter-av { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #fff; border: 1.5px solid #111118; margin-left: -4px; }
         .mood-voter-av:first-child { margin-left: 0; }
 
         @keyframes pulse  { 0%,100%{opacity:1;}50%{opacity:.35;} }
@@ -191,21 +361,9 @@
 
         /* ── Profile widget ── */
         #profile-container { position: fixed; top: 10px; right: 70px; z-index: 1001; }
-        .profile-avatar-btn {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: linear-gradient(135deg, #6d28d9, #00c9a7);
-            border: 2px solid rgba(255,255,255,0.15);
-            color: #fff; font-weight: 800; font-size: 14px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; -webkit-tap-highlight-color: transparent;
-        }
+        .profile-avatar-btn { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6d28d9, #00c9a7); border: 2px solid rgba(255,255,255,0.15); color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
         .profile-avatar-btn:hover { transform: scale(1.08); box-shadow: 0 0 14px rgba(109,40,217,0.4); }
-        .profile-dropdown {
-            display: none; position: absolute; top: 46px; right: 0;
-            background: rgba(14,14,22,0.98); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px; padding: 14px; min-width: 200px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6); backdrop-filter: blur(20px); z-index: 1002;
-        }
+        .profile-dropdown { display: none; position: absolute; top: 46px; right: 0; background: rgba(14,14,22,0.98); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); backdrop-filter: blur(20px); z-index: 1002; }
         .profile-dropdown.open { display: block; }
         .profile-dropdown-name  { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
         .profile-dropdown-email { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -216,95 +374,24 @@
         .profile-signout-btn:hover { background: rgba(239,68,68,0.2); }
 
         /* ── Hamburger ── */
-        .ham {
-            display: none; flex-direction: column; gap: 5px; cursor: pointer;
-            padding: 8px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
-            flex-shrink: 0; margin-left: auto;
-            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-        }
+        .ham { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); flex-shrink: 0; margin-left: auto; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         .ham span { display: block; width: 20px; height: 2px; background: #e2e8f0; border-radius: 2px; transition: all 0.3s; }
         .ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .ham.open span:nth-child(2) { opacity: 0; }
         .ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* ── Side Drawer Overlay ── */
-        .mob-drawer-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 998;
-            backdrop-filter: blur(3px);
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
+        /* ── Drawer ── */
+        .mob-drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 998; backdrop-filter: blur(3px); transition: opacity 0.3s ease; opacity: 0; }
         .mob-drawer-overlay.open { opacity: 1; }
-
-        /* ── Side Drawer (slides in from RIGHT) ── */
-        .mob-drawer {
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 280px;
-            height: 100dvh;
-            background: rgba(7,7,13,0.98);
-            backdrop-filter: blur(24px);
-            border-left: 1px solid rgba(255,255,255,0.08);
-            padding: 72px 14px 24px;
-            flex-direction: column;
-            gap: 6px;
-            z-index: 999;
-            transform: translateX(110%);
-            transition: transform 0.32s cubic-bezier(.34,1.2,.64,1);
-            box-shadow: -24px 0 60px rgba(0,0,0,0.7);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .mob-drawer { display: none; position: fixed; top: 0; right: 0; width: 280px; height: 100dvh; background: rgba(7,7,13,0.98); backdrop-filter: blur(24px); border-left: 1px solid rgba(255,255,255,0.08); padding: 72px 14px 24px; flex-direction: column; gap: 6px; z-index: 999; transform: translateX(110%); transition: transform 0.32s cubic-bezier(.34,1.2,.64,1); box-shadow: -24px 0 60px rgba(0,0,0,0.7); overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .mob-drawer.open { transform: translateX(0); }
-        .mob-drawer .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            font-size: 14px;
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 10px;
-            color: rgba(255,255,255,0.55);
-            text-decoration: none;
-            transition: all 0.2s;
-            font-weight: 500;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .mob-drawer .nav-link.active,
-        .mob-drawer .nav-link:hover { color: #e2e8f0; background: rgba(109,40,217,0.12); border-color: rgba(109,40,217,0.35); }
+        .mob-drawer .nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: rgba(255,255,255,0.55); text-decoration: none; transition: all 0.2s; font-weight: 500; -webkit-tap-highlight-color: transparent; }
+        .mob-drawer .nav-link.active,.mob-drawer .nav-link:hover { color: #e2e8f0; background: rgba(109,40,217,0.12); border-color: rgba(109,40,217,0.35); }
         .mob-drawer .nav-link.active { color: white; background: rgba(109,40,217,0.18); }
-
-        /* Close button inside drawer */
-        .mob-drawer-close {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.5);
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-            line-height: 1;
-        }
+        .mob-drawer-close { display: flex; align-items: center; justify-content: center; position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); font-size: 18px; cursor: pointer; transition: all 0.2s; line-height: 1; }
         .mob-drawer-close:hover { background: rgba(255,255,255,0.14); color: white; }
 
-        /* ══════════════════════════════════════
-           TABLET (≤860px)
-        ══════════════════════════════════════ */
+        /* ══ RESPONSIVE ══ */
         @media (max-width: 860px) {
             #main-nav { height: 56px; padding: 0 14px; flex-wrap: nowrap; gap: 10px; }
             #main-nav .nav-links { display: none !important; }
@@ -318,11 +405,8 @@
             .chat-window { height: 480px !important; }
             .session-layout > div:last-child { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
             .heading-lg { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
+            #videoGrid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important; }
         }
-
-        /* ══════════════════════════════════════
-           MOBILE (≤540px)
-        ══════════════════════════════════════ */
         @media (max-width: 540px) {
             #main-nav { padding: 0 12px !important; }
             #profile-container { right: 54px !important; }
@@ -339,6 +423,7 @@
             #topicBar > span:first-of-type { display: none; }
             #topicBar button[onclick="leaveRoom()"] { margin-left: 0 !important; width: 100% !important; text-align: center !important; padding: 10px !important; font-size: 13px !important; }
             #aiToggleBtn { width: 100% !important; padding: 10px !important; font-size: 13px !important; text-align: center !important; border-radius: 8px !important; }
+            #vcLaunchBtn { width: 100% !important; padding: 10px !important; font-size: 13px !important; justify-content: center !important; }
             #memberCountBadge { display: none !important; }
             .chat-window { height: 420px !important; border-radius: 12px !important; }
             .chat-footer { padding: 10px !important; gap: 8px !important; }
@@ -354,11 +439,11 @@
             #toast { left: 12px !important; right: 12px !important; transform: translateX(0) translateY(60px) !important; white-space: normal !important; text-align: center !important; font-size: 13px !important; bottom: 16px !important; }
             #aiStatusBanner { font-size: 12px !important; padding: 10px 12px !important; }
             .mob-drawer { width: 100vw !important; border-left: none !important; }
+            #videoGrid { grid-template-columns: 1fr !important; }
+            .vc-controls { gap: 8px !important; padding: 12px !important; }
+            .vc-btn { padding: 10px 12px !important; min-width: 56px !important; }
+            .vc-btn .vc-btn-icon { font-size: 18px !important; }
         }
-
-        /* ══════════════════════════════════════
-           VERY SMALL (≤380px)
-        ══════════════════════════════════════ */
         @media (max-width: 380px) {
             .subject-rooms-grid { gap: 6px !important; }
             .src-title { font-size: 11px !important; }
@@ -366,19 +451,81 @@
             .mood-vote-btn { padding: 10px 4px !important; min-height: 80px !important; }
             #profile-container { right: 50px !important; }
         }
-
-        /* ══════════════════════════════════════
-           NOTCH / SAFE AREA SUPPORT
-        ══════════════════════════════════════ */
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .chat-footer { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
             .mob-drawer  { padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important; }
+            .vc-controls { padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important; }
         }
     </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
 <div class="scanlines"></div>
+
+<!-- ══════════════════════════════════
+     VIDEO CALL MODAL
+══════════════════════════════════ -->
+<div id="videoCallModal">
+    <!-- Top bar -->
+    <div class="vc-topbar">
+        <div class="vc-topbar-left">
+            <div class="vc-live-dot"></div>
+            <div>
+                <div class="vc-title">🎥 Video Call — <span id="vcRoomLabel">Room</span></div>
+                <div class="vc-subtitle" id="vcPeerCount">Only you so far — others will join</div>
+            </div>
+        </div>
+        <div class="vc-topbar-right">
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);padding:4px 10px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+                🔒 Peer-to-peer · encrypted
+            </div>
+        </div>
+    </div>
+
+    <!-- Video grid -->
+    <div id="videoGrid">
+        <!-- Local video tile (always present) -->
+        <div class="video-tile" id="localTile">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="vt-camoff-label" id="localCamOffLabel" style="display:none;">
+                <div class="vt-avatar" id="localAvatar" style="background:linear-gradient(135deg,#6d28d9,#00c9a7);">?</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">Camera off</div>
+            </div>
+            <div class="vt-name"><span class="mic-icon" id="localMicIcon">🎙️</span><span id="localNameLabel">You</span></div>
+            <div class="vt-status-badge you">YOU</div>
+        </div>
+        <!-- Remote tiles injected here by JS -->
+    </div>
+
+    <div id="vcPermissionMsg">
+        <div style="font-size:32px;margin-bottom:10px;">🚫</div>
+        <strong>Camera/Microphone access denied.</strong><br>
+        Please allow permissions in your browser settings and try again.
+    </div>
+
+    <!-- Controls -->
+    <div class="vc-controls">
+        <button class="vc-btn active" id="vcMicBtn" onclick="vcToggleMic()">
+            <span class="vc-btn-icon">🎙️</span>
+            <span id="vcMicLabel">Mute</span>
+        </button>
+        <button class="vc-btn active" id="vcCamBtn" onclick="vcToggleCam()">
+            <span class="vc-btn-icon">📷</span>
+            <span id="vcCamLabel">Cam Off</span>
+        </button>
+        <button class="vc-btn" id="vcScreenBtn" onclick="vcToggleScreen()">
+            <span class="vc-btn-icon">🖥️</span>
+            <span id="vcScreenLabel">Share</span>
+        </button>
+        <button class="vc-btn end" onclick="vcEndCall()">
+            <span class="vc-btn-icon">📵</span>
+            <span>Leave</span>
+        </button>
+    </div>
+</div>
+
+<!-- VC notification toast -->
+<div id="vcToast"></div>
 
 <nav id="main-nav">
     <a href="landing.html" class="nav-logo">
@@ -402,10 +549,7 @@
     </div>
 </nav>
 
-<!-- Side Drawer Overlay -->
 <div class="mob-drawer-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
-
-<!-- Side Drawer -->
 <div class="mob-drawer" id="mobDrawer">
     <button class="mob-drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
     <div style="margin-bottom:10px;padding:0 4px;">
@@ -439,7 +583,7 @@
         </p>
     </div>
 
-    <!-- ── PUBLIC SUBJECT ROOMS ── -->
+    <!-- Public Subject Rooms -->
     <div id="roomsSection">
         <div class="section-divider">📚 Subject Rooms — tap to join</div>
         <div class="subject-rooms-grid" id="subjectRoomsGrid"></div>
@@ -453,13 +597,18 @@
         </div>
     </div>
 
-    <!-- ── ACTIVE TOPIC BAR ── -->
+    <!-- Active topic bar -->
     <div id="topicBar">
         <div class="dot"></div>
         <span style="color:rgba(255,255,255,0.5);">Now in:</span>
         <strong id="topicBarLabel" style="color:#00c9a7;"></strong>
         <span id="memberCountBadge" style="font-size:11px;color:rgba(255,255,255,0.4);"></span>
         <button id="aiToggleBtn" class="ai-toggle-btn" onclick="toggleAI()">🤖 AI On</button>
+        <!-- Video Call Launch Button -->
+        <button id="vcLaunchBtn" onclick="vcLaunchOrEnd()">
+            <span id="vcStatusDot"></span>
+            📹 Start Video Call
+        </button>
         <button onclick="leaveRoom()"
             style="margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">
             ← Leave Room
@@ -522,7 +671,7 @@
         </div>
     </div>
 
-    <!-- Session layout: chat + sidebar -->
+    <!-- Session layout -->
     <div class="session-layout">
         <div>
             <div class="chat-window" style="height:540px;">
@@ -538,7 +687,7 @@
                         <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🤖</div>
                         <div>
                             <div style="font-size:11px;color:var(--teal-glow);margin-bottom:3px;">StudySphere AI · just now</div>
-                            <div class="bubble">👋 Welcome! All subject rooms are open — just tap one to jump in and start studying with others in real-time. No codes, no invites needed. 🚀</div>
+                            <div class="bubble">👋 Welcome! All subject rooms are open — just tap one to jump in. You can also start a live video call with your study group by clicking <strong>📹 Start Video Call</strong> in the session bar. 🚀</div>
                         </div>
                     </div>
                 </div>
@@ -647,10 +796,288 @@ const toast=(msg,dur=3000)=>{
     t.style.transform=mob?'translateX(0) translateY(0)':'translateX(-50%) translateY(0)';
     clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform=mob?'translateX(0) translateY(60px)':'translateX(-50%) translateY(60px)';},dur);
 };
+function vcToast(msg,dur=3500){
+    const el=$('vcToast');el.textContent=msg;el.classList.add('show');
+    clearTimeout(window._vtt);window._vtt=setTimeout(()=>el.classList.remove('show'),dur);
+}
 
 const t0=Date.now();
 setInterval(()=>{const e=Math.floor((Date.now()-t0)/1000);const el=$('liveTimer');if(el)el.textContent=`${p2(Math.floor(e/3600))}:${p2(Math.floor((e%3600)/60))}:${p2(e%60)}`;},1000);
 
+/* ════════════════════════════════════════════════
+   VIDEO CALL — WebRTC via PeerJS + Firestore signaling
+   ════════════════════════════════════════════════ */
+let peer=null,localStream=null,screenStream=null;
+let activeCalls={};   // peerId -> MediaConnection
+let vcActive=false,micOn=true,camOn=true,screenOn=false;
+let vcPeerIds={};     // uid -> peerId  (from presence)
+let unsubVcSignal=null;
+
+async function vcLaunchOrEnd(){
+    if(vcActive){ vcEndCall(); return; }
+    if(!SESSION_ROOM_ID){ toast('Join a room first to start a video call.'); return; }
+    await vcStartCall();
+}
+window.vcLaunchOrEnd = vcLaunchOrEnd;
+
+async function vcStartCall(){
+    // Get media
+    try{
+        localStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});
+    }catch(err){
+        $('vcPermissionMsg').style.display='block';
+        $('videoGrid').style.display='none';
+        $('videoCallModal').classList.add('open');
+        return;
+    }
+    $('vcPermissionMsg').style.display='none';
+    $('videoGrid').style.display='grid';
+    // Show local video
+    const lv=$('localVideo');lv.srcObject=localStream;lv.style.display='block';
+    $('localCamOffLabel').style.display='none';
+    const userName=CU?.displayName||CU?.email?.split('@')[0]||'You';
+    $('localNameLabel').textContent=userName+' (you)';
+    $('localAvatar').textContent=userName[0].toUpperCase();
+    // Init PeerJS with a deterministic peer ID based on uid + roomId
+    const safePeerId=('ss-'+SESSION_ROOM_ID+'-'+CU.uid).replace(/[^a-zA-Z0-9\-]/g,'-').substring(0,60);
+    try{
+        peer=new Peer(safePeerId,{
+            host:'0.peerjs.com',port:443,path:'/',secure:true,
+            config:{iceServers:[
+                {urls:'stun:stun.l.google.com:19302'},
+                {urls:'stun:stun1.l.google.com:19302'},
+                {urls:'stun:global.stun.twilio.com:3478'}
+            ]}
+        });
+    }catch(e){ peer=new Peer({config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}}); }
+
+    peer.on('open',async(id)=>{
+        vcActive=true;
+        updateVcLaunchBtn(true);
+        $('videoCallModal').classList.add('open');
+        $('vcRoomLabel').textContent=SESSION_SUBJECT;
+        // Store our peer ID in presence
+        try{ await updateDoc(doc(db,`sessionRooms/${SESSION_ROOM_ID}/presence/${CU.uid}`),{vcPeerId:id,inCall:true}); }catch(e){}
+        // Call everyone already in the room
+        callExistingPeers();
+        // Listen for presence changes to call newcomers
+        vcListenPeers();
+        vcToast('📹 Video call started — others will connect automatically');
+    });
+
+    peer.on('call',(call)=>{
+        call.answer(localStream);
+        handleIncomingCall(call);
+    });
+
+    peer.on('error',(err)=>{
+        console.warn('PeerJS error:',err);
+        if(err.type==='unavailable-id'){
+            // Another tab or stale peer — destroy and retry with random suffix
+            peer.destroy();
+            const randId=('ss-'+SESSION_ROOM_ID+'-'+CU.uid+'-'+Math.random().toString(36).slice(2,6)).replace(/[^a-zA-Z0-9\-]/g,'-').substring(0,60);
+            peer=new Peer(randId);
+            peer.on('open',async(id)=>{
+                try{ await updateDoc(doc(db,`sessionRooms/${SESSION_ROOM_ID}/presence/${CU.uid}`),{vcPeerId:id,inCall:true}); }catch(e){}
+                callExistingPeers();vcListenPeers();
+            });
+            peer.on('call',(call)=>{call.answer(localStream);handleIncomingCall(call);});
+        }
+    });
+}
+
+function callExistingPeers(){
+    Object.values(membersCache).forEach(m=>{
+        if(m.uid!==CU?.uid && m.vcPeerId && m.inCall){
+            callPeer(m.vcPeerId, m);
+        }
+    });
+}
+
+function vcListenPeers(){
+    // Re-use the existing presence snapshot — membersCache is always up to date
+    // We watch for new members with vcPeerId who we haven't called yet
+}
+
+// Called whenever membersCache updates (from existing listenPresence)
+function checkNewVcPeers(){
+    if(!vcActive||!peer)return;
+    Object.values(membersCache).forEach(m=>{
+        if(m.uid!==CU?.uid && m.vcPeerId && m.inCall && !activeCalls[m.vcPeerId]){
+            callPeer(m.vcPeerId, m);
+        }
+        // Remove tiles for peers who left the call
+        if(m.uid!==CU?.uid && (!m.inCall||!m.vcPeerId)){
+            const oldPid=Object.keys(activeCalls).find(pid=>pid.includes(m.uid?.substring(0,8)||'x'));
+            if(oldPid){ removePeerTile(oldPid); }
+        }
+    });
+    // Update peer count label
+    const inCallCount=Object.keys(activeCalls).length+1;
+    $('vcPeerCount').textContent=inCallCount===1?'Only you so far — others will join':`${inCallCount} people in call`;
+}
+
+function callPeer(peerId, memberInfo){
+    if(activeCalls[peerId]||!peer||!localStream)return;
+    console.log('Calling peer:',peerId);
+    const call=peer.call(peerId,localStream,{metadata:{name:CU?.displayName||CU?.email?.split('@')[0]||'User',uid:CU?.uid,color:pc(CU?.uid)}});
+    if(!call)return;
+    activeCalls[peerId]=call;
+    addPeerTile(peerId, memberInfo?.name||'Peer', memberInfo?.uid||peerId, true);
+    call.on('stream',(remoteStream)=>{
+        const vid=document.getElementById('vid-'+sanitizeTileId(peerId));
+        if(vid){vid.srcObject=remoteStream;vid.play().catch(()=>{});}
+        const conn=document.getElementById('conn-'+sanitizeTileId(peerId));
+        if(conn)conn.style.display='none';
+    });
+    call.on('close',()=>removePeerTile(peerId));
+    call.on('error',()=>removePeerTile(peerId));
+    vcToast(`📹 ${memberInfo?.name||'A peer'} joined the call`);
+}
+
+function handleIncomingCall(call){
+    const meta=call.metadata||{};
+    const peerId=call.peer;
+    activeCalls[peerId]=call;
+    const memberInfo=Object.values(membersCache).find(m=>m.uid===meta.uid)||{name:meta.name||'Peer',uid:meta.uid,color:meta.color};
+    addPeerTile(peerId, memberInfo.name||meta.name||'Peer', meta.uid||peerId, true);
+    call.on('stream',(remoteStream)=>{
+        const vid=document.getElementById('vid-'+sanitizeTileId(peerId));
+        if(vid){vid.srcObject=remoteStream;vid.play().catch(()=>{});}
+        const conn=document.getElementById('conn-'+sanitizeTileId(peerId));
+        if(conn)conn.style.display='none';
+    });
+    call.on('close',()=>removePeerTile(peerId));
+    call.on('error',()=>removePeerTile(peerId));
+    const inCallCount=Object.keys(activeCalls).length+1;
+    $('vcPeerCount').textContent=`${inCallCount} people in call`;
+    vcToast(`📹 ${meta.name||'Someone'} connected`);
+}
+
+function sanitizeTileId(id){ return id.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function addPeerTile(peerId, name, uid, connecting){
+    const tid=sanitizeTileId(peerId);
+    if(document.getElementById('tile-'+tid))return;
+    const color=pc(uid||peerId);
+    const initial=(name||'?')[0].toUpperCase();
+    const tile=document.createElement('div');
+    tile.className='video-tile';
+    tile.id='tile-'+tid;
+    tile.innerHTML=`
+        <video id="vid-${tid}" autoplay playsinline style="width:100%;height:100%;object-fit:cover;border-radius:14px;background:#000;display:block;"></video>
+        <div class="vt-camoff-label" id="camoff-${tid}" style="display:none;">
+            <div class="vt-avatar" style="background:${color};">${initial}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">Camera off</div>
+        </div>
+        <div class="vt-name"><span class="mic-icon">🎙️</span>${esc(name)}</div>
+        <div class="vt-status-badge peer">PEER</div>
+        ${connecting?`<div class="vc-connecting" id="conn-${tid}"><div class="vc-connecting-dots"><span></span><span></span><span></span></div></div>`:''}`;
+    $('videoGrid').appendChild(tile);
+}
+
+function removePeerTile(peerId){
+    const tid=sanitizeTileId(peerId);
+    const el=document.getElementById('tile-'+tid);
+    if(el)el.remove();
+    if(activeCalls[peerId]){try{activeCalls[peerId].close();}catch(e){} delete activeCalls[peerId];}
+    const inCallCount=Object.keys(activeCalls).length+1;
+    $('vcPeerCount').textContent=inCallCount===1?'Only you so far — others will join':`${inCallCount} people in call`;
+}
+
+window.vcEndCall=async function(){
+    // Stop all calls
+    Object.keys(activeCalls).forEach(pid=>{
+        try{activeCalls[pid].close();}catch(e){}
+    });
+    activeCalls={};
+    // Stop streams
+    if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
+    if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
+    // Destroy peer
+    if(peer){try{peer.destroy();}catch(e){}peer=null;}
+    // Clear Firestore presence
+    if(SESSION_ROOM_ID&&CU){
+        try{ await updateDoc(doc(db,`sessionRooms/${SESSION_ROOM_ID}/presence/${CU.uid}`),{vcPeerId:null,inCall:false}); }catch(e){}
+    }
+    // Reset UI
+    vcActive=false;screenOn=false;micOn=true;camOn=true;
+    $('videoCallModal').classList.remove('open');
+    // Remove all remote tiles
+    const grid=$('videoGrid');
+    Array.from(grid.querySelectorAll('.video-tile:not(#localTile)')).forEach(el=>el.remove());
+    // Reset local video
+    const lv=$('localVideo');lv.srcObject=null;
+    $('localCamOffLabel').style.display='none';
+    updateVcLaunchBtn(false);
+    vcToast('📵 You left the video call');
+};
+
+window.vcToggleMic=function(){
+    micOn=!micOn;
+    if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=micOn);
+    const btn=$('vcMicBtn');
+    btn.className='vc-btn '+(micOn?'active':'muted');
+    btn.querySelector('.vc-btn-icon').textContent=micOn?'🎙️':'🔇';
+    $('vcMicLabel').textContent=micOn?'Mute':'Unmute';
+    $('localMicIcon').textContent=micOn?'🎙️':'🔇';
+};
+
+window.vcToggleCam=function(){
+    camOn=!camOn;
+    if(localStream)localStream.getVideoTracks().forEach(t=>t.enabled=camOn);
+    const btn=$('vcCamBtn');
+    btn.className='vc-btn '+(camOn?'active':'camoff');
+    btn.querySelector('.vc-btn-icon').textContent=camOn?'📷':'🚫';
+    $('vcCamLabel').textContent=camOn?'Cam Off':'Cam On';
+    const lv=$('localVideo');
+    $('localCamOffLabel').style.display=camOn?'none':'flex';
+    lv.style.display=camOn?'block':'none';
+};
+
+window.vcToggleScreen=async function(){
+    if(screenOn){
+        // Revert to camera
+        if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
+        if(localStream){
+            const vTrack=localStream.getVideoTracks()[0];
+            Object.values(activeCalls).forEach(call=>{
+                const sender=call.peerConnection?.getSenders().find(s=>s.track?.kind==='video');
+                if(sender&&vTrack)sender.replaceTrack(vTrack);
+            });
+            $('localVideo').srcObject=localStream;
+        }
+        screenOn=false;
+        const btn=$('vcScreenBtn');btn.className='vc-btn';btn.querySelector('.vc-btn-icon').textContent='🖥️';$('vcScreenLabel').textContent='Share';
+        return;
+    }
+    try{
+        screenStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+        const sTrack=screenStream.getVideoTracks()[0];
+        // Replace video track in all active calls
+        Object.values(activeCalls).forEach(call=>{
+            const sender=call.peerConnection?.getSenders().find(s=>s.track?.kind==='video');
+            if(sender)sender.replaceTrack(sTrack);
+        });
+        $('localVideo').srcObject=screenStream;
+        screenOn=true;
+        const btn=$('vcScreenBtn');btn.className='vc-btn active';btn.querySelector('.vc-btn-icon').textContent='⏹️';$('vcScreenLabel').textContent='Stop';
+        screenStream.getVideoTracks()[0].onended=()=>window.vcToggleScreen();
+    }catch(e){ toast('Screen share cancelled or not supported.'); }
+};
+
+function updateVcLaunchBtn(inCall){
+    const btn=$('vcLaunchBtn'),dot=$('vcStatusDot');
+    if(inCall){
+        btn.className=''; btn.id='vcLaunchBtn'; btn.classList.add('incall');
+        btn.innerHTML=`<span id="vcStatusDot" class="on" style="width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulse 1.2s infinite;"></span> 📵 End Video Call`;
+    }else{
+        btn.className=''; btn.id='vcLaunchBtn';
+        btn.innerHTML=`<span id="vcStatusDot" style="display:none;"></span> 📹 Start Video Call`;
+    }
+}
+
+/* ════ ORIGINAL SESSION LOGIC (UNCHANGED) ════ */
 function buildProfileWidget(user){
     const name=user.displayName||user.email?.split('@')[0]||'User';
     const initial=name[0].toUpperCase(),email=user.email||'';
@@ -678,7 +1105,6 @@ function buildProfileWidget(user){
     btn.addEventListener('click',e=>{e.stopPropagation();menu.classList.toggle('open');});
     document.addEventListener('click',e=>{if(!container.contains(e.target))menu.classList.remove('open');});
     $('profileSignOut').addEventListener('click',()=>signOut(auth).then(()=>window.location.href='login.html'));
-    // Sync active button state
     window.applyTheme(localStorage.getItem('ss-theme')||'dark');
 }
 function buildProfileLoggedOut(){
@@ -756,6 +1182,8 @@ window.leaveRoom=async function(){await doLeaveRoom(true);};
 
 async function doLeaveRoom(showMsg){
     if(!SESSION_ROOM_ID||!CU)return;
+    // End video call if active
+    if(vcActive)await window.vcEndCall();
     const roomId=SESSION_ROOM_ID;
     await removePresence();
     try{await addDoc(collection(db,`sessionRooms/${roomId}/messages`),{text:`👋 ${CU.displayName||CU.email?.split('@')[0]||'Someone'} left`,senderUid:'system',senderName:'System',createdAt:serverTimestamp(),isAI:false,isSystem:true});}catch(e){}
@@ -777,7 +1205,7 @@ async function doLeaveRoom(showMsg){
 
 async function writePresence(roomId){
     const ref=doc(db,`sessionRooms/${roomId}/presence/${CU.uid}`);
-    await setDoc(ref,{uid:CU.uid,name:CU.displayName||CU.email?.split('@')[0]||'User',color:pc(CU.uid),skills:userProfile?.skills||[],joinedAt:serverTimestamp(),lastSeen:serverTimestamp(),typing:false,mood:null,moodVal:null});
+    await setDoc(ref,{uid:CU.uid,name:CU.displayName||CU.email?.split('@')[0]||'User',color:pc(CU.uid),skills:userProfile?.skills||[],joinedAt:serverTimestamp(),lastSeen:serverTimestamp(),typing:false,mood:null,moodVal:null,vcPeerId:null,inCall:false});
     clearInterval(window._presInt);
     window._presInt=setInterval(async()=>{try{await updateDoc(ref,{lastSeen:serverTimestamp()});}catch(e){}},15000);
     window._presRef=ref;
@@ -808,6 +1236,8 @@ function listenPresence(roomId){
         const n=snap.size;
         $('memberBadge').textContent=`${n} online`;$('onlineCount').textContent=`${n} online`;
         $('memberCountBadge').textContent=`${n} member${n!==1?'s':''}`;
+        // Check for new VC peers
+        if(vcActive)checkNewVcPeers();
     });
 }
 
@@ -848,11 +1278,13 @@ function renderMembers(members){
     el.innerHTML=members.map(m=>{
         const isMe=m.uid===CU?.uid,typing=m.typing&&!isMe;
         const moodEmoji=m.mood&&MOOD_CFG[m.mood]?MOOD_CFG[m.mood].emoji:'';
+        const inCallBadge=m.inCall?`<span style="font-size:9px;background:rgba(34,197,94,0.15);color:#86efac;border:1px solid rgba(34,197,94,0.3);padding:1px 6px;border-radius:20px;font-weight:700;">📹 In Call</span>`:'';
         return `<div class="member-row">
             <div class="member-av" style="background:${m.color||pc(m.uid||'x')};">${(m.name||'?')[0].toUpperCase()}</div>
             <div style="flex:1;min-width:0;">
                 <div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(m.name||'User')}${isMe?' <span style="font-size:10px;color:rgba(255,255,255,0.3);">(you)</span>':''}</div>
                 <div style="font-size:10px;color:${typing?'#22c55e':'var(--muted)'};">${typing?'✏️ typing…':`${(m.skills||[]).length} skills`}</div>
+                ${inCallBadge?`<div style="margin-top:3px;">${inCallBadge}</div>`:''}
             </div>
             <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
                 ${moodEmoji?`<span style="font-size:13px;">${moodEmoji}</span>`:''}
@@ -1031,7 +1463,8 @@ function trackDebt(text){
 function showStatus(t){const e=$('aiStatusBanner');$('aiStatusText').textContent=t;if(e)e.style.display='flex';}
 function hideStatus(){const e=$('aiStatusBanner');if(e)e.style.display='none';}
 
-window.addEventListener('beforeunload',()=>{
+window.addEventListener('beforeunload',async()=>{
+    if(vcActive)try{peer?.destroy();localStream?.getTracks().forEach(t=>t.stop());}catch(e){}
     if(unsubMsgs)unsubMsgs();if(unsubRoom)unsubRoom();if(unsubPresence)unsubPresence();
     roomCountUnsubs.forEach(u=>u());removePresence();
 });
@@ -1049,7 +1482,6 @@ window.applyTheme=function(mode){
     body.style.setProperty('background',vars['--bg'],'important');
     body.style.setProperty('color',vars['--text'],'important');
     const isLight=mode==='light';
-    /* Nav bar */
     const nav=document.getElementById('main-nav');
     if(nav){
         nav.style.background=isLight?'#ffffff':'rgba(7,7,13,0.92)';
@@ -1061,13 +1493,11 @@ window.applyTheme=function(mode){
         const ham=nav.querySelector('.ham');
         if(ham){ham.style.borderColor=isLight?'#e2e8f0':'rgba(255,255,255,0.1)';ham.style.background=isLight?'rgba(0,0,0,0.04)':'rgba(255,255,255,0.05)';}
     }
-    /* Cards */
     document.querySelectorAll('.card').forEach(el=>{
         el.style.background=isLight?'#ffffff':'';
         el.style.borderColor=isLight?'#e2e8f0':'';
         el.style.color=isLight?'#0f172a':'';
     });
-    /* Theme button active states */
     const btnD=document.getElementById('btn-dark'),btnL=document.getElementById('btn-light'),lbl=document.getElementById('theme-row-label');
     if(btnD){btnD.style.background=mode==='dark'?'rgba(109,40,217,0.3)':'rgba(255,255,255,0.08)';btnD.style.borderColor=mode==='dark'?'rgba(109,40,217,0.6)':'rgba(255,255,255,0.12)';btnD.style.color=mode==='dark'?'#c4b5fd':'#e2e8f0';}
     if(btnL){btnL.style.background=mode==='light'?'rgba(109,40,217,0.3)':'rgba(255,255,255,0.08)';btnL.style.borderColor=mode==='light'?'rgba(109,40,217,0.6)':'rgba(255,255,255,0.12)';btnL.style.color=mode==='light'?'#c4b5fd':'#e2e8f0';}
@@ -1077,7 +1507,6 @@ window.applyTheme=function(mode){
 window.applyTheme(localStorage.getItem('ss-theme')||'dark');
 </script>
 
-<!-- ════ HAMBURGER / SIDE DRAWER LOGIC ════ -->
 <script>
 const hamBtn     = document.getElementById('hamBtn');
 const mobDrawer  = document.getElementById('mobDrawer');
@@ -1105,7 +1534,6 @@ hamBtn.addEventListener('click', () => {
 });
 
 mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
-
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 </script>
 </body>
