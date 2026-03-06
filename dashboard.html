@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - StudySphere</title>
     <link rel="stylesheet" href="stylesheet1.css">
-    <link rel="icon" href="favicon-32x32.png">
+    <link rel="icon" href="facicon-32x32.png>
     <script>
     (function() {
         var s = localStorage.getItem('ss-theme') || 'dark';
@@ -18,30 +18,312 @@
         r.style.color = v['--text'];
     })();
     </script>
+
+    <style>
+        /* ═══════════════════════════════════════════════════
+           INVITE / ACCEPT POPUP SYSTEM  (same style as match page)
+        ═══════════════════════════════════════════════════ */
+
+        /* Floating bell button in nav */
+        .dash-bell-btn {
+            position: relative;
+            cursor: pointer;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+        .dash-bell-btn:hover { border-color: var(--accent); color: var(--glow); }
+        .dash-bell-count {
+            position: absolute;
+            top: -5px; right: -5px;
+            background: #ef4444;
+            color: #fff;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Invite panel dropdown */
+        #dashInvitePanel {
+            position: fixed;
+            top: 58px;
+            right: 20px;
+            width: min(360px, calc(100vw - 24px));
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            z-index: 600;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            max-height: 74vh;
+            overflow-y: auto;
+        }
+
+        /* Invite item card */
+        .dash-invite-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 8px;
+        }
+
+        /* Full-screen popup overlay for invite accept/send */
+        #invitePopupOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9800;
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #invitePopupOverlay.show {
+            display: flex;
+        }
+
+        #invitePopupBox {
+            background: linear-gradient(160deg, #0d0d1f 0%, #111128 100%);
+            border: 1px solid rgba(109,40,217,0.35);
+            border-radius: 24px;
+            padding: 32px;
+            width: min(480px, 94vw);
+            box-shadow: 0 40px 120px rgba(0,0,0,0.9), 0 0 0 1px rgba(167,139,250,0.1);
+            animation: popupIn 0.35s cubic-bezier(.34,1.56,.64,1);
+            position: relative;
+        }
+        @keyframes popupIn {
+            from { opacity:0; transform: scale(0.88) translateY(20px); }
+            to   { opacity:1; transform: scale(1) translateY(0); }
+        }
+
+        .popup-avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 24px; color: white;
+            margin: 0 auto 16px;
+            border: 2px solid rgba(167,139,250,0.4);
+            box-shadow: 0 0 30px rgba(109,40,217,0.3);
+        }
+
+        .popup-chip {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+            margin: 2px;
+        }
+        .popup-chip-green  { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .popup-chip-red    { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+        .popup-chip-teal   { background: rgba(8,145,178,0.12);  color: #22d3ee; border: 1px solid rgba(8,145,178,0.2); }
+        .popup-chip-purple { background: rgba(109,40,217,0.15); color: #a78bfa; border: 1px solid rgba(109,40,217,0.3); }
+
+        .popup-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 11px 24px;
+            border-radius: 999px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .popup-btn-success { background: linear-gradient(135deg,#059669,#10b981); color: #fff; }
+        .popup-btn-success:hover { opacity: 0.88; transform: translateY(-1px); }
+        .popup-btn-danger  { background: linear-gradient(135deg,#dc2626,#ef4444); color: #fff; }
+        .popup-btn-danger:hover  { opacity: 0.88; transform: translateY(-1px); }
+        .popup-btn-ghost   { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.5); }
+        .popup-btn-ghost:hover   { border-color: rgba(255,255,255,0.3); color: white; }
+
+        /* Success confirmation popup */
+        #inviteSuccessPopup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 9900;
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #inviteSuccessPopup.show { display: flex; }
+        #inviteSuccessBox {
+            background: linear-gradient(160deg, #051a0f 0%, #0b2210 100%);
+            border: 1px solid rgba(16,185,129,0.4);
+            border-radius: 24px;
+            padding: 36px 32px;
+            width: min(420px, 92vw);
+            text-align: center;
+            box-shadow: 0 40px 120px rgba(0,0,0,0.9), 0 0 60px rgba(16,185,129,0.1);
+            animation: popupIn 0.35s cubic-bezier(.34,1.56,.64,1);
+        }
+        .success-ring {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(16,185,129,0.15);
+            border: 2px solid rgba(16,185,129,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 40px rgba(16,185,129,0.2);
+            animation: successPulse 0.6s ease;
+        }
+        @keyframes successPulse {
+            0%   { transform: scale(0.5); opacity:0; }
+            70%  { transform: scale(1.15); }
+            100% { transform: scale(1); opacity:1; }
+        }
+
+        /* Incoming invite toast (like match page but at bottom) */
+        #incomingInviteToast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #0d0d1f, #1a1a35);
+            border: 1px solid rgba(109,40,217,0.45);
+            border-radius: 20px;
+            padding: 16px 20px;
+            z-index: 9700;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(109,40,217,0.15);
+            transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+            min-width: min(340px, calc(100vw - 32px));
+            max-width: calc(100vw - 32px);
+        }
+        #incomingInviteToast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* General toast */
+        #dashToast {
+            position: fixed;
+            bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: rgba(17,17,24,0.97);
+            border: 1px solid var(--border);
+            color: #e2e8f0;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        #dashToast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Hamburger */
+        .ham {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .ham span { display:block; width:20px; height:2px; background:#e2e8f0; border-radius:2px; transition:all 0.3s; }
+        .ham.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+        .ham.open span:nth-child(2) { opacity:0; }
+        .ham.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+        /* Mobile drawer */
+        .mob-drawer {
+            display: none;
+            position: fixed;
+            top: 56px; left:0; right:0;
+            background: rgba(7,7,13,0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 14px;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 999;
+            transform: translateY(-110%);
+            transition: transform 0.3s ease;
+        }
+        .mob-drawer.open { transform:translateY(0); }
+        .mob-drawer .nav-link { display:block; padding:10px 14px; font-size:14px; border:1px solid rgba(255,255,255,0.08); border-radius:8px; }
+
+        @media (max-width: 860px) {
+            #main-nav { height:56px; padding:0 14px; gap:10px; flex-wrap:nowrap; }
+            #main-nav .nav-links { display:none !important; }
+            .ham { display:flex; }
+            .mob-drawer { display:flex; }
+            #profile-container { position:fixed !important; top:4px !important; right:60px !important; width:auto !important; }
+            .content-wrapper { padding-top:68px !important; padding-left:12px !important; padding-right:12px !important; }
+            .kpi-grid { grid-template-columns:repeat(2,1fr) !important; gap:10px !important; }
+            .grid-2 { grid-template-columns:1fr !important; gap:14px !important; }
+            #skillBars { flex-direction:column !important; gap:10px !important; }
+            #streakGrid { grid-template-columns:1fr !important; }
+            .card { padding:16px !important; }
+            .activity-item { padding:8px 10px !important; gap:8px !important; }
+            .room-live-card { flex-wrap:wrap; gap:8px !important; }
+            .room-live-card > button { width:100% !important; margin-top:4px; }
+        }
+        @media (max-width: 540px) {
+            .kpi-grid { grid-template-columns:1fr 1fr !important; }
+            .heading-lg { font-size:22px !important; }
+            #chatWindow { bottom:0 !important; right:0 !important; left:0 !important; width:100vw !important; height:72vh !important; border-radius:16px 16px 0 0 !important; }
+            #roomChatModal { width:100vw !important; height:100dvh !important; top:0 !important; left:0 !important; transform:none !important; border-radius:0 !important; flex-direction:column !important; }
+            #videoModal { width:100vw !important; height:100dvh !important; top:0 !important; left:0 !important; transform:none !important; border-radius:0 !important; }
+            #socialModal { width:100vw !important; height:100dvh !important; top:0 !important; left:0 !important; transform:none !important; border-radius:0 !important; max-height:100dvh !important; }
+            #dashInvitePanel { position:fixed; top:auto; bottom:0; right:0; left:0; width:100% !important; max-height:80vh; border-radius:16px 16px 0 0; border-bottom:none; }
+            #dashToast { width:calc(100% - 32px); white-space:normal; text-align:center; font-size:12px; }
+        }
+    </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
 <div class="scanlines"></div>
 
 <nav id="main-nav">
-<a href="landing.html" class="nav-logo">
-<div class="nav-logo-icon">🔗</div>StudySphere</a>
-<div class="nav-links">
-<a class="nav-link" href="landing.html">Intro</a>
-<a class="nav-link active" href="dashboard.html">Dashboard</a>
-<a class="nav-link" href="match.html">Match</a>
-<a class="nav-link" href="session.html">Session</a>
-<a class="nav-link" href="leaderboard.html">Leaderboard</a>
-<a class="nav-link" href="whiteboard.html">Whiteboard</a>
-<a class="nav-link" href="resources.html">Resources</a>
-<a class="nav-link" href="onboard.html">Onboard</a>
-</div>
-<div class="nav-right">
-<div id="profile-container"></div>
-<button class="ham" id="hamBtn" aria-label="Menu">
-<span></span><span></span><span></span>
-</button>
-</div>
+    <a href="landing.html" class="nav-logo">
+        <div class="nav-logo-icon">🔗</div>StudySphere
+    </a>
+    <div class="nav-links">
+        <a class="nav-link" href="landing.html">Intro</a>
+        <a class="nav-link active" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="match.html">Match</a>
+        <a class="nav-link" href="session.html">Session</a>
+        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
+        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
+        <a class="nav-link" href="resources.html">Resources</a>
+        <a class="nav-link" href="onboard.html">Onboard</a>
+    </div>
+    <div class="nav-right" style="display:flex;align-items:center;gap:10px;">
+        <!-- INVITE BELL — shown when logged in -->
+        <div id="dashBellWrap" style="display:none;">
+            <button class="dash-bell-btn" onclick="toggleDashInvitePanel()">
+                🔔 Invites
+                <span id="dashBellCount" class="dash-bell-count" style="display:none;">0</span>
+            </button>
+        </div>
+        <div id="profile-container"></div>
+        <button class="ham" id="hamBtn" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
 </nav>
 
 <div class="mob-drawer" id="mobDrawer">
@@ -55,18 +337,68 @@
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
 
-<!-- ════ VIDEO CALL MODAL ════ -->
+<!-- ════════════════════════════════════
+     INVITE PANEL (Bell dropdown)
+════════════════════════════════════ -->
+<div id="dashInvitePanel">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);z-index:1;">
+        <span style="font-weight:700;font-size:14px;">📬 Study Invites</span>
+        <span onclick="toggleDashInvitePanel()" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;">×</span>
+    </div>
+    <div id="dashInviteList" style="padding:12px;">
+        <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">
+            <span style="font-size:28px;display:block;margin-bottom:8px;">⏳</span>Loading…
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════
+     FULL-SCREEN INVITE POPUP (Accept/Decline)
+════════════════════════════════════ -->
+<div id="invitePopupOverlay" onclick="closeInvitePopup(event)">
+    <div id="invitePopupBox" onclick="event.stopPropagation()">
+        <button onclick="closeInvitePopup()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div id="invitePopupContent"></div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════
+     SUCCESS / CONFIRMATION POPUP
+════════════════════════════════════ -->
+<div id="inviteSuccessPopup" onclick="closeSuccessPopup()">
+    <div id="inviteSuccessBox" onclick="event.stopPropagation()">
+        <div class="success-ring" id="successRingEmoji">🎉</div>
+        <h2 id="successTitle" style="font-size:22px;font-weight:800;color:white;margin-bottom:8px;font-family:sans-serif;"></h2>
+        <p id="successBody" style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:24px;line-height:1.6;"></p>
+        <div id="successActions" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"></div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════
+     INCOMING INVITE TOAST (bottom)
+════════════════════════════════════ -->
+<div id="incomingInviteToast">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <div id="toastInviteAvatar" style="width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white;flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:white;margin-bottom:3px;">📬 New Study Invite!</div>
+            <div id="toastInviteName" style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;"></div>
+            <div style="display:flex;gap:8px;">
+                <button id="toastAcceptBtn" style="background:linear-gradient(135deg,#059669,#10b981);border:none;color:white;border-radius:10px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">✓ View Invite</button>
+                <button onclick="hideIncomingInviteToast()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);border-radius:10px;padding:7px 14px;font-size:12px;cursor:pointer;">Dismiss</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- General toast -->
+<div id="dashToast"></div>
+
+<!-- ════════════════════════════════════
+     VIDEO CALL MODAL
+════════════════════════════════════ -->
 <div id="videoOverlay" onclick="hangUp()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;backdrop-filter:blur(16px);"></div>
-<div id="videoModal" style="
-    display:none;position:fixed;top:50%;left:50%;
-    transform:translate(-50%,-50%) scale(0.92);
-    width:min(960px,97vw);height:min(620px,94vh);
-    border-radius:28px;z-index:10001;
-    background:linear-gradient(160deg,#0d0d1f 0%,#111128 100%);
-    border:1px solid rgba(109,40,217,0.25);
-    box-shadow:0 60px 180px rgba(0,0,0,0.98),0 0 0 1px rgba(77,148,255,0.1),0 0 80px rgba(109,40,217,0.08);
-    opacity:0;transition:all 0.35s cubic-bezier(.34,1.56,.64,1);
-    overflow:hidden;flex-direction:column;">
+<div id="videoModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.92);width:min(960px,97vw);height:min(620px,94vh);border-radius:28px;z-index:10001;background:linear-gradient(160deg,#0d0d1f 0%,#111128 100%);border:1px solid rgba(109,40,217,0.25);box-shadow:0 60px 180px rgba(0,0,0,0.98);opacity:0;transition:all 0.35s cubic-bezier(.34,1.56,.64,1);overflow:hidden;flex-direction:column;">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(255,255,255,0.025);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;animation:vPulse 1.2s infinite;"></div>
@@ -92,20 +424,18 @@
         <div style="width:8px;height:8px;border-radius:50%;background:#00c9a7;animation:vcDot 1.2s infinite 0.4s;"></div>
       </div>
     </div>
-    <video id="localVideo" autoplay playsinline muted
-      style="position:absolute;bottom:20px;right:20px;width:200px;height:140px;border-radius:16px;object-fit:cover;border:2px solid rgba(109,40,217,0.6);box-shadow:0 8px 32px rgba(0,0,0,0.8);background:#111;z-index:2;transition:all 0.3s;cursor:pointer;"
-      onclick="swapVideos()"></video>
+    <video id="localVideo" autoplay playsinline muted style="position:absolute;bottom:20px;right:20px;width:200px;height:140px;border-radius:16px;object-fit:cover;border:2px solid rgba(109,40,217,0.6);box-shadow:0 8px 32px rgba(0,0,0,0.8);background:#111;z-index:2;transition:all 0.3s;cursor:pointer;" onclick="swapVideos()"></video>
     <div id="localVideoOff" style="display:none;position:absolute;bottom:20px;right:20px;width:200px;height:140px;border-radius:16px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);align-items:center;justify-content:center;z-index:2;">
       <div style="text-align:center;"><div style="font-size:28px;">📷</div><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">Camera off</div></div>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 24px;background:rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
-    <button id="btnMic" onclick="toggleMic()" title="Toggle Mic" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🎤</button>
-    <button id="btnCam" onclick="toggleCamera()" title="Toggle Camera" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">📹</button>
-    <button id="btnScreen" onclick="toggleScreen()" title="Screen Share" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🖥️</button>
-    <button onclick="hangUp()" title="End Call" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.45);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📵</button>
-    <button id="btnInCallChat" onclick="toggleInCallChat()" title="In-Call Chat" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">💬</button>
-    <button onclick="toggleFullscreen()" title="Fullscreen" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">⛶</button>
+    <button id="btnMic" onclick="toggleMic()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🎤</button>
+    <button id="btnCam" onclick="toggleCamera()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">📹</button>
+    <button id="btnScreen" onclick="toggleScreen()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🖥️</button>
+    <button onclick="hangUp()" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.45);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📵</button>
+    <button id="btnInCallChat" onclick="toggleInCallChat()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">💬</button>
+    <button onclick="toggleFullscreen()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">⛶</button>
   </div>
   <div id="inCallChat" style="display:none;position:absolute;top:62px;right:0;bottom:0;width:280px;background:rgba(8,8,20,0.95);border-left:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(10px);flex-direction:column;z-index:5;">
     <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;font-weight:700;color:white;">💬 In-Call Chat</div>
@@ -117,31 +447,22 @@
   </div>
 </div>
 
-<!-- Incoming call notification -->
-<div id="incomingCallToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#0d0d1f,#1a1a35);border:1px solid rgba(109,40,217,0.4);border-radius:20px;padding:16px 24px;z-index:11000;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(109,40,217,0.15);transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);min-width:300px;">
+<!-- Incoming video call notification -->
+<div id="incomingCallToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#0d0d1f,#1a1a35);border:1px solid rgba(109,40,217,0.4);border-radius:20px;padding:16px 24px;z-index:11000;box-shadow:0 20px 60px rgba(0,0,0,0.8);transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);min-width:300px;">
   <div style="display:flex;align-items:center;gap:14px;">
     <div id="incomingAvatar" style="width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white;flex-shrink:0;animation:vPulse 1s infinite;"></div>
     <div style="flex:1;">
       <div style="font-size:13px;font-weight:700;color:white;margin-bottom:3px;">📞 Incoming Video Call</div>
       <div id="incomingName" style="font-size:12px;color:rgba(255,255,255,0.5);"></div>
     </div>
-    <button id="btnAccept" onclick="acceptCall()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:white;border-radius:12px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(34,197,94,0.4);">Accept</button>
+    <button id="btnAccept" onclick="acceptCall()" style="background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:white;border-radius:12px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;">Accept</button>
     <button onclick="declineCall()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;">Decline</button>
   </div>
 </div>
 
 <!-- ════ ROOM CHAT MODAL ════ -->
 <div id="roomChatOverlay" onclick="closeRoomChat()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9500;backdrop-filter:blur(10px);"></div>
-<div id="roomChatModal" style="
-    display:none;position:fixed;top:50%;left:50%;
-    transform:translate(-50%,-50%) scale(0.95);
-    width:min(860px,96vw);height:min(620px,92vh);
-    border-radius:24px;z-index:9600;
-    background:#0b0b18;
-    border:1px solid rgba(255,255,255,0.07);
-    box-shadow:0 50px 150px rgba(0,0,0,0.95),0 0 0 1px rgba(109,40,217,0.2);
-    opacity:0;transition:all 0.32s cubic-bezier(.34,1.56,.64,1);
-    flex-direction:row;overflow:hidden;">
+<div id="roomChatModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(860px,96vw);height:min(620px,92vh);border-radius:24px;z-index:9600;background:#0b0b18;border:1px solid rgba(255,255,255,0.07);box-shadow:0 50px 150px rgba(0,0,0,0.95);opacity:0;transition:all 0.32s cubic-bezier(.34,1.56,.64,1);flex-direction:row;overflow:hidden;">
   <div style="width:210px;flex-shrink:0;background:rgba(255,255,255,0.025);border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;padding:20px 14px;">
     <div style="margin-bottom:18px;">
       <div id="rmEmoji" style="font-size:34px;margin-bottom:10px;">📚</div>
@@ -171,17 +492,7 @@
     </div>
     <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
       <a id="rmSessionLink" href="session.html" style="display:block;text-align:center;padding:8px;border-radius:10px;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;font-size:12px;font-weight:700;text-decoration:none;">🚀 Full Session →</a>
-      <button id="rmEndSessionBtn" onclick="endSession()" style="
-          display:none;
-          width:100%;padding:8px;border-radius:10px;
-          background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));
-          border:1px solid rgba(239,68,68,0.35);
-          color:#f87171;font-size:12px;font-weight:700;
-          cursor:pointer;transition:all 0.2s;"
-        onmouseover="this.style.background='linear-gradient(135deg,rgba(239,68,68,0.35),rgba(220,38,38,0.22))';this.style.color='white';"
-        onmouseout="this.style.background='linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08))';this.style.color='#f87171';">
-        🛑 End Session
-      </button>
+      <button id="rmEndSessionBtn" onclick="endSession()" style="display:none;width:100%;padding:8px;border-radius:10px;background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));border:1px solid rgba(239,68,68,0.35);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;">🛑 End Session</button>
       <button onclick="closeRoomChat()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.35);font-size:12px;padding:7px;cursor:pointer;">✕ Close</button>
     </div>
   </div>
@@ -193,20 +504,13 @@
       </div>
       <div style="background:rgba(0,201,167,0.08);border:1px solid rgba(0,201,167,0.2);border-radius:20px;padding:4px 12px;font-size:11px;color:#00c9a7;font-weight:600;">🔴 Firebase Live</div>
     </div>
-    <div id="rmMessages" style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:10px;">
-      <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px;">Loading messages…</div>
-    </div>
+    <div id="rmMessages" style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:10px;"></div>
     <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;background:rgba(0,0,0,0.2);">
       <div style="display:flex;gap:10px;align-items:flex-end;">
         <div id="rmSenderAvatar" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:white;background:#6a4dff;"></div>
         <div style="flex:1;position:relative;">
-          <textarea id="rmInput" placeholder="Message the room… (Enter to send)" rows="1"
-            onkeydown="handleRoomKey(event)" oninput="autoResizeRm(this)"
-            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:10px 50px 10px 16px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:100px;font-family:inherit;transition:border-color 0.2s;"
-            onfocus="this.style.borderColor='rgba(109,40,217,0.5)'"
-            onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
-          <button onclick="sendRoomMessage()" title="Send" style="position:absolute;right:8px;bottom:8px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;"
-            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">➤</button>
+          <textarea id="rmInput" placeholder="Message the room… (Enter to send)" rows="1" onkeydown="handleRoomKey(event)" oninput="autoResizeRm(this)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:10px 50px 10px 16px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:100px;font-family:inherit;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(109,40,217,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          <button onclick="sendRoomMessage()" style="position:absolute;right:8px;bottom:8px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">➤</button>
         </div>
       </div>
     </div>
@@ -221,121 +525,17 @@
             <div id="chatName" style="font-weight:700;font-size:14px;color:white;"></div>
             <div id="chatSub" style="font-size:11px;color:rgba(255,255,255,0.4);"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:5px;">
-            <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
-            <span style="font-size:11px;color:#22c55e;">Live</span>
-        </div>
-        <button id="btnVideoCall" onclick="startVideoCall()" title="Start Video Call"
-          style="background:linear-gradient(135deg,rgba(109,40,217,0.25),rgba(77,148,255,0.2));border:1px solid rgba(109,40,217,0.45);color:white;border-radius:12px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:700;transition:all 0.2s;display:flex;align-items:center;gap:6px;"
-          onmouseover="this.style.background='linear-gradient(135deg,rgba(109,40,217,0.5),rgba(77,148,255,0.35))'"
-          onmouseout="this.style.background='linear-gradient(135deg,rgba(109,40,217,0.25),rgba(77,148,255,0.2))'">
-          📹 <span style="font-size:11px;">Call</span>
-        </button>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div><span style="font-size:11px;color:#22c55e;">Live</span></div>
+        <button id="btnVideoCall" onclick="startVideoCall()" style="background:linear-gradient(135deg,rgba(109,40,217,0.25),rgba(77,148,255,0.2));border:1px solid rgba(109,40,217,0.45);color:white;border-radius:12px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px;">📹 <span style="font-size:11px;">Call</span></button>
         <button onclick="closeChatWindow()" style="background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
-    <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;">
-        <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:40px;">Loading messages…</div>
-    </div>
+    <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;"></div>
     <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,0.07);background:#0f0f1a;">
         <div style="display:flex;align-items:flex-end;gap:8px;">
-            <textarea id="chatInput" placeholder="Message… (Enter to send)" rows="1"
-                onkeydown="handleChatKey(event)" oninput="autoResizeInput(this)"
-                style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:9px 14px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:90px;font-family:inherit;transition:border-color 0.2s;"
-                onfocus="this.style.borderColor='rgba(109,40,217,0.5)'"
-                onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+            <textarea id="chatInput" placeholder="Message… (Enter to send)" rows="1" onkeydown="handleChatKey(event)" oninput="autoResizeInput(this)" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:9px 14px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:90px;font-family:inherit;" onfocus="this.style.borderColor='rgba(109,40,217,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
             <button onclick="sendDM()" style="background:linear-gradient(135deg,#4d94ff,#6a4dff);border:none;color:white;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">➤</button>
         </div>
     </div>
-</div>
-
-<!-- ════ LIVE ROOMS MODAL (opens from KPI card) ════ -->
-<div id="roomsModalOverlay" onclick="closeRoomsModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
-<div id="roomsModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(520px,95vw);max-height:85vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
-        <div>
-            <div style="font-size:16px;font-weight:700;color:white;">🏠 Live Study Rooms</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">Real-time rooms across StudySphere</div>
-        </div>
-        <button onclick="closeRoomsModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
-    </div>
-    <!-- Create & Join panels inside modal -->
-    <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
-            <input id="modalJoinRoomCode" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;">
-            <button onclick="joinRoomFromModal()" class="btn btn-primary" style="padding:9px 18px;font-size:12px;white-space:nowrap;">Join →</button>
-        </div>
-        <button onclick="toggleModalCreateRoom()" style="background:rgba(109,40,217,0.12);border:1px solid rgba(109,40,217,0.3);color:#b48dff;border-radius:10px;padding:7px 16px;font-size:12px;cursor:pointer;font-weight:600;width:100%;">+ Create New Room</button>
-        <div id="modalCreateRoomPanel" style="display:none;margin-top:10px;background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.08);">
-            <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Room Code (auto)</div>
-            <input id="modalRoomCode" type="text" readonly style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#00c9a7;padding:9px 14px;font-size:13px;outline:none;margin-bottom:8px;letter-spacing:2px;font-weight:700;">
-            <input id="modalRoomSubject" type="text" placeholder="Subject (e.g. Calculus, Biology…)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:8px;">
-            <select id="modalRoomMaxMembers" style="width:100%;box-sizing:border-box;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
-                <option value="4">Max 4 members</option><option value="6">Max 6 members</option><option value="10">Max 10 members</option>
-            </select>
-            <div style="display:flex;gap:8px;">
-                <button id="modalCreateRoomBtn" onclick="submitCreateRoomFromModal()" class="btn btn-primary" style="padding:8px 18px;font-size:12px;flex:1;">💬 Create & Open Chat</button>
-                <button onclick="toggleModalCreateRoom()" class="btn btn-outline" style="padding:8px 12px;font-size:12px;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    <div id="modalLiveRoomsList" style="overflow-y:auto;flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-        <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:30px;">Loading rooms…</div>
-    </div>
-</div>
-
-<!-- ════ STREAKS MODAL (opens from XP KPI card) ════ -->
-<div id="streaksModalOverlay" onclick="closeStreaksModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
-<div id="streaksModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(440px,94vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
-        <div>
-            <div style="font-size:16px;font-weight:700;color:white;">⚡ Weekly XP & Streaks</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">Top streak holders &amp; your weekly goals</div>
-        </div>
-        <button onclick="closeStreaksModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
-    </div>
-    <!-- My XP summary -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;background:rgba(255,255,255,0.02);">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Weekly Goals</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-            <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.6);">Study Hours</span><span id="smGoalHoursPct" style="color:var(--green-glow);">—</span></div>
-                <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;"><div id="smGoalHoursBar" style="height:100%;width:0%;background:var(--green-glow);border-radius:3px;transition:width 1s;"></div></div>
-            </div>
-            <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.6);">Peer Teachings</span><span id="smGoalTeachPct" style="color:var(--teal-glow);">—</span></div>
-                <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;"><div id="smGoalTeachBar" style="height:100%;width:0%;background:var(--teal-glow);border-radius:3px;transition:width 1s;"></div></div>
-            </div>
-            <div>
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.6);">Quiz Score Avg</span><span id="smGoalQuizPct" style="color:var(--orange-glow);">—</span></div>
-                <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;"><div id="smGoalQuizBar" style="height:100%;width:0%;background:var(--orange-glow);border-radius:3px;transition:width 1s;"></div></div>
-            </div>
-        </div>
-    </div>
-    <!-- Streak leaderboard -->
-    <div style="padding:14px 20px 6px;flex-shrink:0;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">🔥 Streak Leaderboard</div>
-    </div>
-    <div id="streaksModalList" style="overflow-y:auto;flex:1;padding:0 12px 14px;display:flex;flex-direction:column;gap:8px;">
-        <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:24px;">Loading streaks…</div>
-    </div>
-</div>
-
-<!-- ════ SOCIAL MODAL ════ -->
-<div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
-<div id="socialModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(430px,93vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
-        <div style="display:flex;">
-            <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
-            <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
-        </div>
-        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
-    </div>
-    <div style="padding:14px 18px 10px;">
-        <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…"
-            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:9px 14px;font-size:13px;outline:none;">
-    </div>
-    <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
-    <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
 </div>
 
 <!-- ════ MAIN CONTENT ════ -->
@@ -358,52 +558,13 @@
 
     <!-- KPI GRID -->
     <div class="kpi-grid">
-      <!-- Active Study Rooms — opens Live Rooms modal -->
-      <div class="kpi-card" onclick="openRoomsModal()" style="cursor:pointer;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <span style="font-size:12px;color:var(--muted);">Active Study Rooms</span>
-          <span style="font-size:22px;">🏠</span>
-        </div>
-        <div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div>
-        <div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div>
-      </div>
-
-      <!-- Weekly XP — opens Streaks modal -->
-      <div class="kpi-card" onclick="openStreaksModal()" style="cursor:pointer;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span>
-          <span style="font-size:22px;">⚡</span>
-        </div>
-        <div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div>
-        <div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div>
-      </div>
-
-      <div class="kpi-card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <span style="font-size:12px;color:var(--muted);">People Matched</span>
-          <span style="font-size:22px;">👥</span>
-        </div>
-        <div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div>
-        <div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div>
-      </div>
-
-      <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <span style="font-size:12px;color:var(--muted);">Followers</span>
-          <span style="font-size:22px;">👤</span>
-        </div>
-        <div class="kpi-value" style="color:var(--teal-glow);" id="kpiFollowers">—</div>
-        <div style="font-size:11px;color:var(--green-glow);" id="kpiFollowersSub">Loading…</div>
-      </div>
-
-      <div class="kpi-card" onclick="openSocialModal('following')" style="cursor:pointer;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <span style="font-size:12px;color:var(--muted);">Following</span>
-          <span style="font-size:22px;">🔄</span>
-        </div>
-        <div class="kpi-value" style="color:var(--orange-glow);" id="kpiFollowing">—</div>
-        <div style="font-size:11px;color:var(--muted);" id="kpiFollowingSub">Active connections</div>
-      </div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div><div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Group Mood Score</span><span style="font-size:22px;">🧠</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMood">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMoodSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Match Compatibility</span><span style="font-size:22px;">🎯</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMatch">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMatchSub">Loading…</div></div>
+      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">People Matched</span><span style="font-size:22px;">👥</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div></div>
+      <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Followers</span><span style="font-size:22px;">👤</span></div><div class="kpi-value" style="color:var(--teal-glow);" id="kpiFollowers">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiFollowersSub">Loading…</div></div>
+      <div class="kpi-card" onclick="openSocialModal('following')" style="cursor:pointer;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Following</span><span style="font-size:22px;">🔄</span></div><div class="kpi-value" style="color:var(--orange-glow);" id="kpiFollowing">—</div><div style="font-size:11px;color:var(--muted);" id="kpiFollowingSub">Active connections</div></div>
     </div>
 
     <!-- Study Partners Banner -->
@@ -428,7 +589,6 @@
       </div>
       <div id="skillBars" style="display:flex;flex-wrap:wrap;gap:16px;"></div>
     </div>
-
     <div id="onboardBanner" class="card" style="padding:20px;margin-bottom:20px;display:none;border:1px solid rgba(109,40,217,0.3);background:rgba(109,40,217,0.06);">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">🚀 Complete your onboarding</div><div style="font-size:12px;color:var(--muted);">Set up your skill profile to personalise your experience</div></div>
@@ -436,19 +596,82 @@
       </div>
     </div>
 
+    <div class="grid-2">
+      <!-- LIVE STUDY ROOMS -->
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">🏠 Live Study Rooms</h3>
+          <button class="btn btn-outline" style="padding:5px 14px;font-size:12px;" onclick="openCreateRoom()">+ Create</button>
+        </div>
+        <div id="createRoomPanel" style="display:none;background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Room Code (auto)</div>
+          <input id="roomCode" type="text" readonly style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#00c9a7;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;letter-spacing:2px;font-weight:700;">
+          <input id="roomSubject" type="text" placeholder="Subject (e.g. Calculus, Biology…)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
+          <select id="roomMaxMembers" style="width:100%;box-sizing:border-box;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:12px;">
+            <option value="4">Max 4 members</option><option value="6">Max 6 members</option><option value="10">Max 10 members</option>
+          </select>
+          <div style="display:flex;gap:8px;">
+            <button id="createRoomBtn" onclick="submitCreateRoom()" class="btn btn-primary" style="padding:8px 20px;font-size:12px;flex:1;">💬 Create & Open Chat</button>
+            <button onclick="closeCreateRoom()" class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Cancel</button>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
+          <input id="joinRoomCode" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
+          <button onclick="joinRoom()" class="btn btn-primary" style="padding:7px 18px;font-size:12px;">Join Room →</button>
+        </div>
+        <div id="liveRoomsList"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Loading rooms…</div></div>
+      </div>
+
+      <!-- STREAKS + GOALS -->
+      <div class="card" style="padding:24px;">
+        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:18px;">🔥 Streaks & Weekly Goals</h3>
+        <div id="streakGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1;">Loading streaks…</div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Study Hours Goal</span><span id="goalHoursPct">—</span></div>
+        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalHoursBar" style="width:0%;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Peer Teachings</span><span id="goalTeachPct">—</span></div>
+        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalTeachBar" style="width:0%;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Quiz Score Avg</span><span id="goalQuizPct">—</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="goalQuizBar" style="width:0%;transition:width 1s;"></div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY FEED -->
+    <div class="card" style="padding:24px;margin-top:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">📡 Live Activity Feed</h3>
+        <span style="font-size:11px;color:var(--muted);">Updates in real-time</span>
+      </div>
+      <div id="activityFeed" style="display:flex;flex-direction:column;gap:10px;"><div style="color:var(--muted);font-size:13px;">Loading activity…</div></div>
+    </div>
+
    </div>
   </div>
  </div>
 </div>
 
+<!-- SOCIAL MODAL -->
+<div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
+<div id="socialModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(430px,93vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;">
+            <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
+            <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
+        </div>
+        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
+    </div>
+    <div style="padding:14px 18px 10px;">
+        <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:9px 14px;font-size:13px;outline:none;">
+    </div>
+    <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
+    <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
+</div>
+
 <style>
 @keyframes vPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4);}50%{opacity:0.7;box-shadow:0 0 0 8px rgba(34,197,94,0);}}
 @keyframes vcDot{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
-
-#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar,#modalLiveRoomsList::-webkit-scrollbar,#streaksModalList::-webkit-scrollbar{width:4px;}
-#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb,#modalLiveRoomsList::-webkit-scrollbar-thumb,#streaksModalList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
-
-.rm-out{align-self:flex-end;max-width:72%;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:18px 18px 4px 18px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;box-shadow:0 4px 16px rgba(109,40,217,0.3);}
+#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar{width:4px;}
+#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
+.rm-out{align-self:flex-end;max-width:72%;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:18px 18px 4px 18px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;}
 .rm-in{align-self:flex-start;max-width:72%;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;}
 .rm-sys{align-self:center;font-size:11px;color:rgba(255,255,255,0.28);padding:4px 14px;background:rgba(255,255,255,0.05);border-radius:20px;margin:4px 0;}
 .rm-meta{font-size:10px;color:rgba(255,255,255,0.22);margin-top:3px;padding:0 2px;}
@@ -456,16 +679,13 @@
 .rm-name{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px;padding-left:2px;font-weight:600;}
 .rm-member{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,0.04);}
 .rm-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:white;}
-
 .bubble-out{align-self:flex-end;max-width:78%;background:linear-gradient(135deg,#4d94ff,#6a4dff);color:white;border-radius:18px 18px 4px 18px;padding:9px 14px;font-size:13px;line-height:1.45;word-break:break-word;}
 .bubble-in{align-self:flex-start;max-width:78%;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:9px 14px;font-size:13px;line-height:1.45;word-break:break-word;}
 .bubble-name{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px;padding-left:2px;font-weight:600;}
 .bubble-time{font-size:10px;color:rgba(255,255,255,0.25);margin-top:3px;padding:0 2px;}
 .bubble-time.right{text-align:right;}
-
 .ic-out{align-self:flex-end;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:12px 12px 2px 12px;padding:7px 11px;font-size:12px;max-width:85%;word-break:break-word;}
 .ic-in{align-self:flex-start;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);border-radius:12px 12px 12px 2px;padding:7px 11px;font-size:12px;max-width:85%;word-break:break-word;}
-
 .s-row{display:flex;align-items:center;gap:13px;padding:10px 20px;transition:background 0.15s;}
 .s-row:hover{background:rgba(255,255,255,0.04);}
 .s-row+.s-row{border-top:1px solid rgba(255,255,255,0.04);}
@@ -476,69 +696,18 @@
 .s-partner{display:inline-block;font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:#34d399;border-radius:20px;padding:2px 8px;margin-left:5px;}
 .btn-msg{background:rgba(77,148,255,0.15);border:1px solid rgba(77,148,255,0.35);color:#80b3ff;border-radius:9px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
 .btn-msg:hover{background:rgba(77,148,255,0.3);color:white;}
-.btn-vid{background:rgba(109,40,217,0.15);border:1px solid rgba(109,40,217,0.4);color:#b48dff;border-radius:9px;padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.btn-vid{background:rgba(109,40,217,0.15);border:1px solid rgba(109,40,217,0.4);color:#b48dff;border-radius:9px;padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap;}
 .btn-vid:hover{background:rgba(109,40,217,0.35);color:white;}
-.btn-unfollow{background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);border-radius:9px;padding:6px 12px;font-size:12px;cursor:pointer;}
-
-.room-live-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);transition:all 0.2s;}
+.room-live-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);margin-bottom:10px;transition:all 0.2s;}
 .room-live-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(109,40,217,0.3);}
-
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);}
+.kpi-card[onclick]:hover{outline:1px solid rgba(77,148,255,0.3);}
 .partner-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);}
 .partner-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white;flex-shrink:0;}
-
-.streak-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);transition:all 0.2s;}
-.streak-row:hover{background:rgba(255,255,255,0.07);}
-.streak-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;}
-
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .msg-new{animation:fadeUp 0.2s ease;}
 .vc-btn-off{background:rgba(239,68,68,0.2)!important;border-color:rgba(239,68,68,0.5)!important;color:#f87171!important;}
-.kpi-card[onclick]:hover{outline:1px solid rgba(77,148,255,0.3);}
-
-/* ── Hamburger ── */
-.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);flex-shrink:0;margin-left:auto;}
-.ham span{display:block;width:20px;height:2px;background:#e2e8f0;border-radius:2px;transition:all 0.3s;}
-.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.ham.open span:nth-child(2){opacity:0;}
-.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-
-/* ── Mobile drawer ── */
-.mob-drawer{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(7,7,13,0.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px;flex-direction:column;gap:6px;z-index:999;transform:translateY(-110%);transition:transform 0.3s ease;}
-.mob-drawer.open{transform:translateY(0);}
-.mob-drawer .nav-link{display:block;padding:10px 14px;font-size:14px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--muted);text-decoration:none;}
-.mob-drawer .nav-link.active,.mob-drawer .nav-link:hover{color:#e2e8f0;background:var(--surface);}
-
-@media(max-width:860px){
-    #main-nav{height:56px;padding:0 14px;gap:10px;flex-wrap:nowrap;}
-    #main-nav .nav-links{display:none!important;}
-    .ham{display:flex;}
-    .mob-drawer{display:flex;}
-    #profile-container{position:fixed!important;top:4px!important;right:60px!important;width:auto!important;}
-    .content-wrapper{padding-top:68px!important;padding-left:12px!important;padding-right:12px!important;}
-    .dash-page .content>div:first-child{flex-direction:column!important;align-items:flex-start!important;gap:10px;}
-    .kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
-    #skillBars{flex-direction:column!important;gap:10px!important;}
-    #studyPartnersGrid{gap:8px!important;}
-    .card{padding:16px!important;}
-    #roomsModal,#streaksModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;max-height:100dvh!important;}
-}
-@media(max-width:540px){
-    .kpi-grid{grid-template-columns:1fr 1fr!important;}
-    .heading-lg{font-size:22px!important;}
-    #chatWindow{bottom:0!important;right:0!important;left:0!important;width:100vw!important;height:72vh!important;border-radius:16px 16px 0 0!important;transform:translateY(30px)!important;}
-    #roomChatModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;flex-direction:column!important;}
-    #roomChatModal>div:first-child{width:100%!important;flex-direction:row!important;flex-wrap:wrap!important;padding:10px 12px!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;max-height:200px;overflow-y:auto;}
-    #rmMembersList{flex-direction:row!important;flex-wrap:wrap!important;max-height:70px!important;}
-    #videoModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;}
-    #localVideo{width:100px!important;height:74px!important;bottom:86px!important;right:12px!important;}
-    #videoModal>div:nth-child(3){gap:10px!important;padding:12px 8px!important;}
-    #videoModal>div:nth-child(3) button{width:44px!important;height:44px!important;font-size:16px!important;}
-    #videoModal>div:nth-child(3) button:nth-child(4){width:54px!important;height:54px!important;}
-    #socialModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;max-height:100dvh!important;}
-    #incomingCallToast{left:16px!important;right:16px!important;transform:translateX(0) translateY(80px)!important;min-width:unset!important;}
-    #incomingCallToast.show{transform:translateX(0) translateY(0)!important;}
-}
 </style>
 
 <!-- ═══ FIREBASE MODULE ═══ -->
@@ -569,6 +738,8 @@ let unsubRoomMsgs = null, unsubRoom = null;
 let unsubDM = null;
 let activeDMSessionId = null;
 let activeDMPeer = null;
+let unsubInvites = null;
+let unsubSentInvites = null;
 
 // WebRTC state
 let localStream = null, remoteStream = null, peerConnection = null;
@@ -577,19 +748,17 @@ let vcTimerInterval = null, vcSeconds = 0;
 let micOn = true, camOn = true, screenSharing = false, screenTrack = null;
 let inCallChatOpen = false, pendingCallData = null;
 
-const ICE_SERVERS = {
-    iceServers:[
-        {urls:'stun:stun.l.google.com:19302'},
-        {urls:'stun:stun1.l.google.com:19302'},
-        {urls:'stun:stun2.l.google.com:19302'}
-    ]
-};
+// Track which invite toasts we've shown
+let shownInviteIds = new Set();
+// Track pending invite data for popup
+let currentPopupInvite = null;
 
+const ICE_SERVERS = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
 const EMOJIS = ['📚','⚡','⚗️','🧬','🔬','🖥️','📐','🎨','🎯','🔭'];
 
 const $   = id => document.getElementById(id);
-const st  = (id,v)  => { const e=$(id); if(e) e.textContent=v; };
-const sb  = (id,p)  => { const e=$(id); if(e) e.style.width=Math.min(100,p)+'%'; };
+const st  = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+const sb  = (id,p) => { const e=$(id); if(e) e.style.width=Math.min(100,p)+'%'; };
 const sh  = id => { const e=$(id); if(e) e.style.display='block'; };
 const hd  = id => { const e=$(id); if(e) e.style.display='none'; };
 const esc = t  => { const d=document.createElement('div'); d.appendChild(document.createTextNode(t||'')); return d.innerHTML; };
@@ -597,6 +766,20 @@ const pc  = uid => { const c=['#6a4dff','#4d94ff','#00c9a7','#f59e0b','#10b981',
 const isToday = ts => { if(!ts?.toDate) return false; const d=ts.toDate(),n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); };
 const fmt = ts => ts?.toDate?.()?.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) || '';
 const dmSessionId = (uidA, uidB) => [uidA, uidB].sort().join('__DM__');
+const initials = name => name.split(' ').map(n=>n[0]||'').join('').toUpperCase().slice(0,2)||'?';
+
+const GRADS = [
+    'linear-gradient(135deg,#f59e0b,#ef4444)',
+    'linear-gradient(135deg,#6d28d9,#ec4899)',
+    'linear-gradient(135deg,#0891b2,#6d28d9)',
+    'linear-gradient(135deg,#059669,#0891b2)',
+    'linear-gradient(135deg,#d97706,#ec4899)',
+    'linear-gradient(135deg,#7c3aed,#06b6d4)',
+];
+function avatarGrad(uid=''){
+    let h=0; for(const c of uid) h=(h*31+c.charCodeAt(0))&0xfffffff;
+    return GRADS[h%GRADS.length];
+}
 
 window._log = async (type, detail) => {
     if (!CU) return;
@@ -609,8 +792,7 @@ window._log = async (type, detail) => {
 onAuthStateChanged(auth, async user => {
     if (!user) {
         st('dashGreeting','Your Dashboard');
-        loadPubRooms();
-        watchStreaksLive();
+        loadPubRooms(); watchStreaks(); watchFeed();
         return;
     }
     CU = user;
@@ -619,14 +801,22 @@ onAuthStateChanged(auth, async user => {
     st('dashGreeting', (h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', '+name+' 👋');
     const sav = $('rmSenderAvatar');
     if(sav){ sav.textContent=name[0].toUpperCase(); sav.style.background=pc(user.uid); }
+
+    // Show bell in nav
+    const bell = $('dashBellWrap');
+    if(bell) bell.style.display = 'flex';
+
     await ensureUser(user);
     window._log('join','opened the dashboard');
     watchProfile(user.uid);
     watchRoomsKPI();
     watchRooms(user.uid);
-    watchStreaksLive();
+    watchStreaks();
+    watchFeed();
     watchSocial(user.uid);
     listenForIncomingCalls(user.uid);
+    listenInvites(user.uid);
+    listenSentInviteAcceptances(user.uid);
 });
 
 async function ensureUser(u) {
@@ -643,6 +833,268 @@ async function ensureUser(u) {
     }
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// INVITE SYSTEM  (full popup + bell panel, like match page)
+// ══════════════════════════════════════════════════════════════════════
+
+function listenInvites(uid) {
+    if(unsubInvites) unsubInvites();
+    const q = query(collection(db,'invites'), where('toUid','==',uid), where('status','==','pending'));
+    unsubInvites = onSnapshot(q, snap => {
+        const invites = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+        // Bell count
+        const bc = $('dashBellCount');
+        if(bc){ bc.textContent=invites.length; bc.style.display=invites.length?'flex':'none'; }
+
+        // Render panel list
+        renderDashInviteList(invites);
+
+        // Show toast for NEW invites (not yet shown)
+        invites.forEach(inv => {
+            if(!shownInviteIds.has(inv.id)){
+                shownInviteIds.add(inv.id);
+                showIncomingInviteToast(inv);
+            }
+        });
+    });
+}
+
+function listenSentInviteAcceptances(uid) {
+    if(unsubSentInvites) unsubSentInvites();
+    const q = query(collection(db,'invites'), where('fromUid','==',uid), where('status','==','accepted'));
+    unsubSentInvites = onSnapshot(q, snap => {
+        snap.docChanges().forEach(ch => {
+            if(ch.type === 'modified' || ch.type === 'added'){
+                const d = ch.doc.data();
+                // Only fire popup on actual modification (not initial load)
+                if(ch.type === 'modified'){
+                    showInviteAcceptedPopup(d.toName || 'Someone', d.compatScore || 0);
+                }
+            }
+        });
+    });
+}
+
+function renderDashInviteList(invites) {
+    const el = $('dashInviteList');
+    if(!invites.length){
+        el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;"><span style="font-size:28px;display:block;margin-bottom:8px;">🎉</span>No pending invites!</div>';
+        return;
+    }
+    el.innerHTML = invites.map(inv => `
+        <div class="dash-invite-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:38px;height:38px;border-radius:50%;background:${avatarGrad(inv.fromUid)};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;flex-shrink:0;">${initials(inv.fromName||'?')}</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;">${esc(inv.fromName||'Someone')}</div>
+                    <div style="font-size:11px;color:var(--muted);">${esc(inv.fromUniversity||'wants to study with you')}</div>
+                    <div style="font-size:11px;color:var(--green-glow);margin-top:2px;">🎯 ${inv.compatScore||0}% compatibility</div>
+                </div>
+            </div>
+            ${inv.fromStrong?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">💪 Strengths: <span style="color:var(--green-glow);">${esc(inv.fromStrong)}</span></div>`:''}
+            ${inv.fromWeak?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">⚠️ Gaps: <span style="color:#f87171;">${esc(inv.fromWeak)}</span></div>`:''}
+            ${inv.sharedSlots?`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">🗓 Free together: <span style="color:var(--teal-glow);">${esc(inv.sharedSlots)}</span></div>`:''}
+            <div style="display:flex;gap:8px;">
+                <button onclick="openInvitePopup('${inv.id}','${esc(inv.fromUid)}','${esc(inv.fromName||'').replace(/'/g,"\\'")}',${inv.compatScore||0},'${esc(inv.fromStrong||'')}','${esc(inv.fromWeak||'')}','${esc(inv.fromUniversity||'')}','${esc(inv.sharedSlots||'')}','${avatarGrad(inv.fromUid)}')"
+                    class="popup-btn popup-btn-success" style="flex:1;padding:8px 14px;font-size:12px;border-radius:10px;">
+                    👀 View & Respond
+                </button>
+            </div>
+        </div>`).join('');
+}
+
+// ── Toast for incoming invite ──
+function showIncomingInviteToast(inv) {
+    const toast = $('incomingInviteToast');
+    const av = $('toastInviteAvatar');
+    const nm = $('toastInviteName');
+    const btn = $('toastAcceptBtn');
+    if(!toast) return;
+
+    av.textContent = initials(inv.fromName||'?');
+    av.style.background = avatarGrad(inv.fromUid);
+    nm.textContent = `${inv.fromName||'Someone'} wants to study with you · ${inv.compatScore||0}% match`;
+    btn.onclick = () => {
+        hideIncomingInviteToast();
+        openInvitePopup(inv.id, inv.fromUid, inv.fromName, inv.compatScore, inv.fromStrong, inv.fromWeak, inv.fromUniversity, inv.sharedSlots, avatarGrad(inv.fromUid));
+    };
+
+    toast.classList.add('show');
+    // Auto-hide after 8 seconds
+    clearTimeout(window._inviteToastTimer);
+    window._inviteToastTimer = setTimeout(hideIncomingInviteToast, 8000);
+}
+
+window.hideIncomingInviteToast = function(){
+    const toast = $('incomingInviteToast');
+    if(toast) toast.classList.remove('show');
+    clearTimeout(window._inviteToastTimer);
+};
+
+// ── Full-screen invite popup ──
+window.openInvitePopup = function(inviteId, fromUid, fromName, score, strong, weak, university, sharedSlots, gradBg) {
+    currentPopupInvite = { inviteId, fromUid, fromName, score };
+    toggleDashInvitePanel(false); // close panel
+
+    const content = $('invitePopupContent');
+    const slotsHtml = sharedSlots
+        ? `<div style="background:rgba(8,145,178,0.08);border:1px solid rgba(8,145,178,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;">
+               🗓 <strong>Available together:</strong>
+               <span style="color:#22d3ee;">${esc(sharedSlots)}</span>
+           </div>` : '';
+
+    content.innerHTML = `
+        <div style="text-align:center;margin-bottom:20px;">
+            <div class="popup-avatar" style="background:${gradBg||avatarGrad(fromUid)};">${initials(fromName||'?')}</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);border-radius:999px;padding:4px 14px;font-size:11px;color:#34d399;font-weight:700;margin-bottom:12px;">
+                🎯 ${score}% Compatibility
+            </div>
+            <h2 style="font-size:22px;font-weight:800;color:white;margin-bottom:6px;font-family:sans-serif;">${esc(fromName||'Someone')}</h2>
+            <p style="font-size:13px;color:rgba(255,255,255,0.45);">${esc(university||'Wants to be your study partner')}</p>
+        </div>
+
+        ${strong ? `<div style="margin-bottom:10px;"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">💪 Their strengths</div><div>${strong.split(',').map(s=>`<span class="popup-chip popup-chip-green">${esc(s.trim())}</span>`).join('')}</div></div>` : ''}
+        ${weak   ? `<div style="margin-bottom:16px;"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">⚠️ Where you can help them</div><div>${weak.split(',').map(s=>`<span class="popup-chip popup-chip-red">${esc(s.trim())}</span>`).join('')}</div></div>` : ''}
+        ${slotsHtml}
+
+        <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="popup-btn popup-btn-success" style="flex:1;"
+                onclick="dashRespondInvite('${inviteId}','accepted','${fromUid}','${(fromName||'').replace(/'/g,"\\'")}',${score})">
+                ✓ Accept Invite
+            </button>
+            <button class="popup-btn popup-btn-danger" style="flex:1;"
+                onclick="dashRespondInvite('${inviteId}','declined','${fromUid}','${(fromName||'').replace(/'/g,"\\'")}',${score})">
+                ✗ Decline
+            </button>
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+            <a href="match.html" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none;">View full compatibility on Match page →</a>
+        </div>`;
+
+    const overlay = $('invitePopupOverlay');
+    overlay.classList.add('show');
+};
+
+window.closeInvitePopup = function(e) {
+    if(e && e.target !== $('invitePopupOverlay')) return;
+    $('invitePopupOverlay').classList.remove('show');
+    currentPopupInvite = null;
+};
+
+// ── Accept/Decline invite ──
+window.dashRespondInvite = async function(inviteId, status, fromUid, fromName, score) {
+    $('invitePopupOverlay').classList.remove('show');
+    try {
+        await updateDoc(doc(db,'invites',inviteId), { status, respondedAt: serverTimestamp() });
+
+        if(status === 'accepted') {
+            const [mySnap, theirSnap] = await Promise.all([
+                getDoc(doc(db,'users',CU.uid)),
+                getDoc(doc(db,'users',fromUid))
+            ]);
+            const myData    = mySnap.exists()    ? mySnap.data()    : {};
+            const theirData = theirSnap.exists() ? theirSnap.data() : {};
+            const myName    = myData.displayName    || myData.name    || CU.displayName || 'User';
+            const theirName = theirData.displayName || theirData.name || fromName || 'User';
+
+            // Mutual follows
+            await setDoc(doc(db,'social',CU.uid,'following',fromUid),{
+                displayName:theirName, email:theirData.email||'', color:theirData.color||'#4d94ff',
+                subject:theirData.subject||'Studying', subjects:theirData.subjects||[],
+                matchScore:score||0, matched:true, followedAt:serverTimestamp()
+            });
+            await setDoc(doc(db,'social',fromUid,'following',CU.uid),{
+                displayName:myName, email:myData.email||'', color:myData.color||'#6a4dff',
+                subject:myData.subject||'Studying', subjects:myData.subjects||[],
+                matchScore:score||0, matched:true, followedAt:serverTimestamp()
+            });
+            await setDoc(doc(db,'social',CU.uid,'followers',fromUid),{
+                displayName:theirName, email:theirData.email||'', color:theirData.color||'#4d94ff',
+                subject:theirData.subject||'Studying', matchScore:score||0,
+                matched:true, followedAt:serverTimestamp()
+            });
+            await setDoc(doc(db,'social',fromUid,'followers',CU.uid),{
+                displayName:myName, email:myData.email||'', color:myData.color||'#6a4dff',
+                subject:myData.subject||'Studying', matchScore:score||0,
+                matched:true, followedAt:serverTimestamp()
+            });
+
+            // Update matchedCount
+            try {
+                await updateDoc(doc(db,'users',CU.uid),   {matchedCount:increment(1),matchedThisWeek:increment(1)});
+                await updateDoc(doc(db,'users',fromUid), {matchedCount:increment(1),matchedThisWeek:increment(1)});
+            } catch(e){ console.warn('matchedCount update failed:',e); }
+
+            // Show success popup
+            showAcceptedSuccessPopup(theirName, score);
+            await window._log('match','connected with '+theirName);
+        } else {
+            showDashToast('❌ Declined ' + fromName + '\'s invite.');
+        }
+    } catch(e) {
+        console.error('dashRespondInvite failed:',e);
+        showDashToast('⚠️ Error: ' + e.message);
+    }
+};
+
+// ── Popup shown when your sent invite is accepted ──
+function showInviteAcceptedPopup(peerName, score) {
+    $('successRingEmoji').textContent = '🎉';
+    $('successTitle').textContent = 'Invite Accepted!';
+    $('successBody').innerHTML = `<strong style="color:white;">${esc(peerName)}</strong> accepted your study invite!<br>You are now following each other.`;
+    $('successActions').innerHTML = `
+        <button onclick="closeSuccessPopup()" class="popup-btn popup-btn-success" style="padding:10px 24px;">
+            🎊 Awesome!
+        </button>
+        <a href="match.html" onclick="closeSuccessPopup()" class="popup-btn popup-btn-ghost" style="text-decoration:none;padding:10px 20px;">
+            View on Match →
+        </a>`;
+    $('inviteSuccessPopup').classList.add('show');
+}
+
+// ── Popup shown when you accept someone else's invite ──
+function showAcceptedSuccessPopup(peerName, score) {
+    $('successRingEmoji').textContent = '✅';
+    $('successTitle').textContent = 'You\'re now Study Partners!';
+    $('successBody').innerHTML = `You and <strong style="color:white;">${esc(peerName)}</strong> are now connected.<br><span style="color:#34d399;">${score}% match</span> — you're following each other on the dashboard.`;
+    $('successActions').innerHTML = `
+        <button onclick="closeSuccessPopup()" class="popup-btn popup-btn-success" style="padding:10px 24px;">
+            🚀 Let's study!
+        </button>
+        <a href="match.html" onclick="closeSuccessPopup()" class="popup-btn popup-btn-ghost" style="text-decoration:none;padding:10px 20px;">
+            View Match →
+        </a>`;
+    $('inviteSuccessPopup').classList.add('show');
+}
+
+window.closeSuccessPopup = function() {
+    $('inviteSuccessPopup').classList.remove('show');
+};
+
+// ── Bell panel toggle ──
+window.toggleDashInvitePanel = function(force) {
+    const p = $('dashInvitePanel');
+    if(force === false){ p.style.display='none'; return; }
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+};
+
+document.addEventListener('click', e => {
+    const p = $('dashInvitePanel');
+    const b = $('dashBellWrap');
+    if(p && p.style.display==='block' && !p.contains(e.target) && !b?.contains(e.target))
+        p.style.display='none';
+});
+
+// ── Toast helper ──
+function showDashToast(msg) {
+    const t = $('dashToast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(window._dt);
+    window._dt = setTimeout(()=>t.classList.remove('show'),3500);
+}
+window.showDashToast = showDashToast;
+
 // ══════════════════════════════════════════
 // DASHBOARD WATCHERS
 // ══════════════════════════════════════════
@@ -652,18 +1104,17 @@ function watchProfile(uid) {
         const d = snap.data();
         st('kpiXP',(d.xp||0).toLocaleString());
         st('kpiXPSub','+'+(d.xpToday||0)+' today');
+        st('kpiMatch',(d.matchScore||0)+'%');
+        st('kpiMatchSub',d.matchRank?'Top '+d.matchRank+'% match':'No matches yet');
         st('kpiMatched',d.matchedCount||0);
         st('kpiMatchedSub','+'+(d.matchedThisWeek||0)+' this week');
-
-        // Mirror goal data into streaks modal bars
         const g=d.goals||{};
         const hp=Math.min(100,Math.round((g.studyHours||0)/(g.studyHoursTarget||10)*100));
-        sb('smGoalHoursBar',hp); st('smGoalHoursPct',hp+'%');
-        sb('smGoalTeachBar',Math.min(100,g.peerTeachings||0));
-        st('smGoalTeachPct',Math.min(100,g.peerTeachings||0)+'%');
-        sb('smGoalQuizBar',Math.min(100,g.quizAvg||0));
-        st('smGoalQuizPct',Math.min(100,g.quizAvg||0)+'%');
-
+        sb('goalHoursBar',hp); st('goalHoursPct',hp+'%');
+        sb('goalTeachBar',Math.min(100,g.peerTeachings||0));
+        st('goalTeachPct',Math.min(100,g.peerTeachings||0)+'%');
+        sb('goalQuizBar',Math.min(100,g.quizAvg||0));
+        st('goalQuizPct',Math.min(100,g.quizAvg||0)+'%');
         if(d.skills?.length){
             sh('skillBanner'); hd('onboardBanner');
             $('skillBars').innerHTML = [...d.skills].sort((a,b)=>a.confidence-b.confidence).map(s=>{
@@ -686,81 +1137,72 @@ function watchRoomsKPI() {
         st('kpiRooms',snap.size||0);
         const t=snap.docs.filter(d=>d.data().createdToday===true).length;
         st('kpiRoomsSub',t>0?'+'+t+' created today':'No new rooms today');
+        const moods=snap.docs.map(d=>d.data().mood).filter(m=>typeof m==='number');
+        const avg=moods.length?Math.round(moods.reduce((a,b)=>a+b,0)/moods.length):0;
+        st('kpiMood',avg>0?avg+'%':'—');
+        st('kpiMoodSub',avg>=80?'Focused 🎯':avg>=60?'Steady 📖':avg>0?'Tired 😴':'No data');
     });
 }
 
-// Live rooms data — used by both the modal list and the KPI
-let _allRoomsSnap = null;
-function watchRooms(uid){
-    onSnapshot(collection(db,'rooms'),snap=>{
-        _allRoomsSnap=snap;
-        renderModalRooms(snap, uid);
-    });
-}
-function loadPubRooms(){
-    onSnapshot(collection(db,'rooms'),snap=>{
-        _allRoomsSnap=snap;
-        renderModalRooms(snap, null);
-    });
-}
+function watchRooms(uid){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,uid)); }
+function loadPubRooms(){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,null)); }
 
-function renderModalRooms(snap, uid){
-    const list=$('modalLiveRoomsList'); if(!list)return;
-    if(snap.empty){list.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:30px;">No rooms yet — create one!</div>';return;}
-    list.innerHTML='';
-    snap.docs.forEach((d,i)=>{
-        const r=d.data(), mood=typeof r.mood==='number'?r.mood:74;
+function renderRooms(snap,uid){
+    const list=$('liveRoomsList');
+    if(snap.empty){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">No rooms yet — create one!</div>';return;}
+    list.innerHTML=snap.docs.map((d,i)=>{
+        const r=d.data(),mood=typeof r.mood==='number'?r.mood:74;
         const mc=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
         const im=uid&&(r.members||[]).includes(uid), mb=(r.members||[]).length;
         const isEnded=r.status==='ended';
-        const card=document.createElement('div');
-        card.className='room-live-card';
-        if(isEnded) card.style.opacity='0.45';
-        card.innerHTML=`
+        return `<div class="room-live-card" style="${isEnded?'opacity:0.45;':''}">
             <div style="font-size:22px;">${EMOJIS[i%EMOJIS.length]}</div>
             <div style="flex:1;min-width:0;">
-                <div style="font-weight:600;font-size:14px;color:white;">${esc(r.subject||'Study Room')}${isEnded?' <span style="font-size:10px;color:#f87171;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:20px;padding:2px 7px;margin-left:5px;">Ended</span>':''}</div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.4);">${esc(r.topic||'General')} · ${mb} member${mb!==1?'s':''}</div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;">Code: <span style="color:#00c9a7;letter-spacing:1px;font-weight:700;">${esc(r.code||d.id)}</span></div>
+                <div style="font-weight:600;font-size:14px;">${esc(r.subject||'Study Room')}${isEnded?' <span style="font-size:10px;color:#f87171;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:20px;padding:2px 7px;margin-left:5px;">Ended</span>':''}</div>
+                <div style="font-size:11px;color:var(--muted);">${esc(r.topic||'General')} · ${mb} member${mb!==1?'s':''}</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px;">Code: <span style="color:#00c9a7;letter-spacing:1px;font-weight:700;">${esc(r.code||d.id)}</span></div>
             </div>
             <div style="text-align:right;flex-shrink:0;">
                 <div style="font-size:11px;color:${mc};margin-bottom:4px;">Mood ${mood}%</div>
-                <div class="progress-bar" style="width:60px;height:4px;"><div class="progress-fill" style="width:${mood}%;background:${mc};"></div></div>
+                <div class="progress-bar" style="width:70px;height:4px;"><div class="progress-fill" style="width:${mood}%;background:${mc};"></div></div>
             </div>
-            ${!isEnded
-                ?`<button onclick="window._joinFromModal('${d.id}','${esc(r.subject||'Room')}','${esc(r.code||d.id)}',${i})"
-                    class="btn ${im?'btn-primary':'btn-outline'}" style="padding:6px 12px;font-size:11px;white-space:nowrap;flex-shrink:0;">
-                    ${im?'▶ Resume':'💬 Chat'}
-                  </button>`
-                :'<div style="font-size:11px;color:rgba(255,255,255,0.25);white-space:nowrap;">Ended</div>'}`;
-        list.appendChild(card);
+            ${!isEnded?`<button onclick="window.openRoomChat('${d.id}','${esc(r.subject||'Room')}','${esc(r.code||d.id)}',${i})"
+                class="btn ${im?'btn-primary':'btn-outline'}" style="padding:6px 14px;font-size:12px;white-space:nowrap;flex-shrink:0;">
+                ${im?'▶ Resume':'💬 Chat'}
+            </button>`:'<div style="font-size:11px;color:rgba(255,255,255,0.25);white-space:nowrap;">Session ended</div>'}
+        </div>`;
+    }).join('');
+}
+
+function watchStreaks(){
+    onSnapshot(query(collection(db,'users'),orderBy('streak','desc'),limit(6)),snap=>{
+        const g=$('streakGrid'); if(!g)return;
+        if(snap.empty){g.innerHTML='<div style="grid-column:1/-1;color:var(--muted);font-size:13px;text-align:center;padding:16px;">No streaks yet 🔥</div>';return;}
+        const cols=['linear-gradient(135deg,var(--accent),var(--pink))','linear-gradient(135deg,var(--teal),var(--accent))','linear-gradient(135deg,var(--green),var(--teal))','linear-gradient(135deg,var(--orange),var(--pink))'];
+        g.innerHTML=snap.docs.map((d,i)=>{
+            const u=d.data();
+            return `<div style="background:var(--surface);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:${cols[i%cols.length]};display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">${(u.displayName||u.email||'U')[0].toUpperCase()}</div>
+                <div><div style="font-size:12px;font-weight:600;">${esc(u.displayName||u.email?.split('@')[0]||'User')}</div>
+                <div style="font-size:11px;color:var(--orange-glow);">🔥 ${u.streak||0} day streak</div></div>
+            </div>`;
+        }).join('');
     });
 }
 
-window._joinFromModal = function(roomId, subject, code, emojiIdx){
-    closeRoomsModal();
-    setTimeout(()=>window.openRoomChat(roomId, subject, code, emojiIdx), 200);
-};
-
-// ── Streaks live watcher (populates both modal) ──
-function watchStreaksLive(){
-    onSnapshot(query(collection(db,'users'),orderBy('streak','desc'),limit(10)),snap=>{
-        const list=$('streaksModalList'); if(!list)return;
-        if(snap.empty){list.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:24px;">No streaks yet 🔥</div>';return;}
-        const cols=['linear-gradient(135deg,#f59e0b,#ef4444)','linear-gradient(135deg,#6a4dff,#4d94ff)','linear-gradient(135deg,#10b981,#22d3ee)','linear-gradient(135deg,#8b5cf6,#ec4899)','linear-gradient(135deg,#0ea5e9,#6a4dff)'];
-        const medals=['🥇','🥈','🥉'];
-        list.innerHTML=snap.docs.map((d,i)=>{
-            const u=d.data(), isMe=CU&&d.id===CU.uid;
-            return `<div class="streak-row">
-                <div style="font-size:18px;min-width:24px;text-align:center;">${medals[i]||'🔥'}</div>
-                <div class="streak-av" style="background:${cols[i%cols.length]};">${(u.displayName||u.email||'U')[0].toUpperCase()}</div>
+function watchFeed(){
+    onSnapshot(query(collection(db,'activity'),orderBy('createdAt','desc'),limit(12)),snap=>{
+        const feed=$('activityFeed'); if(!feed)return;
+        if(snap.empty){feed.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">No activity yet.</div>';return;}
+        const icons={join:'🚪',message:'💬',create:'🏠',match:'🎯',quiz:'📝',xp:'⚡',leave:'👋',videocall:'📹'};
+        feed.innerHTML=snap.docs.map(d=>{
+            const a=d.data();
+            const t=a.createdAt?.toDate?.()?.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})||'just now';
+            return `<div class="activity-item">
+                <div style="font-size:20px;flex-shrink:0;">${icons[a.type]||'📡'}</div>
                 <div style="flex:1;">
-                    <div style="font-size:13px;font-weight:600;color:white;">${esc(u.displayName||u.email?.split('@')[0]||'User')}${isMe?' <span style="font-size:10px;color:rgba(255,255,255,0.35);">(you)</span>':''}</div>
-                    <div style="font-size:11px;color:rgba(255,255,255,0.35);">${esc(u.email?.split('@')[0]||'')}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:16px;font-weight:800;color:var(--orange-glow);">🔥 ${u.streak||0}</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,0.3);">day streak</div>
+                    <div style="font-size:13px;color:white;"><strong>${esc(a.name||'Someone')}</strong> <span style="color:var(--muted);font-weight:400;">${esc(a.detail||'')}</span></div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t}</div>
                 </div>
             </div>`;
         }).join('');
@@ -806,84 +1248,9 @@ function mapSD(d){
     return {uid:d.id,name:u.displayName||u.name||u.email||'User',sub:u.subject||u.subjects?.[0]||'Studying',match:u.matchScore||0,av:(u.displayName||u.name||'U')[0].toUpperCase(),col:u.color||'#4d94ff',matched:u.matched||false};
 }
 
-// ══════════════════════════════════════════════════════════════════════
-// ROOMS MODAL — KPI click handler
-// ══════════════════════════════════════════════════════════════════════
-window.openRoomsModal = function(){
-    const overlay=$('roomsModalOverlay'), modal=$('roomsModal');
-    overlay.style.display='block'; modal.style.display='flex';
-    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
-    // Re-render with current snapshot
-    if(_allRoomsSnap) renderModalRooms(_allRoomsSnap, CU?.uid||null);
-};
-window.closeRoomsModal = function(){
-    const modal=$('roomsModal'), overlay=$('roomsModalOverlay');
-    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
-    setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; },200);
-};
-window.toggleModalCreateRoom = function(){
-    const p=$('modalCreateRoomPanel');
-    if(p.style.display==='none'||!p.style.display){
-        $('modalRoomCode').value='ROOM-'+Math.random().toString(36).substring(2,7).toUpperCase();
-        p.style.display='block';
-    } else { p.style.display='none'; }
-};
-window.joinRoomFromModal = async function(){
-    const code=$('modalJoinRoomCode').value.trim().toUpperCase();
-    if(!code) return;
-    try{
-        const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code)));
-        if(snap.empty){
-            const inp=$('modalJoinRoomCode'); inp.style.borderColor='rgba(255,80,80,0.6)'; inp.placeholder='❌ Not found';
-            setTimeout(()=>{ inp.style.borderColor='rgba(255,255,255,0.1)'; inp.placeholder='Enter Room Code (e.g. ROOM-X7K2P)'; },2000); return;
-        }
-        const d=snap.docs[0], rid=d.id, r=d.data();
-        if(r.status==='ended'){ alert('⛔ This session has been ended by the host.'); return; }
-        if(CU){
-            await updateDoc(doc(db,'rooms',rid),{members:arrayUnion(CU.uid)});
-            await addDoc(collection(db,'rooms/'+rid+'/messages'),{text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
-            await window._log('join','joined room "'+r.subject+'"');
-        }
-        $('modalJoinRoomCode').value='';
-        window.closeRoomsModal();
-        setTimeout(()=>window.openRoomChat(rid,r.subject||'Study Room',r.code||code,0), 200);
-    }catch(e){ alert('Join failed: '+e.message); }
-};
-window.submitCreateRoomFromModal = async function(){
-    if(!CU){ alert('Please log in first.'); return; }
-    const subject=$('modalRoomSubject').value.trim(), code=$('modalRoomCode').value.trim(), max=parseInt($('modalRoomMaxMembers').value)||4;
-    if(!subject){ alert('Enter a subject name.'); return; }
-    const btn=$('modalCreateRoomBtn'); btn.textContent='Creating…'; btn.disabled=true;
-    try{
-        const ref=doc(collection(db,'rooms'));
-        await setDoc(ref,{subject,code,hostUid:CU.uid,hostName:CU.displayName||CU.email,members:[CU.uid],maxMembers:max,mood:74,topic:'',status:'active',createdAt:serverTimestamp(),createdToday:true});
-        await addDoc(collection(db,'rooms/'+ref.id+'/messages'),{text:'🏠 Room "'+subject+'" created! Welcome, say hello 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
-        await window._log('create','created room "'+subject+'" ('+code+')');
-        await updateDoc(doc(db,'users/'+CU.uid),{streak:increment(1)}).catch(()=>{});
-        $('modalRoomSubject').value=''; $('modalCreateRoomPanel').style.display='none';
-        window.closeRoomsModal();
-        setTimeout(()=>window.openRoomChat(ref.id,subject,code,0), 200);
-    }catch(e){ alert('Could not create room: '+e.message); }
-    finally{ btn.textContent='💬 Create & Open Chat'; btn.disabled=false; }
-};
-
-// ══════════════════════════════════════════════════════════════════════
-// STREAKS MODAL — XP KPI click handler
-// ══════════════════════════════════════════════════════════════════════
-window.openStreaksModal = function(){
-    const overlay=$('streaksModalOverlay'), modal=$('streaksModal');
-    overlay.style.display='block'; modal.style.display='flex';
-    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
-};
-window.closeStreaksModal = function(){
-    const modal=$('streaksModal'), overlay=$('streaksModalOverlay');
-    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
-    setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; },200);
-};
-
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // ROOM CHAT
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 window.openRoomChat = async function(roomId, subject, code, emojiIdx){
     if(!CU){ alert('Please log in to chat.'); return; }
     activeRoomId = roomId;
@@ -891,25 +1258,19 @@ window.openRoomChat = async function(roomId, subject, code, emojiIdx){
     $('rmCode').textContent=code;
     $('rmEmoji').textContent=EMOJIS[emojiIdx%EMOJIS.length];
     $('rmSessionLink').href='session.html?room='+roomId;
-
     try {
         const roomSnap = await getDoc(doc(db,'rooms',roomId));
-        const isHost = roomSnap.exists() && roomSnap.data().hostUid === CU.uid;
-        const endBtn  = $('rmEndSessionBtn');
-        const badge   = $('rmHostBadge');
-        if(endBtn) endBtn.style.display = isHost ? 'block' : 'none';
-        if(badge)  badge.style.display  = isHost ? 'inline-block' : 'none';
-    } catch(e){ console.warn('Host check failed:', e); }
-
-    try { await updateDoc(doc(db,'rooms',roomId),{members:arrayUnion(CU.uid)}); } catch(e){}
-
+        const isHost = roomSnap.exists() && roomSnap.data().hostUid===CU.uid;
+        const endBtn=$('rmEndSessionBtn'), badge=$('rmHostBadge');
+        if(endBtn) endBtn.style.display=isHost?'block':'none';
+        if(badge)  badge.style.display=isHost?'inline-block':'none';
+    } catch(e){}
+    try{ await updateDoc(doc(db,'rooms',roomId),{members:arrayUnion(CU.uid)}); }catch(e){}
     const overlay=$('roomChatOverlay'), modal=$('roomChatModal');
     overlay.style.display='block'; modal.style.display='flex';
     requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
-
     if(unsubRoomMsgs){ unsubRoomMsgs(); unsubRoomMsgs=null; }
     if(unsubRoom){ unsubRoom(); unsubRoom=null; }
-
     unsubRoom=onSnapshot(doc(db,'rooms',roomId),async snap=>{
         if(!snap.exists()) return;
         const r=snap.data(), members=r.members||[];
@@ -918,37 +1279,24 @@ window.openRoomChat = async function(roomId, subject, code, emojiIdx){
             let name=uid.substring(0,8)+'…', color='#6a4dff';
             try{ const s=await getDoc(doc(db,'users/'+uid)); if(s.exists()){const u=s.data();name=u.displayName||u.email?.split('@')[0]||uid;color=u.color||'#6a4dff';} }catch(e){}
             const chip=document.createElement('div'); chip.className='rm-member';
-            const isMe=uid===CU.uid;
             chip.innerHTML=`<div class="rm-av" style="background:${color};">${name[0].toUpperCase()}</div>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(name)}${isMe?' <span style="color:rgba(255,255,255,0.3);font-size:10px;">(you)</span>':''}</div>
-                    <div style="display:flex;align-items:center;gap:4px;margin-top:2px;"><div style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></div><span style="font-size:10px;color:rgba(255,255,255,0.3);">online</span></div>
-                </div>`;
+                <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(name)}</div>
+                <div style="display:flex;align-items:center;gap:4px;margin-top:2px;"><div style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></div><span style="font-size:10px;color:rgba(255,255,255,0.3);">online</span></div></div>`;
             ml.appendChild(chip);
         }
         const mood=typeof r.mood==='number'?r.mood:74;
         st('rmMoodPct',mood+'%'); $('rmMoodBar').style.width=mood+'%';
         $('rmMoodPct').style.color=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
-
-        if(r.status === 'ended'){
-            const msgs = $('rmMessages');
+        if(r.status==='ended'){
+            const msgs=$('rmMessages');
             if(msgs){
-                const notice = document.createElement('div');
-                notice.className = 'rm-sys';
-                notice.style.cssText = 'color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);';
-                notice.textContent  = '🛑 The host has ended this session.';
-                msgs.appendChild(notice);
-                msgs.scrollTop = msgs.scrollHeight;
+                const notice=document.createElement('div'); notice.className='rm-sys';
+                notice.style.cssText='color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);';
+                notice.textContent='🛑 The host has ended this session.'; msgs.appendChild(notice); msgs.scrollTop=msgs.scrollHeight;
             }
-            if(CU && r.hostUid !== CU.uid){
-                setTimeout(()=>{
-                    window.closeRoomChat();
-                    showSessionEndedToast(false);
-                }, 2500);
-            }
+            if(CU && r.hostUid!==CU.uid){ setTimeout(()=>{ window.closeRoomChat(); showDashToast('🛑 Host ended the session.'); },2500); }
         }
     });
-
     st('rmChatSub','Connecting…');
     const msgsQ=query(collection(db,'rooms/'+roomId+'/messages'),orderBy('createdAt','asc'),limit(150));
     unsubRoomMsgs=onSnapshot(msgsQ,snap=>{
@@ -974,24 +1322,12 @@ window.sendRoomMessage = async function(){
     const input=$('rmInput'); const text=input.value.trim();
     if(!text||!activeRoomId||!CU) return;
     input.value=''; input.style.height='auto';
-    try {
-        await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{
-            text, senderUid:CU.uid,
-            senderName:CU.displayName||CU.email?.split('@')[0]||'User',
-            createdAt:serverTimestamp(), type:'message'
-        });
-    } catch(e){ console.error('Room send failed:',e); }
+    try{ await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{text,senderUid:CU.uid,senderName:CU.displayName||CU.email?.split('@')[0]||'User',createdAt:serverTimestamp(),type:'message'}); }catch(e){}
 };
-
-window.handleRoomKey = e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendRoomMessage();} };
-window.autoResizeRm  = el=>{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; };
-
-window.voteMood = async val=>{
-    if(!activeRoomId) return;
-    try{ await updateDoc(doc(db,'rooms',activeRoomId),{mood:val}); }catch(e){}
-};
-
-window.closeRoomChat = function(){
+window.handleRoomKey=e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendRoomMessage();} };
+window.autoResizeRm=el=>{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; };
+window.voteMood=async val=>{ if(!activeRoomId) return; try{await updateDoc(doc(db,'rooms',activeRoomId),{mood:val});}catch(e){} };
+window.closeRoomChat=function(){
     const modal=$('roomChatModal'), overlay=$('roomChatOverlay');
     modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
     setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; },280);
@@ -999,63 +1335,77 @@ window.closeRoomChat = function(){
     if(unsubRoom){ unsubRoom(); unsubRoom=null; }
     activeRoomId=null;
     const endBtn=$('rmEndSessionBtn'); if(endBtn) endBtn.style.display='none';
-    const badge=$('rmHostBadge');      if(badge)  badge.style.display='none';
+    const badge=$('rmHostBadge'); if(badge) badge.style.display='none';
 };
 
-window.endSession = async function(){
-    if(!activeRoomId || !CU){ return; }
+window.endSession=async function(){
+    if(!activeRoomId||!CU) return;
     let roomData;
-    try {
-        const snap = await getDoc(doc(db,'rooms',activeRoomId));
-        if(!snap.exists()){ window.closeRoomChat(); return; }
-        roomData = snap.data();
-    } catch(e){ console.error('Host verify failed:',e); return; }
-    if(roomData.hostUid !== CU.uid){ alert('⛔ Only the session host can end this session.'); return; }
-    if(roomData.status === 'ended'){ alert('This session has already been ended.'); window.closeRoomChat(); return; }
-    const ok = confirm('🛑 End session for everyone?\n\nThis will close the room for all members immediately.\nThis cannot be undone.');
-    if(!ok) return;
-    try {
+    try{ const snap=await getDoc(doc(db,'rooms',activeRoomId)); if(!snap.exists()){window.closeRoomChat();return;} roomData=snap.data(); }catch(e){return;}
+    if(roomData.hostUid!==CU.uid){ alert('⛔ Only the session host can end this session.'); return; }
+    if(roomData.status==='ended'){ window.closeRoomChat(); return; }
+    if(!confirm('🛑 End session for everyone?\n\nThis will close the room for all members immediately.')) return;
+    try{
         await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{text:'🛑 The host ended this session. Thanks for studying together! 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
         await updateDoc(doc(db,'rooms',activeRoomId),{status:'ended',endedAt:serverTimestamp(),endedBy:CU.uid});
         await window._log('leave','ended session "'+(roomData.subject||'Room')+'" (host)');
-    } catch(e){ console.error('endSession failed:',e); alert('Could not end session: '+e.message); return; }
+    }catch(e){ alert('Could not end session: '+e.message); return; }
     window.closeRoomChat();
-    showSessionEndedToast(true);
+    showDashToast('🛑 You ended the session.');
 };
 
-function showSessionEndedToast(isHost){
-    const existing=document.getElementById('_sessionEndToast');
-    if(existing) existing.remove();
-    const t=document.createElement('div');
-    t.id='_sessionEndToast';
-    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(0);background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(17,17,24,0.98));border:1px solid rgba(239,68,68,0.4);color:#f87171;padding:13px 28px;border-radius:14px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.8);pointer-events:none;';
-    t.textContent = isHost ? '🛑 You ended the session.' : '🛑 Host ended the session.';
-    document.body.appendChild(t);
-    setTimeout(()=>{t.style.transition='opacity 0.4s,transform 0.4s';t.style.opacity='0';t.style.transform='translateX(-50%) translateY(30px)';setTimeout(()=>t.remove(),450);},3500);
-}
+window.submitCreateRoom=async function(){
+    if(!CU){ alert('Please log in first.'); return; }
+    const subject=$('roomSubject').value.trim(), code=$('roomCode').value.trim(), max=parseInt($('roomMaxMembers').value)||4;
+    if(!subject){ alert('Enter a subject name.'); return; }
+    const btn=$('createRoomBtn'); btn.textContent='Creating…'; btn.disabled=true;
+    try{
+        const ref=doc(collection(db,'rooms'));
+        await setDoc(ref,{subject,code,hostUid:CU.uid,hostName:CU.displayName||CU.email,members:[CU.uid],maxMembers:max,mood:74,topic:'',status:'active',createdAt:serverTimestamp(),createdToday:true});
+        await addDoc(collection(db,'rooms/'+ref.id+'/messages'),{text:'🏠 Room "'+subject+'" created! Welcome, say hello 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+        await window._log('create','created room "'+subject+'" ('+code+')');
+        await updateDoc(doc(db,'users/'+CU.uid),{streak:increment(1)}).catch(()=>{});
+        closeCreateRoom();
+        window.openRoomChat(ref.id,subject,code,0);
+    }catch(e){ alert('Could not create room: '+e.message); }
+    finally{ btn.textContent='💬 Create & Open Chat'; btn.disabled=false; }
+};
+
+window.joinRoom=async function(){
+    const code=$('joinRoomCode').value.trim().toUpperCase();
+    if(!code) return;
+    try{
+        const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code)));
+        if(snap.empty){ const inp=$('joinRoomCode'); inp.style.borderColor='rgba(255,80,80,0.6)'; inp.placeholder='❌ Not found'; setTimeout(()=>{ inp.style.borderColor='rgba(255,255,255,0.1)'; inp.placeholder='Enter Room Code (e.g. ROOM-X7K2P)'; },2000); return; }
+        const d=snap.docs[0], rid=d.id, r=d.data();
+        if(r.status==='ended'){ alert('⛔ This session has been ended by the host.'); return; }
+        if(CU){
+            await updateDoc(doc(db,'rooms',rid),{members:arrayUnion(CU.uid)});
+            await addDoc(collection(db,'rooms/'+rid+'/messages'),{text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+            await window._log('join','joined room "'+r.subject+'"');
+        }
+        $('joinRoomCode').value='';
+        window.openRoomChat(rid,r.subject||'Study Room',r.code||code,0);
+    }catch(e){ alert('Join failed: '+e.message); }
+};
 
 // ══════════════════════════════════════════
 // DM CHAT
 // ══════════════════════════════════════════
-window.openChat = async function(peerUid, peerName, peerAv, peerCol, peerSub){
+window.openChat=async function(peerUid,peerName,peerAv,peerCol,peerSub){
     if(!CU){ alert('Please log in to message.'); return; }
-    if(peerUid===CU.uid){ return; }
+    if(peerUid===CU.uid) return;
     if(unsubDM){ unsubDM(); unsubDM=null; }
-    activeDMPeer = { uid:peerUid, name:peerName, av:peerAv, col:peerCol, sub:peerSub||'Studying' };
-    activeDMSessionId = dmSessionId(CU.uid, peerUid);
-    const avatar=$('chatAvatar');
-    avatar.textContent=peerAv; avatar.style.background=peerCol;
+    activeDMPeer={uid:peerUid,name:peerName,av:peerAv,col:peerCol,sub:peerSub||'Studying'};
+    activeDMSessionId=dmSessionId(CU.uid,peerUid);
+    const avatar=$('chatAvatar'); avatar.textContent=peerAv; avatar.style.background=peerCol;
     st('chatName',peerName); st('chatSub',peerSub||'Studying');
-    const w=$('chatWindow');
-    w.style.display='flex';
+    const w=$('chatWindow'); w.style.display='flex';
     requestAnimationFrame(()=>{ w.style.opacity='1'; w.style.transform='translateY(0)'; });
     $('chatInput').value='';
     $('chatMessages').innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:30px;">Loading…</div>';
     const sessionRef=doc(db,'sessions',activeDMSessionId);
-    try{
-        const snap=await getDoc(sessionRef);
-        if(!snap.exists()){ await setDoc(sessionRef,{participants:[CU.uid,peerUid],type:'dm',createdAt:serverTimestamp()}); }
-    }catch(e){ console.error('Session create failed:',e); }
+    try{ const snap=await getDoc(sessionRef); if(!snap.exists()){ await setDoc(sessionRef,{participants:[CU.uid,peerUid],type:'dm',createdAt:serverTimestamp()}); } }catch(e){}
     const msgsQ=query(collection(db,'sessions',activeDMSessionId,'messages'),orderBy('createdAt','asc'),limit(100));
     unsubDM=onSnapshot(msgsQ,snap=>{
         const c=$('chatMessages');
@@ -1070,27 +1420,20 @@ window.openChat = async function(peerUid, peerName, peerAv, peerCol, peerSub){
             c.appendChild(wrap);
         });
         c.scrollTop=c.scrollHeight;
-    }, err=>{ console.error('DM listen error:',err); });
+    });
     closeSocialModal();
     window._log('message','opened DM with '+peerName);
 };
 
-window.sendDM = async function(){
+window.sendDM=async function(){
     const input=$('chatInput'); const text=input.value.trim();
     if(!text||!activeDMSessionId||!CU) return;
     input.value=''; input.style.height='auto';
-    try{
-        await addDoc(collection(db,'sessions',activeDMSessionId,'messages'),{
-            text, senderUid:CU.uid,
-            senderName:CU.displayName||CU.email?.split('@')[0]||'User',
-            createdAt:serverTimestamp()
-        });
-    }catch(e){ console.error('DM send failed:',e); }
+    try{ await addDoc(collection(db,'sessions',activeDMSessionId,'messages'),{text,senderUid:CU.uid,senderName:CU.displayName||CU.email?.split('@')[0]||'User',createdAt:serverTimestamp()}); }catch(e){}
 };
 
-window.closeChatWindow = function(){
-    const w=$('chatWindow');
-    w.style.opacity='0'; w.style.transform='translateY(30px)';
+window.closeChatWindow=function(){
+    const w=$('chatWindow'); w.style.opacity='0'; w.style.transform='translateY(30px)';
     setTimeout(()=>{ w.style.display='none'; },220);
     if(unsubDM){ unsubDM(); unsubDM=null; }
     activeDMSessionId=null; activeDMPeer=null;
@@ -1099,39 +1442,30 @@ window.closeChatWindow = function(){
 // ══════════════════════════════════════════
 // WEBRTC VIDEO CALL
 // ══════════════════════════════════════════
-function showVideoModal(peerName, peerAv, peerCol){
-    st('vcTitle','📹 Video Call with '+peerName);
-    st('vcTimer','Connecting…');
-    st('vcPeerName',peerName);
-    st('vcWaitText','Waiting for camera…');
-    $('vcPeerAvatar').textContent=peerAv;
-    $('vcPeerAvatar').style.background=peerCol;
-    $('vcWaiting').style.display='flex';
-    $('remoteVideo').style.display='block';
-    $('localVideo').style.display='block';
-    $('localVideoOff').style.display='none';
-    $('btnMic').classList.remove('vc-btn-off');
-    $('btnCam').classList.remove('vc-btn-off');
-    $('btnScreen').classList.remove('vc-btn-off');
+function showVideoModal(peerName,peerAv,peerCol){
+    st('vcTitle','📹 Video Call with '+peerName); st('vcTimer','Connecting…');
+    st('vcPeerName',peerName); st('vcWaitText','Waiting for camera…');
+    $('vcPeerAvatar').textContent=peerAv; $('vcPeerAvatar').style.background=peerCol;
+    $('vcWaiting').style.display='flex'; $('remoteVideo').style.display='block';
+    $('localVideo').style.display='block'; $('localVideoOff').style.display='none';
+    $('btnMic').classList.remove('vc-btn-off'); $('btnCam').classList.remove('vc-btn-off'); $('btnScreen').classList.remove('vc-btn-off');
     const overlay=$('videoOverlay'), modal=$('videoModal');
     overlay.style.display='block'; modal.style.display='flex';
     requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
 }
 
-window.startVideoCall = async function(){
+window.startVideoCall=async function(){
     if(!CU){ alert('Please log in first.'); return; }
     if(!activeDMPeer){ alert('Open a DM chat first.'); return; }
     const peer=activeDMPeer;
-    try { localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }
-    catch(e){ alert('Camera/microphone permission denied.\n\n'+e.message); return; }
+    try{ localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }catch(e){ alert('Camera/microphone permission denied.\n\n'+e.message); return; }
     showVideoModal(peer.name,peer.av,peer.col);
     $('localVideo').srcObject=localStream;
     const callRef=doc(collection(db,'videoCalls'));
     activeCallId=callRef.id;
     peerConnection=new RTCPeerConnection(ICE_SERVERS);
     localStream.getTracks().forEach(track=>peerConnection.addTrack(track,localStream));
-    remoteStream=new MediaStream();
-    $('remoteVideo').srcObject=remoteStream;
+    remoteStream=new MediaStream(); $('remoteVideo').srcObject=remoteStream;
     peerConnection.ontrack=e=>{ e.streams[0].getTracks().forEach(track=>remoteStream.addTrack(track)); $('vcWaiting').style.display='none'; startCallTimer(); };
     peerConnection.onicecandidate=async e=>{ if(!e.candidate)return; try{await addDoc(collection(db,'videoCalls',activeCallId,'callerCandidates'),e.candidate.toJSON());}catch(err){} };
     const offer=await peerConnection.createOffer();
@@ -1143,42 +1477,35 @@ window.startVideoCall = async function(){
         if(data.answer&&peerConnection.signalingState==='have-local-offer'){ try{await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));}catch(e){} }
         if(data.status==='ended'||data.status==='declined') hangUp(false);
     });
-    onSnapshot(collection(db,'videoCalls',activeCallId,'calleeCandidates'),snap=>{
-        snap.docChanges().forEach(async change=>{ if(change.type==='added') try{await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));}catch(e){} });
-    });
+    onSnapshot(collection(db,'videoCalls',activeCallId,'calleeCandidates'),snap=>{ snap.docChanges().forEach(async change=>{ if(change.type==='added') try{await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));}catch(e){} }); });
     window._log('videocall','started a video call with '+peer.name);
     st('vcWaitText','Ringing '+peer.name+'…');
 };
 
 function listenForIncomingCalls(uid){
     onSnapshot(query(collection(db,'videoCalls'),where('calleeUid','==',uid),where('status','==','ringing')),snap=>{
-        snap.docChanges().forEach(change=>{ if(change.type==='added') showIncomingCall(change.doc.id,change.doc.data()); });
+        snap.docChanges().forEach(change=>{ if(change.type==='added') showIncomingVideoCall(change.doc.id,change.doc.data()); });
     });
 }
 
-function showIncomingCall(callId,data){
+function showIncomingVideoCall(callId,data){
     pendingCallData={callId,data};
-    const av=$('incomingAvatar');
-    av.textContent=data.callerAv||'?'; av.style.background=data.callerCol||'#6a4dff';
+    const av=$('incomingAvatar'); av.textContent=data.callerAv||'?'; av.style.background=data.callerCol||'#6a4dff';
     st('incomingName',data.callerName||'Someone');
-    const toast=$('incomingCallToast');
-    toast.style.display='block';
+    const toast=$('incomingCallToast'); toast.style.display='block';
     requestAnimationFrame(()=>{ toast.style.transform='translateX(-50%) translateY(0)'; });
     setTimeout(()=>{ if(pendingCallData?.callId===callId) declineCall(); },30000);
 }
 
-function hideIncomingToast(){
-    const toast=$('incomingCallToast');
-    toast.style.transform='translateX(-50%) translateY(80px)';
-    setTimeout(()=>{ toast.style.display='none'; },400);
-    pendingCallData=null;
+function hideCallToast(){
+    const toast=$('incomingCallToast'); toast.style.transform='translateX(-50%) translateY(80px)';
+    setTimeout(()=>{ toast.style.display='none'; },400); pendingCallData=null;
 }
 
 window.acceptCall=async function(){
     if(!pendingCallData)return;
-    const{callId,data}=pendingCallData; hideIncomingToast(); activeCallId=callId;
-    try{ localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }
-    catch(e){ alert('Camera/microphone permission denied.\n\n'+e.message); await updateDoc(doc(db,'videoCalls',callId),{status:'declined'}); return; }
+    const{callId,data}=pendingCallData; hideCallToast(); activeCallId=callId;
+    try{ localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }catch(e){ alert('Camera/microphone permission denied.'); await updateDoc(doc(db,'videoCalls',callId),{status:'declined'}); return; }
     showVideoModal(data.callerName,data.callerAv,data.callerCol);
     $('localVideo').srcObject=localStream; st('vcWaitText','Connecting…');
     peerConnection=new RTCPeerConnection(ICE_SERVERS);
@@ -1192,12 +1519,11 @@ window.acceptCall=async function(){
     await updateDoc(doc(db,'videoCalls',callId),{answer:{type:answer.type,sdp:answer.sdp},status:'active'});
     onSnapshot(collection(db,'videoCalls',callId,'callerCandidates'),snap=>{ snap.docChanges().forEach(async change=>{ if(change.type==='added') try{await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));}catch(e){} }); });
     unsubCallSignal=onSnapshot(doc(db,'videoCalls',callId),snap=>{ if(!snap.exists())return; if(snap.data().status==='ended') hangUp(false); });
-    window._log('videocall','accepted a video call from '+data.callerName);
 };
 
 window.declineCall=async function(){
     if(!pendingCallData)return;
-    const{callId}=pendingCallData; hideIncomingToast();
+    const{callId}=pendingCallData; hideCallToast();
     try{await updateDoc(doc(db,'videoCalls',callId),{status:'declined'});}catch(e){}
 };
 
@@ -1235,7 +1561,7 @@ window.toggleScreen=async function(){
             if(sender)await sender.replaceTrack(screenTrack);
             $('localVideo').srcObject=ss; $('btnScreen').classList.add('vc-btn-off'); $('btnScreen').textContent='🖥️✓'; screenSharing=true;
             screenTrack.onended=()=>{ stopScreenShare(); };
-        }catch(e){console.log('Screen share cancelled:',e.message);}
+        }catch(e){ console.log('Screen share cancelled.'); }
     } else { stopScreenShare(); }
 };
 async function stopScreenShare(){
@@ -1265,7 +1591,7 @@ window.sendInCallMsg=async function(){
 // ══════════════════════════════════════════
 window._sf=[]; window._sw=[]; window._cst='followers';
 
-window.renderUsers = function(users){
+window.renderUsers=function(users){
     const list=$('socialUserList'), count=$('socialCount'), tab=window._cst;
     count.textContent=users.length?users.length+' '+(tab==='followers'?'follower'+(users.length>1?'s':''):'following'):'';
     if(!users.length){ list.innerHTML='<div style="text-align:center;padding:44px 20px;color:rgba(255,255,255,0.25);font-size:13px;">😶 No users found</div>'; return; }
@@ -1282,7 +1608,7 @@ window.renderUsers = function(users){
                 ${isSelf
                     ?'<span style="font-size:11px;color:var(--muted);padding:6px 10px;">You</span>'
                     :`<button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">💬 Chat</button>
-                      <button class="btn-vid" title="Start video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
+                      <button class="btn-vid" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
                 }
             </div>
         </div>`;
@@ -1290,7 +1616,6 @@ window.renderUsers = function(users){
 };
 </script>
 
-<!-- NON-MODULE: UI helpers -->
 <script>
 function openSocialModal(tab){
     window._cst=tab;
@@ -1325,15 +1650,24 @@ function filterUsers(){
     const src=window._cst==='followers'?(window._sf||[]):(window._sw||[]);
     window.renderUsers(src.filter(u=>u.name.toLowerCase().includes(q)||u.sub.toLowerCase().includes(q)));
 }
+function openCreateRoom(){
+    const p=document.getElementById('createRoomPanel');
+    document.getElementById('roomCode').value='ROOM-'+Math.random().toString(36).substring(2,7).toUpperCase();
+    p.style.display=p.style.display==='none'?'block':'none';
+}
+function closeCreateRoom(){
+    document.getElementById('createRoomPanel').style.display='none';
+    document.getElementById('roomSubject').value='';
+}
 function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendDM();} }
 function autoResizeInput(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
 document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
         closeSocialModal();
-        window.closeRoomsModal?.();
-        window.closeStreaksModal?.();
         if(typeof window.closeChatWindow==='function') window.closeChatWindow();
         if(typeof window.closeRoomChat==='function') window.closeRoomChat();
+        document.getElementById('invitePopupOverlay')?.classList.remove('show');
+        document.getElementById('inviteSuccessPopup')?.classList.remove('show');
     }
 });
 </script>
@@ -1358,31 +1692,15 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     window.applyTheme=function(mode){
         const vars=mode==='dark'?DARK:LIGHT;
         const root=document.documentElement;
-        const body=document.body;
         Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-        root.setAttribute('data-theme',mode);
-        root.style.setProperty('background',vars['--bg'],'important');
-        root.style.setProperty('color',vars['--text'],'important');
-        body.style.setProperty('background',vars['--bg'],'important');
-        body.style.setProperty('color',vars['--text'],'important');
-        const isLight=mode==='light';
-        document.querySelectorAll('.kpi-card,.card,.room-live-card,.partner-chip').forEach(el=>{
-            el.style.background=isLight?'#ffffff':'';
-            el.style.borderColor=isLight?'#e2e8f0':'';
-            el.style.color=isLight?'#0f172a':'';
-        });
-        const nav=document.getElementById('main-nav');
-        if(nav){
-            nav.style.background=isLight?'rgba(255,255,255,0.92)':'rgba(7,7,13,0.85)';
-            nav.style.borderBottomColor=isLight?'#e2e8f0':'rgba(255,255,255,0.06)';
-        }
-        document.querySelectorAll('.nav-link').forEach(a=>{ a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#475569'):''; });
-        document.querySelectorAll('.kpi-value').forEach(el=>{ el.style.color=''; });
-        document.querySelectorAll('.section-tag,.kpi-label,.kpi-delta').forEach(el=>{ el.style.color=isLight?'#64748b':''; });
-        const btnD=document.getElementById('btn-dark'), btnL=document.getElementById('btn-light'), lbl=document.getElementById('theme-row-label');
+        document.body.style.setProperty('background',vars['--bg'],'important');
+        document.body.style.setProperty('color',vars['--text'],'important');
+        const btnD=document.getElementById('btn-dark');
+        const btnL=document.getElementById('btn-light');
+        const lbl=document.getElementById('theme-row-label');
         if(btnD) btnD.classList.toggle('active',mode==='dark');
         if(btnL) btnL.classList.toggle('active',mode==='light');
-        if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
+        if(lbl)  lbl.textContent=mode==='light'?'☀️ Theme':'🌙 Theme';
         localStorage.setItem('ss-theme',mode);
     };
     window.applyTheme(localStorage.getItem('ss-theme')||'dark');
@@ -1401,6 +1719,7 @@ mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
     mobDrawer.classList.remove('open');
 }));
 </script>
+<script src="notify.js" type="module"></script>
+
 </body>
 </html>
-
