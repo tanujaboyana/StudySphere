@@ -251,10 +251,9 @@
     </div>
 </div>
 
-<!-- ════ LIVE ROOMS MODAL (KPI click) ════ -->
+<!-- ════ LIVE ROOMS MODAL ════ -->
 <div id="roomsModalOverlay" onclick="closeRoomsModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
 <div id="roomsModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(520px,93vw);max-height:85vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
-    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:10px;">
             <span style="font-size:20px;">🏠</span>
@@ -268,7 +267,6 @@
             <button onclick="closeRoomsModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
         </div>
     </div>
-    <!-- Join by code -->
     <div style="padding:14px 18px 0;flex-shrink:0;">
         <div style="display:flex;gap:8px;">
             <input id="joinRoomCodeModal" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)"
@@ -276,7 +274,6 @@
             <button onclick="joinRoomModal()" style="background:rgba(77,148,255,0.15);border:1px solid rgba(77,148,255,0.35);color:#80b3ff;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Join →</button>
         </div>
     </div>
-    <!-- Create panel (hidden by default) -->
     <div id="createRoomPanelModal" style="display:none;padding:14px 18px 0;flex-shrink:0;">
         <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.08);">
             <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">New Room</div>
@@ -291,13 +288,12 @@
             </div>
         </div>
     </div>
-    <!-- Rooms list -->
     <div id="roomsModalList" style="flex:1;overflow-y:auto;padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px;">Loading rooms…</div>
     </div>
 </div>
 
-<!-- ════ XP / STREAKS MODAL (KPI click) ════ -->
+<!-- ════ XP / STREAKS MODAL ════ -->
 <div id="xpModalOverlay" onclick="closeXpModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
 <div id="xpModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(460px,93vw);max-height:85vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
@@ -310,7 +306,6 @@
         </div>
         <button onclick="closeXpModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
     </div>
-    <!-- My Goals -->
     <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
         <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Weekly Goals</div>
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.5);">Study Hours</span><span id="xpGoalHoursPct" style="color:#22d3ee;">—</span></div>
@@ -320,7 +315,6 @@
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.5);">Quiz Score Avg</span><span id="xpGoalQuizPct" style="color:#f59e0b;">—</span></div>
         <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;"><div id="xpGoalQuizBar" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:3px;transition:width 1s;"></div></div>
     </div>
-    <!-- Streaks leaderboard -->
     <div style="flex:1;overflow-y:auto;padding:16px 20px 20px;">
         <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">🔥 Streak Leaderboard</div>
         <div id="xpStreakList" style="display:flex;flex-direction:column;gap:8px;">
@@ -337,7 +331,12 @@
             <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
             <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
         </div>
-        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <button onclick="closeSocialModal();setTimeout(window.openBlockedList,180)" title="Manage blocked users"
+              style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;"
+              onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">🚫 Blocked</button>
+            <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+        </div>
     </div>
     <div style="padding:14px 18px 10px;">
         <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…"
@@ -345,6 +344,172 @@
     </div>
     <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
     <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     FEEDBACK OVERLAY & MODAL (no Firebase — localStorage)
+════════════════════════════════════════════════════ -->
+<div id="feedbackOverlay" onclick="closeFeedback()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(12px);z-index:15000;"></div>
+
+<div id="feedbackModal" role="dialog" aria-modal="true" aria-label="Feedback" style="
+    display:none;position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0.94);
+    width:min(480px,94vw);
+    border-radius:24px;z-index:15001;
+    background:linear-gradient(160deg,#0c0c1e 0%,#111128 100%);
+    border:1px solid rgba(109,40,217,0.3);
+    box-shadow:0 60px 160px rgba(0,0,0,0.95),0 0 0 1px rgba(77,148,255,0.07),0 0 80px rgba(109,40,217,0.07);
+    opacity:0;overflow:hidden;
+    transition:all 0.38s cubic-bezier(.34,1.56,.64,1);">
+
+  <!-- shimmer top bar (injected via CSS) -->
+
+  <!-- FORM VIEW -->
+  <div id="fbForm">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 0;">
+      <div>
+        <div id="fbTitle" style="font-size:17px;font-weight:800;color:white;margin-bottom:4px;line-height:1.3;">How was your experience? 🌟</div>
+        <div id="fbSub"   style="font-size:12px;color:rgba(255,255,255,0.38);">Your feedback helps improve StudySphere</div>
+      </div>
+      <button onclick="closeFeedback()" aria-label="Close"
+        style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:12px;display:flex;align-items:center;justify-content:center;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">✕</button>
+    </div>
+    <div id="fbCtxPill" style="display:none;margin:12px 24px 0;display:none;align-items:center;gap:7px;padding:5px 13px;border-radius:20px;background:rgba(109,40,217,0.12);border:1px solid rgba(109,40,217,0.28);font-size:11px;color:#c4b5fd;font-weight:600;width:fit-content;"></div>
+
+    <!-- Mood -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.32);font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;">Overall mood</div>
+      <div id="fbMoods" style="display:flex;gap:10px;justify-content:center;margin-bottom:4px;">
+        <span class="fb-mood" data-val="1" title="Terrible"  onclick="selectMood(this)">😤</span>
+        <span class="fb-mood" data-val="2" title="Not great" onclick="selectMood(this)">😕</span>
+        <span class="fb-mood" data-val="3" title="Okay"      onclick="selectMood(this)">😐</span>
+        <span class="fb-mood" data-val="4" title="Good"      onclick="selectMood(this)">😊</span>
+        <span class="fb-mood" data-val="5" title="Amazing"   onclick="selectMood(this)">🤩</span>
+      </div>
+    </div>
+
+    <!-- Stars -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.32);font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;">Star rating</div>
+      <div id="fbStars" style="display:flex;gap:8px;">
+        <span class="fb-star" data-val="1" onmouseenter="hoverStars(1)" onmouseleave="resetStarHover()" onclick="selectStars(1)">★</span>
+        <span class="fb-star" data-val="2" onmouseenter="hoverStars(2)" onmouseleave="resetStarHover()" onclick="selectStars(2)">★</span>
+        <span class="fb-star" data-val="3" onmouseenter="hoverStars(3)" onmouseleave="resetStarHover()" onclick="selectStars(3)">★</span>
+        <span class="fb-star" data-val="4" onmouseenter="hoverStars(4)" onmouseleave="resetStarHover()" onclick="selectStars(4)">★</span>
+        <span class="fb-star" data-val="5" onmouseenter="hoverStars(5)" onmouseleave="resetStarHover()" onclick="selectStars(5)">★</span>
+      </div>
+      <div id="fbStarLabel" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;height:16px;transition:opacity .2s;"></div>
+    </div>
+
+    <!-- Tags -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.32);font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;">What stood out? <span style="opacity:.5;font-size:9px;">(pick any)</span></div>
+      <div id="fbTags" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
+    </div>
+
+    <!-- Comment -->
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.32);font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:8px;">Tell us more <span style="opacity:.5;font-size:9px;">(optional)</span></div>
+      <textarea id="fbComment" rows="3" placeholder="What could we improve? What did you love?…" maxlength="400"
+        style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:12px 16px;font-size:13px;outline:none;resize:none;font-family:inherit;line-height:1.5;transition:border-color .2s;"
+        onfocus="this.style.borderColor='rgba(109,40,217,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+        oninput="document.getElementById('fbCharCount').textContent=this.value.length+' / 400';document.getElementById('fbCharCount').style.color=this.value.length>350?'#f87171':'rgba(255,255,255,0.2)';"></textarea>
+      <div id="fbCharCount" style="text-align:right;font-size:10px;color:rgba(255,255,255,0.2);margin-top:4px;">0 / 400</div>
+    </div>
+
+    <div style="display:flex;gap:10px;padding:20px 24px 24px;margin-top:6px;">
+      <button onclick="closeFeedback()"
+        style="padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:rgba(255,255,255,0.35);border-radius:14px;font-size:13px;cursor:pointer;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Skip</button>
+      <button id="fbSubmitBtn" onclick="submitFeedback()" disabled
+        style="flex:1;padding:12px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s;box-shadow:0 4px 20px rgba(106,77,255,0.35);"
+        onmouseover="if(!this.disabled){this.style.transform='translateY(-1px)';this.style.boxShadow='0 7px 28px rgba(106,77,255,0.5)';}"
+        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(106,77,255,0.35)';">Submit Feedback</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS VIEW -->
+  <div id="fbSuccess" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;">
+    <div id="fbSuccessIcon" style="font-size:52px;margin-bottom:16px;">🎉</div>
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:8px;">Thanks for your feedback!</div>
+    <div id="fbSuccessMsg" style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;">Your response has been saved locally.<br>We'll use it to make StudySphere better for you.</div>
+    <div id="fbXpReward" style="display:none;margin-top:16px;padding:10px 20px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;font-size:13px;color:#fbbf24;font-weight:700;">⚡ +10 XP earned for feedback!</div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="fbHistory" style="display:none;padding:0 0 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px;">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:white;margin-bottom:3px;">📋 Your Feedback History</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.38);">Stored locally on this device</div>
+      </div>
+      <button onclick="closeFeedback()"
+        style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="fbHistoryList" style="padding:0 24px;max-height:360px;overflow-y:auto;"></div>
+    <div style="padding:14px 24px 0;display:flex;gap:8px;">
+      <button onclick="showFbForm()" style="flex:1;padding:10px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ New Feedback</button>
+      <button onclick="clearFeedbackHistory()"
+        style="padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:12px;font-size:12px;cursor:pointer;">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BLOCK CONFIRM MODAL ════ -->
+<div id="blockOverlay" onclick="closeBlockModal()"></div>
+
+<div id="blockModal">
+  <div style="padding:28px 24px 24px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+      <div id="blockTargetAvatar" style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;flex-shrink:0;border:2px solid rgba(239,68,68,0.4);"></div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:white;margin-bottom:3px;">Block <span id="blockTargetName" style="color:#f87171;"></span>?</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.38);line-height:1.5;">They won't be able to message you or see your profile.</div>
+      </div>
+    </div>
+    <!-- What blocking does -->
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:14px;padding:14px 16px;margin-bottom:20px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">What happens when you block</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.55);">
+          <span style="color:#f87171;font-size:14px;">🚫</span> They can no longer message or DM you
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.55);">
+          <span style="color:#f87171;font-size:14px;">🙈</span> They're hidden from your followers/following lists
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.55);">
+          <span style="color:#f87171;font-size:14px;">📵</span> No video calls or invitations from them
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.55);">
+          <span style="color:#22c55e;font-size:14px;">↩️</span> You can unblock them anytime
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeBlockModal()"
+        style="flex:1;padding:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);border-radius:13px;font-size:13px;cursor:pointer;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,0.09)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">Cancel</button>
+      <button id="blockConfirmBtn" onclick="confirmBlock()"
+        style="flex:1;padding:11px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;border-radius:13px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(239,68,68,0.4);transition:transform .15s,box-shadow .15s;"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 7px 24px rgba(239,68,68,0.55)'"
+        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 18px rgba(239,68,68,0.4)'">🚫 Block User</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BLOCKED USERS LIST MODAL ════ -->
+<div id="blockedListOverlay" onclick="closeBlockedList()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(12px);z-index:16000;"></div>
+<div id="blockedListModal">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 22px 14px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+    <div>
+      <div style="font-size:15px;font-weight:800;color:white;margin-bottom:3px;">🚫 Blocked Users</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);">Users you've restricted</div>
+    </div>
+    <button onclick="closeBlockedList()"
+      style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+  </div>
+  <div id="blockedListBody" style="flex:1;overflow-y:auto;padding:10px 0 16px;"></div>
 </div>
 
 <!-- ════════════════════════════════════════════════════
@@ -369,26 +534,44 @@
 
     <!-- KPI GRID -->
     <div class="kpi-grid">
-      <!-- 🏠 Active Study Rooms — opens Rooms Modal -->
+      <!-- Active Study Rooms -->
       <div class="kpi-card" onclick="openRoomsModal()" style="cursor:pointer;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div>
         <div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div>
         <div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div>
       </div>
-      <!-- ⚡ Weekly XP — opens XP/Streaks Modal -->
+      <!-- Weekly XP -->
       <div class="kpi-card" onclick="openXpModal()" style="cursor:pointer;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div>
         <div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div>
         <div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div>
       </div>
-      <!-- <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Group Mood Score</span><span style="font-size:22px;">🧠</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMood">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMoodSub">Loading…</div></div>
-       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Match Compatibility</span><span style="font-size:22px;">🎯</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMatch">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMatchSub">Loading…</div></div> -->
+      <!-- People Matched -->
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">People Matched</span><span style="font-size:22px;">👥</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div></div>
-      <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;">
+      <!-- Followers — WITH feedback button -->
+      <div class="kpi-card" onclick="openSocialModal('followers')" style="cursor:pointer;position:relative;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Followers</span><span style="font-size:22px;">👤</span></div>
         <div class="kpi-value" style="color:var(--teal-glow);" id="kpiFollowers">—</div>
-        <div style="font-size:11px;color:var(--green-glow);" id="kpiFollowersSub">Loading…</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:2px;">
+          <div style="font-size:11px;color:var(--green-glow);" id="kpiFollowersSub">Loading…</div>
+          <!-- ★ FEEDBACK BUTTON -->
+          <button id="fbFollowersBtn"
+            onclick="event.stopPropagation(); openFeedback({
+              context:'followers',
+              title:'Rate your community 🌟',
+              subtitle:'How\'s your StudySphere experience so far?',
+              contextLabel:'👤 Followers & Community',
+              tags:['Great community','Very helpful','Active peers','Need more matches','Love the vibe','Could be better']
+            })"
+            style="position:relative;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s;white-space:nowrap;"
+            onmouseover="this.style.background='rgba(245,158,11,0.22)';this.style.color='white';"
+            onmouseout="this.style.background='rgba(245,158,11,0.1)';this.style.color='#fbbf24';">
+            ⭐ Feedback
+            <span id="fbFollowersBadge" style="display:none;position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:9px;font-weight:800;color:white;align-items:center;justify-content:center;border:2px solid var(--card,#13131f);">!</span>
+          </button>
+        </div>
       </div>
+      <!-- Following -->
       <div class="kpi-card" onclick="openSocialModal('following')" style="cursor:pointer;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Following</span><span style="font-size:22px;">🔄</span></div>
         <div class="kpi-value" style="color:var(--orange-glow);" id="kpiFollowing">—</div>
@@ -431,11 +614,67 @@
 </div>
 
 <style>
+/* ── Feedback shimmer top bar ── */
+#feedbackModal::before {
+  content:''; display:block; height:3px;
+  background:linear-gradient(90deg,#6a4dff,#00c9a7,#4d94ff,#f59e0b);
+  background-size:200% 100%;
+  animation:fbShimmer 2.5s linear infinite;
+}
+@keyframes fbShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+#feedbackModal.fb-open { opacity:1!important; transform:translate(-50%,-50%) scale(1)!important; }
+
+/* Mood emoji */
+.fb-mood {
+  font-size:26px; cursor:pointer; padding:7px; border-radius:12px;
+  border:2px solid transparent; transition:all .15s; user-select:none;
+}
+.fb-mood:hover  { background:rgba(255,255,255,0.06); transform:scale(1.1); }
+.fb-mood.active { border-color:rgba(109,40,217,0.6); background:rgba(109,40,217,0.12); transform:scale(1.12); }
+
+/* Star */
+.fb-star {
+  font-size:28px; cursor:pointer;
+  filter:grayscale(1) opacity(0.35);
+  transition:filter .15s, transform .15s; user-select:none;
+}
+.fb-star:hover,.fb-star.lit { filter:grayscale(0) opacity(1); transform:scale(1.15); }
+.fb-star.lit { animation:fbStarPop .25s ease; }
+@keyframes fbStarPop { 0%{transform:scale(1.15)} 50%{transform:scale(1.35)} 100%{transform:scale(1.15)} }
+
+/* Quick tag */
+.fb-tag {
+  padding:5px 13px; border-radius:20px; font-size:12px; font-weight:600;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.5); cursor:pointer; transition:all .15s;
+}
+.fb-tag:hover  { background:rgba(77,148,255,0.12); border-color:rgba(77,148,255,0.35); color:#80b3ff; }
+.fb-tag.active { background:rgba(77,148,255,0.18); border-color:rgba(77,148,255,0.55); color:white; }
+
+/* History row */
+.fb-hist-row {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 13px; border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:6px; font-size:12px;
+}
+
+/* Nudge badge pulse */
+#fbFollowersBadge { animation:fbBadgePulse 1.5s infinite; }
+@keyframes fbBadgePulse {
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,158,11,0.6);}
+  50%{transform:scale(1.18);box-shadow:0 0 8px rgba(245,158,11,0.9);}
+}
+
+/* fbSubmitBtn disabled state */
+#fbSubmitBtn:disabled { opacity:.42; cursor:not-allowed; }
+
 @keyframes vPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4);}50%{opacity:0.7;box-shadow:0 0 0 8px rgba(34,197,94,0);}}
 @keyframes vcDot{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
 
-#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar,#roomsModalList::-webkit-scrollbar,#xpStreakList::-webkit-scrollbar{width:4px;}
-#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb,#roomsModalList::-webkit-scrollbar-thumb,#xpStreakList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
+#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar,#roomsModalList::-webkit-scrollbar,#xpStreakList::-webkit-scrollbar,#fbHistoryList::-webkit-scrollbar{width:4px;}
+#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb,#roomsModalList::-webkit-scrollbar-thumb,#xpStreakList::-webkit-scrollbar-thumb,#fbHistoryList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
 
 .rm-out{align-self:flex-end;max-width:72%;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:18px 18px 4px 18px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;box-shadow:0 4px 16px rgba(109,40,217,0.3);}
 .rm-in{align-self:flex-start;max-width:72%;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;}
@@ -485,14 +724,12 @@
 .msg-new{animation:fadeUp 0.2s ease;}
 .vc-btn-off{background:rgba(239,68,68,0.2)!important;border-color:rgba(239,68,68,0.5)!important;color:#f87171!important;}
 
-/* ── Hamburger ── */
 .ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);flex-shrink:0;margin-left:auto;}
 .ham span{display:block;width:20px;height:2px;background:#e2e8f0;border-radius:2px;transition:all 0.3s;}
 .ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
 .ham.open span:nth-child(2){opacity:0;}
 .ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
-/* ── Mobile drawer ── */
 .mob-drawer{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(7,7,13,0.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px;flex-direction:column;gap:6px;z-index:999;transform:translateY(-110%);transition:transform 0.3s ease;}
 .mob-drawer.open{transform:translateY(0);}
 .mob-drawer .nav-link{display:block;padding:10px 14px;font-size:14px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--muted);text-decoration:none;}
@@ -526,6 +763,8 @@
     #socialModal,#roomsModal,#xpModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;max-height:100dvh!important;}
     #incomingCallToast{left:16px!important;right:16px!important;transform:translateX(0) translateY(80px)!important;min-width:unset!important;}
     #incomingCallToast.show{transform:translateX(0) translateY(0)!important;}
+    #feedbackModal{border-radius:16px 16px 0 0!important;top:auto!important;bottom:0!important;left:0!important;transform:translateX(0) translateY(0) scale(0.98)!important;width:100vw!important;}
+    #feedbackModal.fb-open{transform:translateX(0) translateY(0) scale(1)!important;}
 }
 
 /* ══ INVITE TOAST ══ */
@@ -540,10 +779,50 @@
 .invite-decline-btn{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;white-space:nowrap;}
 .invite-decline-btn:hover{background:rgba(239,68,68,0.22);}
 .invite-timer-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#6a4dff,#00c9a7);border-radius:0 0 18px 18px;transition:width linear;}
-.btn-invite{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#34d399;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
-.btn-invite:hover{background:rgba(16,185,129,0.28);color:white;}
+/* btn-block */
+.btn-block{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.28);color:#f87171;border-radius:9px;padding:6px 10px;font-size:13px;cursor:pointer;white-space:nowrap;transition:all 0.15s;line-height:1;}
+.btn-block:hover{background:rgba(239,68,68,0.22);border-color:rgba(239,68,68,0.55);color:white;transform:scale(1.06);}
+
+/* Block confirm modal */
+#blockOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(14px);z-index:16000;}
+#blockModal{
+  display:none;position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.92);
+  width:min(400px,92vw);border-radius:22px;z-index:16001;
+  background:linear-gradient(160deg,#0e0b1f 0%,#120e22 100%);
+  border:1px solid rgba(239,68,68,0.35);
+  box-shadow:0 50px 140px rgba(0,0,0,0.96),0 0 60px rgba(239,68,68,0.06);
+  opacity:0;overflow:hidden;
+  transition:all 0.34s cubic-bezier(.34,1.56,.64,1);
+}
+#blockModal::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#ef4444,#f97316,#ef4444);background-size:200% 100%;animation:blockShimmer 2s linear infinite;}
+@keyframes blockShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+#blockModal.bk-open{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* Blocked list modal */
+#blockedListModal{
+  display:none;position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.92);
+  width:min(420px,92vw);max-height:80vh;border-radius:22px;z-index:16001;
+  background:linear-gradient(160deg,#0e0b1f 0%,#120e22 100%);
+  border:1px solid rgba(239,68,68,0.25);
+  box-shadow:0 50px 140px rgba(0,0,0,0.96);
+  opacity:0;overflow:hidden;flex-direction:column;
+  transition:all 0.34s cubic-bezier(.34,1.56,.64,1);
+}
+#blockedListModal.bk-open{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.blocked-row{display:flex;align-items:center;gap:11px;padding:10px 20px;transition:background .15s;}
+.blocked-row:hover{background:rgba(255,255,255,0.03);}
+.blocked-row+.blocked-row{border-top:1px solid rgba(255,255,255,0.04);}
+.btn-unblock{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-unblock:hover{background:rgba(34,197,94,0.25);color:white;}
+
 @media(max-width:860px){#inviteStack{bottom:80px;}}
-@media(max-width:540px){#inviteStack{bottom:16px;padding:0 8px;}.invite-toast{border-radius:14px;}}
+@media(max-width:540px){
+  #inviteStack{bottom:16px;padding:0 8px;}.invite-toast{border-radius:14px;}
+  #blockModal,#blockedListModal{width:100vw!important;border-radius:16px 16px 0 0!important;top:auto!important;bottom:0!important;left:0!important;transform:none!important;}
+  #blockModal.bk-open,#blockedListModal.bk-open{transform:none!important;}
+}
 </style>
 
 <!-- ═══ FIREBASE MODULE ═══ -->
@@ -576,7 +855,6 @@ let activeDMSessionId = null;
 let activeDMPeer = null;
 let unsubRoomsModal = null;
 let unsubStreaks = null;
-// Store latest profile goals for XP modal
 let _latestGoals = {};
 
 // WebRTC state
@@ -666,9 +944,7 @@ function watchProfile(uid) {
         st('kpiMatchSub',d.matchRank?'Top '+d.matchRank+'% match':'No matches yet');
         st('kpiMatched',d.matchedCount||0);
         st('kpiMatchedSub','+'+(d.matchedThisWeek||0)+' this week');
-        // Store goals for XP modal
         _latestGoals = d.goals || {};
-        // Update XP modal goals if it's open
         updateXpModalGoals(_latestGoals);
         if(d.skills?.length){
             sh('skillBanner'); hd('onboardBanner');
@@ -825,7 +1101,6 @@ window.openRoomsModal = function(){
     const overlay=$('roomsModalOverlay'), modal=$('roomsModal');
     overlay.style.display='block'; modal.style.display='flex';
     requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
-    // Render with cached snapshot if available
     if(window._roomsSnap) renderRoomsModal(window._roomsSnap.snap, window._roomsSnap.uid);
 };
 
@@ -892,9 +1167,7 @@ window.openXpModal = function(){
     const overlay=$('xpModalOverlay'), modal=$('xpModal');
     overlay.style.display='block'; modal.style.display='flex';
     requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
-    // Populate goals from latest data
     updateXpModalGoals(_latestGoals);
-    // Render streaks
     if(window._streakSnap) renderStreakList(window._streakSnap);
 };
 
@@ -1174,13 +1447,9 @@ function listenForIncomingCalls(uid){
     });
 }
 
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // INVITATION SYSTEM
-// Firestore: invitations/{id} with fields:
-//   toUid, fromUid, fromName, fromColor,
-//   type ('room'|'study'|'match'), roomId, roomSubject, roomCode,
-//   status ('pending'|'accepted'|'declined'), createdAt
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 const _shownInvites = new Set();
 const INVITE_TIMEOUT = 25000;
 
@@ -1205,7 +1474,6 @@ function listenForInvitations(uid) {
 function showInviteToast(invId, inv) {
     const stack = document.getElementById('inviteStack');
     if (!stack) return;
-    // Max 3 visible — dismiss oldest if over
     const existing = stack.querySelectorAll('.invite-toast');
     if (existing.length >= 3) dismissInviteToast(existing[0], null);
 
@@ -1245,13 +1513,10 @@ function showInviteToast(invId, inv) {
         <div class="invite-timer-bar" style="width:100%;"></div>`;
 
     stack.appendChild(toast);
-    // Animate in
     requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
-    // Shrink timer bar
     const bar = toast.querySelector('.invite-timer-bar');
     bar.style.transition = `width ${INVITE_TIMEOUT}ms linear`;
     requestAnimationFrame(()=>{ bar.style.width='0%'; });
-    // Auto-dismiss
     toast._timer = setTimeout(()=>dismissInviteToast(toast,invId), INVITE_TIMEOUT);
 }
 
@@ -1277,6 +1542,10 @@ window.acceptInvite = async function(invId, roomId, roomSubject, roomCode, toast
         await window._log('invite','accepted invite to room "'+roomSubject+'"');
     }
     _showQuickToast('✅ Invitation accepted!','#22c55e');
+    // Optionally nudge feedback after accepting invite
+    if (Math.random() < 0.3) {
+        setTimeout(() => window._triggerFollowerFeedback('your peer'), 8000);
+    }
 };
 
 window.declineInvite = async function(invId, toastEl) {
@@ -1285,7 +1554,6 @@ window.declineInvite = async function(invId, toastEl) {
     _showQuickToast('Invitation declined.','#64748b');
 };
 
-// Send an invite from current user to peerUid
 window.sendInvite = async function(peerUid, peerName, type, roomId, roomSubject, roomCode, btnEl) {
     if (!CU) { alert('Please log in first.'); return; }
     if (peerUid === CU.uid) return;
@@ -1316,8 +1584,6 @@ function _showQuickToast(msg, color) {
     document.body.appendChild(t);
     setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(16px)';setTimeout(()=>t.remove(),360);},2800);
 }
-
-
 
 function showIncomingCall(callId,data){
     pendingCallData={callId,data};
@@ -1365,6 +1631,9 @@ window.declineCall=async function(){
 };
 
 window.hangUp=async function(updateFirestore=true){
+    // Capture peer name before cleanup for feedback
+    const peerNameForFeedback = activeDMPeer?.name || null;
+
     if(vcTimerInterval){clearInterval(vcTimerInterval);vcTimerInterval=null;vcSeconds=0;}
     if(updateFirestore&&activeCallId){ try{await updateDoc(doc(db,'videoCalls',activeCallId),{status:'ended'});}catch(e){} }
     if(unsubCallSignal){unsubCallSignal();unsubCallSignal=null;}
@@ -1379,6 +1648,9 @@ window.hangUp=async function(updateFirestore=true){
     overlay.style.display='none';
     setTimeout(()=>{ modal.style.display='none'; },300);
     $('inCallChat').style.display='none'; inCallChatOpen=false;
+
+    // ★ Trigger post-call feedback
+    window._triggerPostCallFeedback(peerNameForFeedback);
 };
 
 function startCallTimer(){
@@ -1430,12 +1702,15 @@ window._sf=[]; window._sw=[]; window._cst='followers';
 
 window.renderUsers = function(users){
     const list=$('socialUserList'), count=$('socialCount'), tab=window._cst;
-    count.textContent=users.length?users.length+' '+(tab==='followers'?'follower'+(users.length>1?'s':''):'following'):'';
-    if(!users.length){ list.innerHTML='<div style="text-align:center;padding:44px 20px;color:rgba(255,255,255,0.25);font-size:13px;">😶 No users found</div>'; return; }
-    list.innerHTML=users.map(u=>{
+    // Filter out blocked users
+    const blocked = window._getBlockedList();
+    const visible = users.filter(u => !blocked.includes(u.uid));
+    count.textContent=visible.length?visible.length+' '+(tab==='followers'?'follower'+(visible.length>1?'s':''):'following'):'';
+    if(!visible.length){ list.innerHTML='<div style="text-align:center;padding:44px 20px;color:rgba(255,255,255,0.25);font-size:13px;">😶 No users found</div>'; return; }
+    list.innerHTML=visible.map(u=>{
         const isSelf=CU&&u.uid===CU.uid;
         const partnerBadge=u.matched?'<span class="s-partner">⚡ Study Partner</span>':'<span class="s-match">⚡ Matched</span>';
-        return `<div class="s-row">
+        return `<div class="s-row" id="srow-${u.uid}">
             <div class="s-av" style="background:${u.col};">${u.av}</div>
             <div style="flex:1;min-width:0;">
                 <div class="s-name">${esc(u.name)}${u.matched?partnerBadge:''}</div>
@@ -1444,9 +1719,10 @@ window.renderUsers = function(users){
             <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
                 ${isSelf
                     ?'<span style="font-size:11px;color:var(--muted);padding:6px 10px;">You</span>'
-                    :`<button class="btn-invite" onclick="window.sendInvite('${u.uid}','${esc(u.name)}','study',null,null,null,this)">📩 Invite</button>
-                      <button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">💬</button>
-                      <button class="btn-vid" title="Video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
+                    :`<button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')" title="Message">💬</button>
+                      <button class="btn-vid" title="Video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>
+                      <button style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;" title="Give feedback" onclick="closeSocialModal();setTimeout(()=>window._triggerFollowerFeedback('${esc(u.name)}'),200)">⭐</button>
+                      <button class="btn-block" title="Block user" onclick="window.openBlockModal('${u.uid}','${esc(u.name)}','${u.av}','${u.col}')">🚫</button>`
                 }
             </div>
         </div>`;
@@ -1492,6 +1768,7 @@ function filterUsers(){
 
 document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
+        if(typeof window.closeFeedback==='function') window.closeFeedback();
         closeSocialModal();
         if(typeof window.closeChatWindow==='function') window.closeChatWindow();
         if(typeof window.closeRoomChat==='function') window.closeRoomChat();
@@ -1501,6 +1778,400 @@ document.addEventListener('keydown',e=>{
 });
 function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendDM();} }
 function autoResizeInput(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+</script>
+
+<!-- ══════════════════════════════════════════
+     BLOCK SYSTEM (localStorage — no Firebase)
+══════════════════════════════════════════ -->
+<script>
+(function(){
+    const BK_KEY = 'ss_blocked_v1';
+    let _pendingBlock = null; // { uid, name, av, col }
+
+    /* ── Storage ── */
+    window._getBlockedList = function() {
+        try { return JSON.parse(localStorage.getItem(BK_KEY)||'[]'); } catch(e){ return []; }
+    };
+    function saveBlock(uid, name, av, col) {
+        const list = window._getBlockedList();
+        if (!list.find(b=>b.uid===uid)) {
+            list.push({ uid, name, av, col, blockedAt: new Date().toISOString() });
+            try { localStorage.setItem(BK_KEY, JSON.stringify(list)); } catch(e){}
+        }
+    }
+    function removeBlock(uid) {
+        const list = window._getBlockedList().filter(b=>b.uid!==uid);
+        try { localStorage.setItem(BK_KEY, JSON.stringify(list)); } catch(e){}
+    }
+
+    /* ── Open block confirm modal ── */
+    window.openBlockModal = function(uid, name, av, col) {
+        _pendingBlock = { uid, name, av, col };
+        const avEl = document.getElementById('blockTargetAvatar');
+        avEl.textContent = av;
+        avEl.style.background = col;
+        document.getElementById('blockTargetName').textContent = name;
+        document.getElementById('blockOverlay').style.display = 'block';
+        const modal = document.getElementById('blockModal');
+        modal.style.display = 'block';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>modal.classList.add('bk-open')));
+    };
+
+    window.closeBlockModal = function() {
+        const modal = document.getElementById('blockModal');
+        modal.classList.remove('bk-open');
+        setTimeout(()=>{ modal.style.display='none'; document.getElementById('blockOverlay').style.display='none'; }, 300);
+        _pendingBlock = null;
+    };
+
+    window.confirmBlock = function() {
+        if (!_pendingBlock) return;
+        const { uid, name, av, col } = _pendingBlock;
+        saveBlock(uid, name, av, col);
+        window.closeBlockModal();
+        // Remove row from social modal instantly
+        const row = document.getElementById('srow-'+uid);
+        if (row) {
+            row.style.transition = 'opacity .3s,transform .3s';
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(20px)';
+            setTimeout(()=>row.remove(), 310);
+        }
+        // Close any open DM with this user
+        if (typeof window.activeDMPeer !== 'undefined' && window.activeDMPeer?.uid === uid) {
+            window.closeChatWindow?.();
+        }
+        _showBlockToast(name);
+        // Refresh social lists
+        setTimeout(()=>{
+            if (window._sf) window._sf = window._sf.filter(u=>u.uid!==uid);
+            if (window._sw) window._sw = window._sw.filter(u=>u.uid!==uid);
+        }, 350);
+    };
+
+    function _showBlockToast(name) {
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+            background:linear-gradient(135deg,rgba(239,68,68,0.15),#0e0e1e);
+            border:1px solid rgba(239,68,68,0.4);color:white;
+            padding:11px 22px;border-radius:12px;font-size:13px;font-weight:600;
+            z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.7);pointer-events:none;
+            display:flex;align-items:center;gap:8px;`;
+        t.innerHTML = `<span style="font-size:16px;">🚫</span><span><strong style="color:#f87171;">${name}</strong> has been blocked</span>`;
+        document.body.appendChild(t);
+        setTimeout(()=>{
+            t.style.transition='opacity .35s,transform .35s';
+            t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(14px)';
+            setTimeout(()=>t.remove(), 370);
+        }, 2800);
+    }
+
+    /* ── Blocked list modal ── */
+    window.openBlockedList = function() {
+        const overlay = document.getElementById('blockedListOverlay');
+        const modal   = document.getElementById('blockedListModal');
+        overlay.style.display = 'block';
+        modal.style.display   = 'flex';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>modal.classList.add('bk-open')));
+        renderBlockedList();
+    };
+
+    window.closeBlockedList = function() {
+        const modal = document.getElementById('blockedListModal');
+        modal.classList.remove('bk-open');
+        setTimeout(()=>{
+            modal.style.display='none';
+            document.getElementById('blockedListOverlay').style.display='none';
+        }, 300);
+    };
+
+    window.unblockUser = function(uid) {
+        removeBlock(uid);
+        renderBlockedList();
+        // Refresh social lists to show user again
+        const allUsers = [...(window._allSf||[]), ...(window._allSw||[])];
+        const restored = allUsers.find(u=>u.uid===uid);
+        if (restored) {
+            if (!(window._sf||[]).find(u=>u.uid===uid)) window._sf = [...(window._sf||[]), restored];
+            if (!(window._sw||[]).find(u=>u.uid===uid)) window._sw = [...(window._sw||[]), restored];
+        }
+        _showUnblockToast();
+    };
+
+    function _showUnblockToast() {
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+            background:linear-gradient(135deg,rgba(34,197,94,0.12),#0e0e1e);
+            border:1px solid rgba(34,197,94,0.35);color:white;
+            padding:11px 22px;border-radius:12px;font-size:13px;font-weight:600;
+            z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.7);pointer-events:none;`;
+        t.innerHTML = `<span style="color:#4ade80;">✅ User unblocked successfully</span>`;
+        document.body.appendChild(t);
+        setTimeout(()=>{
+            t.style.transition='opacity .35s,transform .35s';
+            t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(14px)';
+            setTimeout(()=>t.remove(), 370);
+        }, 2400);
+    }
+
+    function renderBlockedList() {
+        const list = window._getBlockedList();
+        const body = document.getElementById('blockedListBody');
+        if (!body) return;
+        if (!list.length) {
+            body.innerHTML = '<div style="text-align:center;padding:44px 20px;color:rgba(255,255,255,0.22);font-size:13px;">No blocked users 🎉</div>';
+            return;
+        }
+        const esc = t => { const d=document.createElement('div'); d.appendChild(document.createTextNode(t||'')); return d.innerHTML; };
+        body.innerHTML = list.map(b => {
+            const date = b.blockedAt ? new Date(b.blockedAt).toLocaleDateString([],{month:'short',day:'numeric'}) : '';
+            return `<div class="blocked-row">
+                <div style="width:38px;height:38px;border-radius:50%;background:${b.col||'#6a4dff'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;flex-shrink:0;filter:grayscale(0.5);opacity:0.7;">${b.av||'?'}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);">${esc(b.name)}</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:1px;">Blocked ${date}</div>
+                </div>
+                <button class="btn-unblock" onclick="window.unblockUser('${b.uid}')">↩ Unblock</button>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── ESC to close ── */
+    document.addEventListener('keydown', e=>{
+        if (e.key==='Escape') { window.closeBlockModal(); window.closeBlockedList(); }
+    });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════
+     FEEDBACK SYSTEM (no Firebase — localStorage)
+══════════════════════════════════════════ -->
+<script>
+(function(){
+    const FB_KEY = 'ss_feedback_v1';
+    const STAR_LABELS = ['','Terrible 😤','Not great 😕','Okay 😐','Good 😊','Amazing 🤩'];
+    let _fbState = { stars:0, mood:0, tags:[], comment:'', context:'', contextLabel:'', title:'', subtitle:'', tagsPool:[] };
+
+    /* ── Storage helpers ── */
+    function loadFeedbacks() {
+        try { return JSON.parse(localStorage.getItem(FB_KEY)||'[]'); } catch(e){ return []; }
+    }
+    function saveFeedback(entry) {
+        const list = loadFeedbacks();
+        list.unshift({...entry, id:Date.now(), savedAt:new Date().toISOString()});
+        try { localStorage.setItem(FB_KEY, JSON.stringify(list.slice(0,50))); } catch(e){}
+        updateNudgeBadge();
+    }
+
+    /* ── Nudge badge ── */
+    function updateNudgeBadge() {
+        const badge = document.getElementById('fbFollowersBadge');
+        if (!badge) return;
+        const list = loadFeedbacks();
+        if (!list.length) { badge.style.display='flex'; return; }
+        const daysSince = (Date.now() - new Date(list[0].savedAt).getTime()) / 86400000;
+        badge.style.display = daysSince > 3 ? 'flex' : 'none';
+    }
+
+    /* ── Open ── */
+    window.openFeedback = function(opts={}) {
+        _fbState = {
+            stars:0, mood:0, tags:[], comment:'',
+            context:      opts.context      || 'general',
+            contextLabel: opts.contextLabel || '',
+            title:        opts.title        || 'How was your experience? 🌟',
+            subtitle:     opts.subtitle     || 'Your feedback helps improve StudySphere',
+            tagsPool:     opts.tags         || ['Great experience','Very helpful','Easy to use','Needs improvement','Love it','Could be better']
+        };
+        // Reset UI elements
+        document.getElementById('fbTitle').textContent   = _fbState.title;
+        document.getElementById('fbSub').textContent     = _fbState.subtitle;
+        const ctxPill = document.getElementById('fbCtxPill');
+        if (_fbState.contextLabel) {
+            ctxPill.textContent = _fbState.contextLabel;
+            ctxPill.style.display = 'inline-flex';
+        } else {
+            ctxPill.style.display = 'none';
+        }
+        document.getElementById('fbComment').value = '';
+        document.getElementById('fbCharCount').textContent = '0 / 400';
+        document.getElementById('fbStarLabel').textContent = '';
+        document.getElementById('fbSubmitBtn').disabled = true;
+        document.querySelectorAll('.fb-star').forEach(s=>{ s.classList.remove('lit'); s.style.filter='grayscale(1) opacity(0.35)'; });
+        document.querySelectorAll('.fb-mood').forEach(m=>m.classList.remove('active'));
+        // Build tags
+        const tagsEl = document.getElementById('fbTags');
+        tagsEl.innerHTML = _fbState.tagsPool.map(t=>
+            `<span class="fb-tag" onclick="toggleTag(this,'${t.replace(/'/g,"\\'")}')">${t}</span>`
+        ).join('');
+        // Show form
+        document.getElementById('fbForm').style.display    = 'block';
+        document.getElementById('fbSuccess').style.display = 'none';
+        document.getElementById('fbHistory').style.display = 'none';
+        // Open modal
+        document.getElementById('feedbackOverlay').style.display = 'block';
+        const modal = document.getElementById('feedbackModal');
+        modal.style.display = 'block';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>modal.classList.add('fb-open')));
+    };
+
+    window.closeFeedback = function() {
+        const modal = document.getElementById('feedbackModal');
+        modal.classList.remove('fb-open');
+        setTimeout(()=>{ modal.style.display='none'; document.getElementById('feedbackOverlay').style.display='none'; }, 340);
+    };
+
+    window.openFeedbackHistory = function() {
+        document.getElementById('fbForm').style.display    = 'none';
+        document.getElementById('fbSuccess').style.display = 'none';
+        document.getElementById('fbHistory').style.display = 'block';
+        renderHistory();
+        document.getElementById('feedbackOverlay').style.display = 'block';
+        const modal = document.getElementById('feedbackModal');
+        modal.style.display = 'block';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>modal.classList.add('fb-open')));
+    };
+
+    window.showFbForm = function() {
+        document.getElementById('fbHistory').style.display = 'none';
+        document.getElementById('fbForm').style.display    = 'block';
+    };
+
+    /* ── Stars ── */
+    window.hoverStars = function(n) {
+        document.querySelectorAll('.fb-star').forEach((s,i)=>{
+            s.style.filter = i<n ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.3)';
+        });
+        document.getElementById('fbStarLabel').textContent = STAR_LABELS[n]||'';
+    };
+    window.resetStarHover = function() {
+        document.querySelectorAll('.fb-star').forEach((s,i)=>{
+            s.style.filter = i<_fbState.stars ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.35)';
+        });
+        document.getElementById('fbStarLabel').textContent = _fbState.stars ? STAR_LABELS[_fbState.stars] : '';
+    };
+    window.selectStars = function(n) {
+        _fbState.stars = n;
+        document.querySelectorAll('.fb-star').forEach((s,i)=>{
+            s.classList.toggle('lit', i<n);
+            s.style.filter = i<n ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.35)';
+        });
+        document.getElementById('fbStarLabel').textContent = STAR_LABELS[n];
+        checkReady();
+    };
+
+    /* ── Mood ── */
+    window.selectMood = function(el) {
+        document.querySelectorAll('.fb-mood').forEach(m=>m.classList.remove('active'));
+        el.classList.add('active');
+        _fbState.mood = parseInt(el.dataset.val);
+        checkReady();
+    };
+
+    /* ── Tags ── */
+    window.toggleTag = function(el, tag) {
+        el.classList.toggle('active');
+        if (_fbState.tags.includes(tag)) { _fbState.tags = _fbState.tags.filter(t=>t!==tag); }
+        else { _fbState.tags.push(tag); }
+    };
+
+    function checkReady() {
+        document.getElementById('fbSubmitBtn').disabled = (_fbState.stars===0 && _fbState.mood===0);
+    }
+
+    /* ── Submit ── */
+    window.submitFeedback = function() {
+        const comment = document.getElementById('fbComment').value.trim();
+        const entry = {
+            context:      _fbState.context,
+            contextLabel: _fbState.contextLabel,
+            stars:        _fbState.stars,
+            mood:         _fbState.mood,
+            moodEmoji:    ['','😤','😕','😐','😊','🤩'][_fbState.mood]||'',
+            tags:         [..._fbState.tags],
+            comment
+        };
+        saveFeedback(entry);
+        document.getElementById('fbForm').style.display    = 'none';
+        document.getElementById('fbSuccess').style.display = 'flex';
+        const msgs = {
+            videocall: 'Call quality saved locally. Helps us tune video features.',
+            followers: 'Community feedback saved. Thanks for helping us grow!',
+            general:   "Your response has been saved locally.<br>We'll use it to make StudySphere better."
+        };
+        document.getElementById('fbSuccessMsg').innerHTML = msgs[_fbState.context]||msgs.general;
+        const xpEl = document.getElementById('fbXpReward');
+        xpEl.style.display = (_fbState.stars>=4||_fbState.mood>=4) ? 'block' : 'none';
+        setTimeout(()=>window.closeFeedback(), 2800);
+    };
+
+    /* ── History ── */
+    function renderHistory() {
+        const list = loadFeedbacks();
+        const el   = document.getElementById('fbHistoryList');
+        if (!list.length) {
+            el.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.25);font-size:13px;">No feedback submitted yet 💭</div>';
+            return;
+        }
+        el.innerHTML = list.map(f=>{
+            const stars = f.stars ? '★'.repeat(f.stars)+'<span style="opacity:.25;">'+'★'.repeat(5-f.stars)+'</span>' : '—';
+            const date  = f.savedAt ? new Date(f.savedAt).toLocaleDateString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+            return `<div class="fb-hist-row">
+                <div style="flex-shrink:0;font-size:20px;">${f.moodEmoji||'💬'}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        <span style="font-size:13px;color:#f59e0b;letter-spacing:1px;">${stars}</span>
+                        ${f.contextLabel?`<span style="font-size:10px;background:rgba(109,40,217,0.15);color:#c4b5fd;border-radius:20px;padding:2px 8px;">${f.contextLabel}</span>`:''}
+                    </div>
+                    ${f.tags?.length?`<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">${f.tags.join(' · ')}</div>`:''}
+                    ${f.comment?`<div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">"${f.comment}"</div>`:''}
+                </div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.2);flex-shrink:0;text-align:right;">${date}</div>
+            </div>`;
+        }).join('');
+    }
+
+    window.clearFeedbackHistory = function() {
+        if(!confirm('Clear all saved feedback?')) return;
+        try { localStorage.removeItem(FB_KEY); } catch(e){}
+        renderHistory();
+        updateNudgeBadge();
+    };
+
+    /* ── Post-call trigger ── */
+    window._triggerPostCallFeedback = function(peerName) {
+        setTimeout(()=>{
+            window.openFeedback({
+                context:      'videocall',
+                title:        '📹 How was the call?',
+                subtitle:     peerName ? 'Rate your call with '+peerName : 'Rate your video call experience',
+                contextLabel: '📹 Video Call',
+                tags:['Clear audio','Good video','Lag-free','Audio issues','Video issues','Great connection','Short but good','Very productive']
+            });
+        }, 650);
+    };
+
+    /* ── Follower interaction trigger ── */
+    window._triggerFollowerFeedback = function(peerName) {
+        setTimeout(()=>{
+            window.openFeedback({
+                context:      'followers',
+                title:        '✨ How was that interaction?',
+                subtitle:     peerName ? 'Rate your interaction with '+peerName : 'Rate your community experience',
+                contextLabel: '👤 Community Interaction',
+                tags:['Very helpful','Great match','Friendly','Responsive','Inspiring','Needs improvement']
+            });
+        }, 400);
+    };
+
+    /* ── Init ── */
+    if (document.readyState==='loading') {
+        document.addEventListener('DOMContentLoaded', updateNudgeBadge);
+    } else {
+        updateNudgeBadge();
+    }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') window.closeFeedback(); });
+})();
 </script>
 
 <script>
@@ -1515,14 +2186,8 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
     const pb=document.getElementById('profile-btn');
     const pm=document.getElementById('profile-menu');
     if(pb&&pm){
-        pb.addEventListener('click',(e)=>{
-            e.stopPropagation();
-            pm.style.display=pm.style.display==='block'?'none':'block';
-        });
-        document.addEventListener('click',(e)=>{
-            if(!pb.contains(e.target)&&!pm.contains(e.target))
-                pm.style.display='none';
-        });
+        pb.addEventListener('click',(e)=>{ e.stopPropagation(); pm.style.display=pm.style.display==='block'?'none':'block'; });
+        document.addEventListener('click',(e)=>{ if(!pb.contains(e.target)&&!pm.contains(e.target)) pm.style.display='none'; });
     }
     const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
     const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
@@ -1551,9 +2216,7 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
             a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#475569'):'';
         });
         document.querySelectorAll('.kpi-value').forEach(el=>{ el.style.color=''; });
-        document.querySelectorAll('.section-tag,.kpi-label,.kpi-delta').forEach(el=>{
-            el.style.color = isLight ? '#64748b' : '';
-        });
+        document.querySelectorAll('.section-tag,.kpi-label,.kpi-delta').forEach(el=>{ el.style.color = isLight ? '#64748b' : ''; });
         const btnD=document.getElementById('btn-dark');
         const btnL=document.getElementById('btn-light');
         const lbl=document.getElementById('theme-row-label');
@@ -1580,5 +2243,3 @@ mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
 </script>
 </body>
 </html>
-
-
