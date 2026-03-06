@@ -22,28 +22,12 @@
 <canvas id="canvas"></canvas>
 <div class="scanlines"></div>
 
-<!--<nav id="main-nav">
-    <a href="landing.html" class="nav-logo"><div class="nav-logo-icon">🔗</div>StudySphere</a>
-    <div class="nav-links">
-        <a class="nav-link" href="landing.html">Intro</a>
-        <a class="nav-link active" href="dashboard.html">Dashboard</a>
-        <a class="nav-link" href="match.html">Match</a>
-        <a class="nav-link" href="session.html">Session</a>
-        <a class="nav-link" href="leaderboard.html">Leaderboard</a>
-        <a class="nav-link" href="whiteboard.html">Whiteboard</a>
-        <a class="nav-link" href="resources.html">Resources</a>
-        <a class="nav-link" href="onboard.html">Onboard</a>
-    </div>
-    <button class="ham" id="hamBtn" aria-label="Menu">
-    <span></span><span></span><span></span>
-</button>
-</nav>-->
+<!-- INVITATION POPUP STACK -->
+<div id="inviteStack" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:12000;display:flex;flex-direction:column-reverse;align-items:center;gap:10px;pointer-events:none;width:min(400px,96vw);"></div>
 
 <nav id="main-nav">
-
 <a href="landing.html" class="nav-logo">
 <div class="nav-logo-icon">🔗</div>StudySphere</a>
-
 <div class="nav-links">
 <a class="nav-link" href="landing.html">Intro</a>
 <a class="nav-link active" href="dashboard.html">Dashboard</a>
@@ -54,15 +38,12 @@
 <a class="nav-link" href="resources.html">Resources</a>
 <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
-
 <div class="nav-right">
 <div id="profile-container"></div>
-
 <button class="ham" id="hamBtn" aria-label="Menu">
 <span></span><span></span><span></span>
 </button>
 </div>
-
 </nav>
 
 <div class="mob-drawer" id="mobDrawer">
@@ -75,13 +56,11 @@
     <a class="nav-link" href="resources.html">Resources</a>
     <a class="nav-link" href="onboard.html">Onboard</a>
 </div>
-<!--<div id="profile-container" style="position:fixed;top:0;right:20px;width:250px;z-index:1000;"></div>-->
 
 <!-- ════════════════════════════════════════════════════
-     VIDEO CALL MODAL  (WebRTC + Firebase Signaling)
+     VIDEO CALL MODAL
 ════════════════════════════════════════════════════ -->
 <div id="videoOverlay" onclick="hangUp()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;backdrop-filter:blur(16px);"></div>
-
 <div id="videoModal" style="
     display:none;position:fixed;top:50%;left:50%;
     transform:translate(-50%,-50%) scale(0.92);
@@ -92,7 +71,6 @@
     box-shadow:0 60px 180px rgba(0,0,0,0.98),0 0 0 1px rgba(77,148,255,0.1),0 0 80px rgba(109,40,217,0.08);
     opacity:0;transition:all 0.35s cubic-bezier(.34,1.56,.64,1);
     overflow:hidden;flex-direction:column;">
-
   <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(255,255,255,0.025);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;animation:vPulse 1.2s infinite;"></div>
@@ -106,7 +84,6 @@
       <button onclick="hangUp()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.45);border-radius:12px;padding:6px 14px;font-size:12px;cursor:pointer;">✕ Close</button>
     </div>
   </div>
-
   <div style="flex:1;display:flex;position:relative;overflow:hidden;background:#080810;">
     <video id="remoteVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;background:#080810;"></video>
     <div id="vcWaiting" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,16,0.97);">
@@ -126,29 +103,19 @@
       <div style="text-align:center;"><div style="font-size:28px;">📷</div><div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">Camera off</div></div>
     </div>
   </div>
-
   <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 24px;background:rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
-    <button id="btnMic" onclick="toggleMic()" title="Toggle Mic"
-      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🎤</button>
-    <button id="btnCam" onclick="toggleCamera()" title="Toggle Camera"
-      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">📹</button>
-    <button id="btnScreen" onclick="toggleScreen()" title="Screen Share"
-      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🖥️</button>
-    <button onclick="hangUp()" title="End Call"
-      style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.45);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;"
-      onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📵</button>
-    <button id="btnInCallChat" onclick="toggleInCallChat()" title="In-Call Chat"
-      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">💬</button>
-    <button onclick="toggleFullscreen()" title="Fullscreen"
-      style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">⛶</button>
+    <button id="btnMic" onclick="toggleMic()" title="Toggle Mic" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🎤</button>
+    <button id="btnCam" onclick="toggleCamera()" title="Toggle Camera" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">📹</button>
+    <button id="btnScreen" onclick="toggleScreen()" title="Screen Share" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">🖥️</button>
+    <button onclick="hangUp()" title="End Call" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:white;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,0.45);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📵</button>
+    <button id="btnInCallChat" onclick="toggleInCallChat()" title="In-Call Chat" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">💬</button>
+    <button onclick="toggleFullscreen()" title="Fullscreen" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:white;font-size:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;">⛶</button>
   </div>
-
   <div id="inCallChat" style="display:none;position:absolute;top:62px;right:0;bottom:0;width:280px;background:rgba(8,8,20,0.95);border-left:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(10px);flex-direction:column;z-index:5;">
     <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;font-weight:700;color:white;">💬 In-Call Chat</div>
     <div id="inCallMsgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;"></div>
     <div style="padding:10px 12px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;">
-      <input id="inCallInput" type="text" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendInCallMsg()"
-        style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:8px 12px;font-size:12px;outline:none;">
+      <input id="inCallInput" type="text" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendInCallMsg()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:8px 12px;font-size:12px;outline:none;">
       <button onclick="sendInCallMsg()" style="background:#6a4dff;border:none;color:white;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">➤</button>
     </div>
   </div>
@@ -184,10 +151,7 @@
       <div id="rmEmoji" style="font-size:34px;margin-bottom:10px;">📚</div>
       <div id="rmSubject" style="font-size:15px;font-weight:700;color:white;line-height:1.3;margin-bottom:6px;">Room</div>
       <div id="rmCode" style="font-size:10px;color:#00c9a7;letter-spacing:2px;font-weight:700;background:rgba(0,201,167,0.1);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;"></div>
-
-      <!-- HOST BADGE — shown only for host -->
-      <div id="rmHostBadge" style="display:none;font-size:10px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:3px 10px;display:none;margin-bottom:8px;">👑 You are the host</div>
-
+      <div id="rmHostBadge" style="display:none;font-size:10px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:3px 10px;margin-bottom:8px;">👑 You are the host</div>
       <div style="display:flex;align-items:center;gap:5px;">
         <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;"></div>
         <span style="font-size:11px;color:#22c55e;font-weight:600;">Live Room</span>
@@ -211,8 +175,6 @@
     </div>
     <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
       <a id="rmSessionLink" href="session.html" style="display:block;text-align:center;padding:8px;border-radius:10px;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;font-size:12px;font-weight:700;text-decoration:none;">🚀 Full Session →</a>
-
-      <!-- END SESSION — host only, hidden by default -->
       <button id="rmEndSessionBtn" onclick="endSession()" style="
           display:none;
           width:100%;padding:8px;border-radius:10px;
@@ -224,7 +186,6 @@
         onmouseout="this.style.background='linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08))';this.style.color='#f87171';">
         🛑 End Session
       </button>
-
       <button onclick="closeRoomChat()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.35);font-size:12px;padding:7px;cursor:pointer;">✕ Close</button>
     </div>
   </div>
@@ -248,8 +209,7 @@
             style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:white;padding:10px 50px 10px 16px;font-size:13px;outline:none;resize:none;line-height:1.4;max-height:100px;font-family:inherit;transition:border-color 0.2s;"
             onfocus="this.style.borderColor='rgba(109,40,217,0.5)'"
             onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
-          <button onclick="sendRoomMessage()" title="Send" style="position:absolute;right:8px;bottom:8px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;"
-            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">➤</button>
+          <button onclick="sendRoomMessage()" title="Send" style="position:absolute;right:8px;bottom:8px;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">➤</button>
         </div>
       </div>
     </div>
@@ -291,7 +251,105 @@
     </div>
 </div>
 
-<!-- ════ MAIN CONTENT ════ -->
+<!-- ════ LIVE ROOMS MODAL (KPI click) ════ -->
+<div id="roomsModalOverlay" onclick="closeRoomsModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
+<div id="roomsModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(520px,93vw);max-height:85vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🏠</span>
+            <div>
+                <div style="font-size:15px;font-weight:700;color:white;">Live Study Rooms</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">Active rooms right now</div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="openCreateRoomModal()" style="background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Create</button>
+            <button onclick="closeRoomsModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+        </div>
+    </div>
+    <!-- Join by code -->
+    <div style="padding:14px 18px 0;flex-shrink:0;">
+        <div style="display:flex;gap:8px;">
+            <input id="joinRoomCodeModal" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)"
+                style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:8px 13px;font-size:12px;outline:none;">
+            <button onclick="joinRoomModal()" style="background:rgba(77,148,255,0.15);border:1px solid rgba(77,148,255,0.35);color:#80b3ff;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Join →</button>
+        </div>
+    </div>
+    <!-- Create panel (hidden by default) -->
+    <div id="createRoomPanelModal" style="display:none;padding:14px 18px 0;flex-shrink:0;">
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.08);">
+            <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">New Room</div>
+            <input id="roomCodeModal" type="text" readonly style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#00c9a7;padding:8px 12px;font-size:12px;outline:none;margin-bottom:8px;letter-spacing:2px;font-weight:700;">
+            <input id="roomSubjectModal" type="text" placeholder="Subject (e.g. Calculus, Biology…)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;padding:8px 12px;font-size:12px;outline:none;margin-bottom:8px;">
+            <select id="roomMaxMembersModal" style="width:100%;box-sizing:border-box;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;padding:8px 12px;font-size:12px;outline:none;margin-bottom:10px;">
+                <option value="4">Max 4 members</option><option value="6">Max 6 members</option><option value="10">Max 10 members</option>
+            </select>
+            <div style="display:flex;gap:8px;">
+                <button id="createRoomBtnModal" onclick="submitCreateRoomModal()" style="flex:1;background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;border-radius:8px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;">💬 Create & Open Chat</button>
+                <button onclick="closeCreateRoomModal()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Rooms list -->
+    <div id="roomsModalList" style="flex:1;overflow-y:auto;padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px;">Loading rooms…</div>
+    </div>
+</div>
+
+<!-- ════ XP / STREAKS MODAL (KPI click) ════ -->
+<div id="xpModalOverlay" onclick="closeXpModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
+<div id="xpModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(460px,93vw);max-height:85vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">⚡</span>
+            <div>
+                <div style="font-size:15px;font-weight:700;color:white;">Weekly XP & Streaks</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">Top performers & your goals</div>
+            </div>
+        </div>
+        <button onclick="closeXpModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+    </div>
+    <!-- My Goals -->
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Weekly Goals</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.5);">Study Hours</span><span id="xpGoalHoursPct" style="color:#22d3ee;">—</span></div>
+        <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;margin-bottom:12px;"><div id="xpGoalHoursBar" style="height:100%;width:0%;background:linear-gradient(90deg,#22d3ee,#6a4dff);border-radius:3px;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.5);">Peer Teachings</span><span id="xpGoalTeachPct" style="color:#10b981;">—</span></div>
+        <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;margin-bottom:12px;"><div id="xpGoalTeachBar" style="height:100%;width:0%;background:linear-gradient(90deg,#10b981,#22d3ee);border-radius:3px;transition:width 1s;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:rgba(255,255,255,0.5);">Quiz Score Avg</span><span id="xpGoalQuizPct" style="color:#f59e0b;">—</span></div>
+        <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;"><div id="xpGoalQuizBar" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:3px;transition:width 1s;"></div></div>
+    </div>
+    <!-- Streaks leaderboard -->
+    <div style="flex:1;overflow-y:auto;padding:16px 20px 20px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">🔥 Streak Leaderboard</div>
+        <div id="xpStreakList" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:30px;">Loading streaks…</div>
+        </div>
+    </div>
+</div>
+
+<!-- SOCIAL MODAL -->
+<div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
+<div id="socialModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(430px,93vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;">
+            <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
+            <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
+        </div>
+        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
+    </div>
+    <div style="padding:14px 18px 10px;">
+        <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:9px 14px;font-size:13px;outline:none;">
+    </div>
+    <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
+    <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════════ -->
 <div class="content-wrapper">
  <div id="page-dashboard" class="page">
   <div class="dash-page">
@@ -311,8 +369,18 @@
 
     <!-- KPI GRID -->
     <div class="kpi-grid">
-      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div></div>
-      <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div><div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div></div>
+      <!-- 🏠 Active Study Rooms — opens Rooms Modal -->
+      <div class="kpi-card" onclick="openRoomsModal()" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Active Study Rooms</span><span style="font-size:22px;">🏠</span></div>
+        <div class="kpi-value" style="color:var(--glow);" id="kpiRooms">—</div>
+        <div style="font-size:11px;color:var(--green-glow);" id="kpiRoomsSub">Loading…</div>
+      </div>
+      <!-- ⚡ Weekly XP — opens XP/Streaks Modal -->
+      <div class="kpi-card" onclick="openXpModal()" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Weekly XP Earned</span><span style="font-size:22px;">⚡</span></div>
+        <div class="kpi-value" style="color:var(--teal-glow);" id="kpiXP">—</div>
+        <div style="font-size:11px;color:var(--green-glow);" id="kpiXPSub">Loading…</div>
+      </div>
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Group Mood Score</span><span style="font-size:22px;">🧠</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMood">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMoodSub">Loading…</div></div>
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">Match Compatibility</span><span style="font-size:22px;">🎯</span></div><div class="kpi-value" style="color:var(--green-glow);" id="kpiMatch">—</div><div style="font-size:11px;color:var(--muted);" id="kpiMatchSub">Loading…</div></div>
       <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><span style="font-size:12px;color:var(--muted);">People Matched</span><span style="font-size:22px;">👥</span></div><div class="kpi-value" style="color:var(--glow);" id="kpiMatched">—</div><div style="font-size:11px;color:var(--green-glow);" id="kpiMatchedSub">Loading…</div></div>
@@ -357,86 +425,17 @@
       </div>
     </div>
 
-    <div class="grid-2">
-      <!-- LIVE STUDY ROOMS -->
-      <div class="card" id="studyRoomsCard" style="padding:24px;"></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-          <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">🏠 Live Study Rooms</h3>
-          <button class="btn btn-outline" style="padding:5px 14px;font-size:12px;" onclick="openCreateRoom()">+ Create</button>
-        </div>
-        <div id="createRoomPanel" style="display:none;background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
-          <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Room Code (auto)</div>
-          <input id="roomCode" type="text" readonly style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#00c9a7;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;letter-spacing:2px;font-weight:700;">
-          <input id="roomSubject" type="text" placeholder="Subject (e.g. Calculus, Biology…)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
-          <select id="roomMaxMembers" style="width:100%;box-sizing:border-box;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:12px;">
-            <option value="4">Max 4 members</option><option value="6">Max 6 members</option><option value="10">Max 10 members</option>
-          </select>
-          <div style="display:flex;gap:8px;">
-            <button id="createRoomBtn" onclick="submitCreateRoom()" class="btn btn-primary" style="padding:8px 20px;font-size:12px;flex:1;">💬 Create & Open Chat</button>
-            <button onclick="closeCreateRoom()" class="btn btn-outline" style="padding:8px 14px;font-size:12px;">Cancel</button>
-          </div>
-        </div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
-          <input id="joinRoomCode" type="text" placeholder="Enter Room Code (e.g. ROOM-X7K2P)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:white;padding:9px 14px;font-size:13px;outline:none;margin-bottom:10px;">
-          <button onclick="joinRoom()" class="btn btn-primary" style="padding:7px 18px;font-size:12px;">Join Room →</button>
-        </div>
-        <div id="liveRoomsList"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Loading rooms…</div></div>
-      </div>
-
-      <!-- STREAKS + GOALS -->
-      <div class="card" style="padding:24px;">
-        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;margin-bottom:18px;">🔥 Streaks & Weekly Goals</h3>
-        <div id="streakGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1;">Loading streaks…</div></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Study Hours Goal</span><span id="goalHoursPct">—</span></div>
-        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalHoursBar" style="width:0%;transition:width 1s;"></div></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Peer Teachings</span><span id="goalTeachPct">—</span></div>
-        <div class="progress-bar" style="margin-bottom:14px;"><div class="progress-fill" id="goalTeachBar" style="width:0%;transition:width 1s;"></div></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--muted);">Quiz Score Avg</span><span id="goalQuizPct">—</span></div>
-        <div class="progress-bar"><div class="progress-fill" id="goalQuizBar" style="width:0%;transition:width 1s;"></div></div>
-      </div>
-    </div>
-
-    <!-- ACTIVITY FEED -->
-    <div class="card" style="padding:24px;margin-top:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h3 style="font-family:var(--syne);font-weight:700;font-size:16px;">📡 Live Activity Feed</h3>
-        <span style="font-size:11px;color:var(--muted);">Updates in real-time</span>
-      </div>
-      <div id="activityFeed" style="display:flex;flex-direction:column;gap:10px;"><div style="color:var(--muted);font-size:13px;">Loading activity…</div></div>
-    </div>
-
    </div>
   </div>
  </div>
 </div>
 
-<!-- SOCIAL MODAL -->
-<div id="socialModalOverlay" onclick="closeSocialModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:8000;backdrop-filter:blur(5px);"></div>
-<div id="socialModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:min(430px,93vw);max-height:82vh;border-radius:20px;z-index:8001;flex-direction:column;background:#12121e;border:1px solid rgba(255,255,255,0.09);box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:transform 0.22s cubic-bezier(.34,1.56,.64,1),opacity 0.18s ease;opacity:0;overflow:hidden;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
-        <div style="display:flex;">
-            <button id="tabFollowers" onclick="switchTab('followers')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Followers</button>
-            <button id="tabFollowing" onclick="switchTab('following')" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);font-size:14px;font-weight:700;padding:8px 20px 12px;cursor:pointer;">Following</button>
-        </div>
-        <button onclick="closeSocialModal()" style="background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;margin-bottom:8px;">✕</button>
-    </div>
-    <div style="padding:14px 18px 10px;">
-        <input id="socialSearch" oninput="filterUsers()" type="text" placeholder="Search…"
-            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;padding:9px 14px;font-size:13px;outline:none;">
-    </div>
-    <div id="socialCount" style="padding:0 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);"></div>
-    <div id="socialUserList" style="overflow-y:auto;flex:1;padding-bottom:10px;"></div>
-</div>
-
 <style>
-    @media (max-width: 860px) {
-    #scrollToRoomsBtn { display: block !important; }
-}
 @keyframes vPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4);}50%{opacity:0.7;box-shadow:0 0 0 8px rgba(34,197,94,0);}}
 @keyframes vcDot{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
 
-#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar{width:4px;}
-#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
+#rmMessages::-webkit-scrollbar,#rmMembersList::-webkit-scrollbar,#socialUserList::-webkit-scrollbar,#chatMessages::-webkit-scrollbar,#inCallMsgs::-webkit-scrollbar,#roomsModalList::-webkit-scrollbar,#xpStreakList::-webkit-scrollbar{width:4px;}
+#rmMessages::-webkit-scrollbar-thumb,#rmMembersList::-webkit-scrollbar-thumb,#socialUserList::-webkit-scrollbar-thumb,#chatMessages::-webkit-scrollbar-thumb,#inCallMsgs::-webkit-scrollbar-thumb,#roomsModalList::-webkit-scrollbar-thumb,#xpStreakList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
 
 .rm-out{align-self:flex-end;max-width:72%;background:linear-gradient(135deg,#6a4dff,#4d94ff);color:white;border-radius:18px 18px 4px 18px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;box-shadow:0 4px 16px rgba(109,40,217,0.3);}
 .rm-in{align-self:flex-start;max-width:72%;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-radius:18px 18px 18px 4px;padding:10px 15px;font-size:13px;line-height:1.5;word-break:break-word;}
@@ -470,217 +469,81 @@
 .btn-vid:hover{background:rgba(109,40,217,0.35);color:white;}
 .btn-unfollow{background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);border-radius:9px;padding:6px 12px;font-size:12px;cursor:pointer;}
 
-.room-live-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);margin-bottom:10px;transition:all 0.2s;}
-.room-live-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(109,40,217,0.3);}
-.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);}
-.kpi-card[onclick]:hover{outline:1px solid rgba(77,148,255,0.3);}
+.room-modal-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);transition:all 0.2s;}
+.room-modal-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(109,40,217,0.3);}
+
+.streak-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);}
+.streak-rank{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:rgba(255,255,255,0.5);flex-shrink:0;}
 
 .partner-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);}
 .partner-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white;flex-shrink:0;}
+
+.kpi-card[onclick]:hover{outline:1px solid rgba(77,148,255,0.3);}
 
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .msg-new{animation:fadeUp 0.2s ease;}
 .vc-btn-off{background:rgba(239,68,68,0.2)!important;border-color:rgba(239,68,68,0.5)!important;color:#f87171!important;}
+
 /* ── Hamburger ── */
-.ham {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.05);
-    flex-shrink: 0;
-    margin-left: auto;
-}
-.ham span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: #e2e8f0;
-    border-radius: 2px;
-    transition: all 0.3s;
-}
-.ham.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.ham.open span:nth-child(2) { opacity: 0; }
-.ham.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);flex-shrink:0;margin-left:auto;}
+.ham span{display:block;width:20px;height:2px;background:#e2e8f0;border-radius:2px;transition:all 0.3s;}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.ham.open span:nth-child(2){opacity:0;}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
 /* ── Mobile drawer ── */
-.mob-drawer {
-    display: none;
-    position: fixed;
-    top: 56px;
-    left: 0; right: 0;
-    background: rgba(7,7,13,0.98);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 14px;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 999;
-    transform: translateY(-110%);
-    transition: transform 0.3s ease;
+.mob-drawer{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(7,7,13,0.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px;flex-direction:column;gap:6px;z-index:999;transform:translateY(-110%);transition:transform 0.3s ease;}
+.mob-drawer.open{transform:translateY(0);}
+.mob-drawer .nav-link{display:block;padding:10px 14px;font-size:14px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--muted);text-decoration:none;}
+.mob-drawer .nav-link.active,.mob-drawer .nav-link:hover{color:#e2e8f0;background:var(--surface);}
+
+@media(max-width:860px){
+    #main-nav{height:56px;padding:0 14px;gap:10px;flex-wrap:nowrap;}
+    #main-nav .nav-links{display:none!important;}
+    .ham{display:flex;}
+    .mob-drawer{display:flex;}
+    #profile-container{position:fixed!important;top:4px!important;right:60px!important;width:auto!important;}
+    .content-wrapper{padding-top:68px!important;padding-left:12px!important;padding-right:12px!important;}
+    .dash-page .content>div:first-child{flex-direction:column!important;align-items:flex-start!important;gap:10px;}
+    .kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
+    #skillBars{flex-direction:column!important;gap:10px!important;}
+    #studyPartnersGrid{gap:8px!important;}
+    .card{padding:16px!important;}
 }
-.mob-drawer.open { transform: translateY(0); }
-.mob-drawer .nav-link {
-    display: block;
-    padding: 10px 14px;
-    font-size: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    color: var(--muted);
-    text-decoration: none;
-}
-.mob-drawer .nav-link.active,
-.mob-drawer .nav-link:hover { color: #e2e8f0; background: var(--surface); }
-
-@media (max-width: 860px) {
-
-    /* ── Nav ── */
-    #main-nav {
-        height: 56px;
-        padding: 0 14px;
-        gap: 10px;
-        flex-wrap: nowrap;
-    }
-    #main-nav .nav-links { display: none !important; }
-    .ham { display: flex; }
-    .mob-drawer { display: flex; }
-
-    /* Profile button: pull left of hamburger */
-    #profile-container {
-        position: fixed !important;
-        top: 4px !important;
-        right: 60px !important;
-        width: auto !important;
-    }
-
-    /* ── Page wrapper ── */
-    .content-wrapper { padding-top: 68px !important; padding-left: 12px !important; padding-right: 12px !important; }
-
-    /* ── Dashboard header ── */
-    .dash-page .content > div:first-child {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 10px;
-    }
-
-    /* ── KPI grid → 2 columns ── */
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
-    }
-
-    /* ── Main grid → single column ── */
-    .grid-2 { grid-template-columns: 1fr !important; gap: 14px !important; }
-
-    /* ── Skill bars ── */
-    #skillBars { flex-direction: column !important; gap: 10px !important; }
-
-    /* ── Study partners ── */
-    #studyPartnersGrid { gap: 8px !important; }
-
-    /* ── Streak grid → 1 column ── */
-    #streakGrid { grid-template-columns: 1fr !important; }
-
-    /* ── Cards ── */
-    .card { padding: 16px !important; }
-
-    /* ── Activity items ── */
-    .activity-item { padding: 8px 10px !important; gap: 8px !important; }
-
-    /* ── Room cards ── */
-    .room-live-card { flex-wrap: wrap; gap: 8px !important; }
-    .room-live-card > button { width: 100% !important; margin-top: 4px; }
-
-    /* ── Create/join room panels ── */
-    #createRoomPanel input,
-    #createRoomPanel select,
-    #createRoomPanel button { width: 100% !important; box-sizing: border-box !important; }
-    #createRoomPanel > div:last-child { flex-direction: column !important; }
+@media(max-width:540px){
+    .kpi-grid{grid-template-columns:1fr 1fr!important;}
+    .heading-lg{font-size:22px!important;}
+    #chatWindow{bottom:0!important;right:0!important;left:0!important;width:100vw!important;height:72vh!important;border-radius:16px 16px 0 0!important;transform:translateY(30px)!important;}
+    #roomChatModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;flex-direction:column!important;}
+    #roomChatModal>div:first-child{width:100%!important;flex-direction:row!important;flex-wrap:wrap!important;padding:10px 12px!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,0.06)!important;max-height:200px;overflow-y:auto;}
+    #rmMembersList{flex-direction:row!important;flex-wrap:wrap!important;max-height:70px!important;}
+    #videoModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;}
+    #localVideo{width:100px!important;height:74px!important;bottom:86px!important;right:12px!important;}
+    #videoModal>div:nth-child(3){gap:10px!important;padding:12px 8px!important;}
+    #videoModal>div:nth-child(3) button{width:44px!important;height:44px!important;font-size:16px!important;}
+    #videoModal>div:nth-child(3) button:nth-child(4){width:54px!important;height:54px!important;}
+    #socialModal,#roomsModal,#xpModal{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;transform:none!important;border-radius:0!important;max-height:100dvh!important;}
+    #incomingCallToast{left:16px!important;right:16px!important;transform:translateX(0) translateY(80px)!important;min-width:unset!important;}
+    #incomingCallToast.show{transform:translateX(0) translateY(0)!important;}
 }
 
-@media (max-width: 540px) {
-
-    /* KPI → 1 column on very small screens */
-    .kpi-grid { grid-template-columns: 1fr 1fr !important; }
-
-    .heading-lg { font-size: 22px !important; }
-
-    /* DM chat window → full-width bottom sheet */
-    #chatWindow {
-        bottom: 0 !important;
-        right: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 72vh !important;
-        border-radius: 16px 16px 0 0 !important;
-        transform: translateY(30px) !important;
-    }
-
-    /* Room chat modal → full screen */
-    #roomChatModal {
-        width: 100vw !important;
-        height: 100dvh !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-        border-radius: 0 !important;
-        flex-direction: column !important;
-    }
-    #roomChatModal > div:first-child {
-        width: 100% !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        padding: 10px 12px !important;
-        border-right: none !important;
-        border-bottom: 1px solid rgba(255,255,255,0.06) !important;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-    #rmMembersList { flex-direction: row !important; flex-wrap: wrap !important; max-height: 70px !important; }
-
-    /* Video modal → full screen */
-    #videoModal {
-        width: 100vw !important;
-        height: 100dvh !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-        border-radius: 0 !important;
-    }
-    #localVideo {
-        width: 100px !important;
-        height: 74px !important;
-        bottom: 86px !important;
-        right: 12px !important;
-    }
-    #videoModal > div:nth-child(3) { gap: 10px !important; padding: 12px 8px !important; }
-    #videoModal > div:nth-child(3) button { width: 44px !important; height: 44px !important; font-size: 16px !important; }
-    #videoModal > div:nth-child(3) button:nth-child(4) { width: 54px !important; height: 54px !important; }
-
-    /* Social modal → full screen */
-    #socialModal {
-        width: 100vw !important;
-        height: 100dvh !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-        border-radius: 0 !important;
-        max-height: 100dvh !important;
-    }
-
-    /* Incoming call toast */
-    #incomingCallToast {
-        left: 16px !important;
-        right: 16px !important;
-        transform: translateX(0) translateY(80px) !important;
-        min-width: unset !important;
-    }
-    #incomingCallToast.show { transform: translateX(0) translateY(0) !important; }
-}
+/* ══ INVITE TOAST ══ */
+.invite-toast{width:100%;pointer-events:all;background:linear-gradient(135deg,#0e0e1e,#14142a);border:1px solid rgba(109,40,217,0.45);border-radius:18px;padding:14px 16px;box-shadow:0 20px 60px rgba(0,0,0,0.85),0 0 40px rgba(109,40,217,0.12);opacity:0;transform:translateY(20px) scale(0.96);transition:opacity 0.35s cubic-bezier(.34,1.56,.64,1),transform 0.35s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.invite-toast::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#6a4dff,#00c9a7,#4d94ff);border-radius:18px 18px 0 0;}
+.invite-toast.show{opacity:1;transform:translateY(0) scale(1);}
+.invite-toast.dismiss{opacity:0;transform:translateY(16px) scale(0.94);transition:opacity 0.25s ease,transform 0.25s ease;}
+.invite-toast-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:white;flex-shrink:0;position:relative;}
+.invite-toast-av::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,#6a4dff,#00c9a7) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;}
+.invite-accept-btn{background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:white;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(34,197,94,0.4);transition:transform 0.15s;white-space:nowrap;}
+.invite-accept-btn:hover{transform:scale(1.05);}
+.invite-decline-btn{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;white-space:nowrap;}
+.invite-decline-btn:hover{background:rgba(239,68,68,0.22);}
+.invite-timer-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#6a4dff,#00c9a7);border-radius:0 0 18px 18px;transition:width linear;}
+.btn-invite{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#34d399;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.btn-invite:hover{background:rgba(16,185,129,0.28);color:white;}
+@media(max-width:860px){#inviteStack{bottom:80px;}}
+@media(max-width:540px){#inviteStack{bottom:16px;padding:0 8px;}.invite-toast{border-radius:14px;}}
 </style>
 
 <!-- ═══ FIREBASE MODULE ═══ -->
@@ -711,6 +574,10 @@ let unsubRoomMsgs = null, unsubRoom = null;
 let unsubDM = null;
 let activeDMSessionId = null;
 let activeDMPeer = null;
+let unsubRoomsModal = null;
+let unsubStreaks = null;
+// Store latest profile goals for XP modal
+let _latestGoals = {};
 
 // WebRTC state
 let localStream = null, remoteStream = null, peerConnection = null;
@@ -751,7 +618,8 @@ window._log = async (type, detail) => {
 onAuthStateChanged(auth, async user => {
     if (!user) {
         st('dashGreeting','Your Dashboard');
-        loadPubRooms(); watchStreaks(); watchFeed();
+        loadPubRooms();
+        watchStreaks();
         return;
     }
     CU = user;
@@ -766,9 +634,9 @@ onAuthStateChanged(auth, async user => {
     watchRoomsKPI();
     watchRooms(user.uid);
     watchStreaks();
-    watchFeed();
     watchSocial(user.uid);
     listenForIncomingCalls(user.uid);
+    listenForInvitations(user.uid);
 });
 
 async function ensureUser(u) {
@@ -798,13 +666,10 @@ function watchProfile(uid) {
         st('kpiMatchSub',d.matchRank?'Top '+d.matchRank+'% match':'No matches yet');
         st('kpiMatched',d.matchedCount||0);
         st('kpiMatchedSub','+'+(d.matchedThisWeek||0)+' this week');
-        const g=d.goals||{};
-        const hp=Math.min(100,Math.round((g.studyHours||0)/(g.studyHoursTarget||10)*100));
-        sb('goalHoursBar',hp); st('goalHoursPct',hp+'%');
-        sb('goalTeachBar',Math.min(100,g.peerTeachings||0));
-        st('goalTeachPct',Math.min(100,g.peerTeachings||0)+'%');
-        sb('goalQuizBar',Math.min(100,g.quizAvg||0));
-        st('goalQuizPct',Math.min(100,g.quizAvg||0)+'%');
+        // Store goals for XP modal
+        _latestGoals = d.goals || {};
+        // Update XP modal goals if it's open
+        updateXpModalGoals(_latestGoals);
         if(d.skills?.length){
             sh('skillBanner'); hd('onboardBanner');
             $('skillBars').innerHTML = [...d.skills].sort((a,b)=>a.confidence-b.confidence).map(s=>{
@@ -822,6 +687,15 @@ function watchProfile(uid) {
     });
 }
 
+function updateXpModalGoals(g) {
+    const hp = Math.min(100,Math.round((g.studyHours||0)/(g.studyHoursTarget||10)*100));
+    sb('xpGoalHoursBar', hp); st('xpGoalHoursPct', hp+'%');
+    sb('xpGoalTeachBar', Math.min(100, g.peerTeachings||0));
+    st('xpGoalTeachPct', Math.min(100, g.peerTeachings||0)+'%');
+    sb('xpGoalQuizBar', Math.min(100, g.quizAvg||0));
+    st('xpGoalQuizPct', Math.min(100, g.quizAvg||0)+'%');
+}
+
 function watchRoomsKPI() {
     onSnapshot(collection(db,'rooms'), snap=>{
         st('kpiRooms',snap.size||0);
@@ -834,69 +708,75 @@ function watchRoomsKPI() {
     });
 }
 
-function watchRooms(uid){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,uid)); }
-function loadPubRooms(){ onSnapshot(collection(db,'rooms'),snap=>renderRooms(snap,null)); }
+function watchRooms(uid){ onSnapshot(collection(db,'rooms'),snap=>{ window._roomsSnap={snap,uid}; renderRoomsModal(snap,uid); }); }
+function loadPubRooms(){ onSnapshot(collection(db,'rooms'),snap=>{ window._roomsSnap={snap,uid:null}; renderRoomsModal(snap,null); }); }
 
-function renderRooms(snap,uid){
-    const list=$('liveRoomsList');
-    if(snap.empty){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">No rooms yet — create one!</div>';return;}
-    list.innerHTML=snap.docs.map((d,i)=>{
-        const r=d.data(),mood=typeof r.mood==='number'?r.mood:74;
-        const mc=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
+function renderRoomsModal(snap, uid) {
+    const list = $('roomsModalList');
+    if(!list) return;
+    if(snap.empty){
+        list.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:40px;">No active rooms — create one!</div>';
+        return;
+    }
+    list.innerHTML = snap.docs.map((d,i)=>{
+        const r=d.data(), mood=typeof r.mood==='number'?r.mood:74;
+        const mc=mood>=80?'#22c55e':mood>=60?'#f59e0b':'#f87171';
         const im=uid&&(r.members||[]).includes(uid), mb=(r.members||[]).length;
         const isEnded = r.status === 'ended';
-        return `<div class="room-live-card" style="${isEnded?'opacity:0.45;':''}">
-            <div style="font-size:22px;">${EMOJIS[i%EMOJIS.length]}</div>
+        return `<div class="room-modal-card" style="${isEnded?'opacity:0.4;':''}">
+            <div style="font-size:24px;flex-shrink:0;">${EMOJIS[i%EMOJIS.length]}</div>
             <div style="flex:1;min-width:0;">
-                <div style="font-weight:600;font-size:14px;">${esc(r.subject||'Study Room')}${isEnded?' <span style="font-size:10px;color:#f87171;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:20px;padding:2px 7px;margin-left:5px;">Ended</span>':''}</div>
-                <div style="font-size:11px;color:var(--muted);">${esc(r.topic||'General')} · ${mb} member${mb!==1?'s':''}</div>
-                <div style="font-size:10px;color:var(--muted);margin-top:2px;">Code: <span style="color:#00c9a7;letter-spacing:1px;font-weight:700;">${esc(r.code||d.id)}</span></div>
+                <div style="font-weight:600;font-size:13px;color:white;">${esc(r.subject||'Study Room')}${isEnded?' <span style="font-size:10px;color:#f87171;background:rgba(239,68,68,0.1);border-radius:20px;padding:1px 6px;margin-left:4px;">Ended</span>':''}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">${mb} member${mb!==1?'s':''} · <span style="color:#00c9a7;letter-spacing:1px;font-weight:700;">${esc(r.code||d.id)}</span></div>
+                <div style="display:flex;align-items:center;gap:5px;margin-top:4px;">
+                    <div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;"><div style="width:${mood}%;height:100%;background:${mc};border-radius:2px;"></div></div>
+                    <span style="font-size:10px;color:${mc};font-weight:700;">${mood}%</span>
+                </div>
             </div>
-            <div style="text-align:right;flex-shrink:0;">
-                <div style="font-size:11px;color:${mc};margin-bottom:4px;">Mood ${mood}%</div>
-                <div class="progress-bar" style="width:70px;height:4px;"><div class="progress-fill" style="width:${mood}%;background:${mc};"></div></div>
-            </div>
-            ${!isEnded?`<button onclick="window.openRoomChat('${d.id}','${esc(r.subject||'Room')}','${esc(r.code||d.id)}',${i})"
-                class="btn ${im?'btn-primary':'btn-outline'}" style="padding:6px 14px;font-size:12px;white-space:nowrap;flex-shrink:0;">
-                ${im?'▶ Resume':'💬 Chat'}
-            </button>`:'<div style="font-size:11px;color:rgba(255,255,255,0.25);white-space:nowrap;">Session ended</div>'}
+            ${!isEnded
+                ?`<button onclick="closeRoomsModal();window.openRoomChat('${d.id}','${esc(r.subject||'Room')}','${esc(r.code||d.id)}',${i})"
+                    style="background:${im?'linear-gradient(135deg,#6a4dff,#4d94ff)':'rgba(255,255,255,0.07)'};border:1px solid ${im?'transparent':'rgba(255,255,255,0.12)'};color:white;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+                    ${im?'▶ Resume':'💬 Join'}
+                </button>`
+                :'<span style="font-size:11px;color:rgba(255,255,255,0.2);white-space:nowrap;flex-shrink:0;">Ended</span>'
+            }
         </div>`;
     }).join('');
 }
 
 function watchStreaks(){
-    onSnapshot(query(collection(db,'users'),orderBy('streak','desc'),limit(6)),snap=>{
-        const g=$('streakGrid'); if(!g)return;
-        if(snap.empty){g.innerHTML='<div style="grid-column:1/-1;color:var(--muted);font-size:13px;text-align:center;padding:16px;">No streaks yet 🔥</div>';return;}
-        const cols=['linear-gradient(135deg,var(--accent),var(--pink))','linear-gradient(135deg,var(--teal),var(--accent))','linear-gradient(135deg,var(--green),var(--teal))','linear-gradient(135deg,var(--orange),var(--pink))'];
-        g.innerHTML=snap.docs.map((d,i)=>{
-            const u=d.data();
-            return `<div style="background:var(--surface);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;">
-                <div style="width:34px;height:34px;border-radius:50%;background:${cols[i%cols.length]};display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">${(u.displayName||u.email||'U')[0].toUpperCase()}</div>
-                <div><div style="font-size:12px;font-weight:600;">${esc(u.displayName||u.email?.split('@')[0]||'User')}</div>
-                <div style="font-size:11px;color:var(--orange-glow);">🔥 ${u.streak||0} day streak</div></div>
-            </div>`;
-        }).join('');
+    if(unsubStreaks){ unsubStreaks(); unsubStreaks=null; }
+    unsubStreaks = onSnapshot(query(collection(db,'users'),orderBy('streak','desc'),limit(8)), snap=>{
+        window._streakSnap = snap;
+        renderStreakList(snap);
     });
 }
 
-function watchFeed(){
-    onSnapshot(query(collection(db,'activity'),orderBy('createdAt','desc'),limit(12)),snap=>{
-        const feed=$('activityFeed'); if(!feed)return;
-        if(snap.empty){feed.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">No activity yet.</div>';return;}
-        const icons={join:'🚪',message:'💬',create:'🏠',match:'🎯',quiz:'📝',xp:'⚡',leave:'👋',videocall:'📹'};
-        feed.innerHTML=snap.docs.map(d=>{
-            const a=d.data();
-            const t=a.createdAt?.toDate?.()?.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})||'just now';
-            return `<div class="activity-item">
-                <div style="font-size:20px;flex-shrink:0;">${icons[a.type]||'📡'}</div>
-                <div style="flex:1;">
-                    <div style="font-size:13px;color:white;"><strong>${esc(a.name||'Someone')}</strong> <span style="color:var(--muted);font-weight:400;">${esc(a.detail||'')}</span></div>
-                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t}</div>
-                </div>
-            </div>`;
-        }).join('');
-    });
+function renderStreakList(snap) {
+    const list = $('xpStreakList');
+    if(!list) return;
+    if(!snap||snap.empty){
+        list.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.25);font-size:13px;padding:30px;">No streaks yet 🔥</div>';
+        return;
+    }
+    const rankColors=['#f59e0b','#94a3b8','#cd7c3a','#6a4dff'];
+    const rankEmoji=['🥇','🥈','🥉',''];
+    list.innerHTML = snap.docs.map((d,i)=>{
+        const u=d.data();
+        const isMe = CU && d.id===CU.uid;
+        return `<div class="streak-row" style="${isMe?'border-color:rgba(109,40,217,0.4);background:rgba(109,40,217,0.08);':''}">
+            <div class="streak-rank" style="background:${i<3?rankColors[i]:'rgba(255,255,255,0.06)'};">${rankEmoji[i]||'#'+(i+1)}</div>
+            <div style="width:34px;height:34px;border-radius:50%;background:${u.color||pc(d.id)};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:white;flex-shrink:0;">${(u.displayName||u.email||'U')[0].toUpperCase()}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;color:white;">${esc(u.displayName||u.email?.split('@')[0]||'User')}${isMe?' <span style="font-size:10px;color:rgba(255,255,255,0.35);">(you)</span>':''}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);">${(u.xp||0).toLocaleString()} XP total</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:15px;font-weight:800;color:#f59e0b;">🔥 ${u.streak||0}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.3);">day streak</div>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 function watchSocial(uid){
@@ -938,9 +818,95 @@ function mapSD(d){
     return {uid:d.id,name:u.displayName||u.name||u.email||'User',sub:u.subject||u.subjects?.[0]||'Studying',match:u.matchScore||0,av:(u.displayName||u.name||'U')[0].toUpperCase(),col:u.color||'#4d94ff',matched:u.matched||false};
 }
 
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
+// ROOMS MODAL
+// ══════════════════════════════════════════
+window.openRoomsModal = function(){
+    const overlay=$('roomsModalOverlay'), modal=$('roomsModal');
+    overlay.style.display='block'; modal.style.display='flex';
+    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
+    // Render with cached snapshot if available
+    if(window._roomsSnap) renderRoomsModal(window._roomsSnap.snap, window._roomsSnap.uid);
+};
+
+window.closeRoomsModal = function(){
+    const modal=$('roomsModal'), overlay=$('roomsModalOverlay');
+    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
+    setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; }, 200);
+    closeCreateRoomModal();
+};
+
+window.openCreateRoomModal = function(){
+    const p=$('createRoomPanelModal');
+    $('roomCodeModal').value='ROOM-'+Math.random().toString(36).substring(2,7).toUpperCase();
+    p.style.display = p.style.display==='none'?'block':'none';
+};
+window.closeCreateRoomModal = function(){
+    const p=$('createRoomPanelModal'); if(p) p.style.display='none';
+    const s=$('roomSubjectModal'); if(s) s.value='';
+};
+
+window.submitCreateRoomModal = async function(){
+    if(!CU){ alert('Please log in first.'); return; }
+    const subject=$('roomSubjectModal').value.trim(), code=$('roomCodeModal').value.trim(), max=parseInt($('roomMaxMembersModal').value)||4;
+    if(!subject){ alert('Enter a subject name.'); return; }
+    const btn=$('createRoomBtnModal'); btn.textContent='Creating…'; btn.disabled=true;
+    try{
+        const ref=doc(collection(db,'rooms'));
+        await setDoc(ref,{subject,code,hostUid:CU.uid,hostName:CU.displayName||CU.email,members:[CU.uid],maxMembers:max,mood:74,topic:'',status:'active',createdAt:serverTimestamp(),createdToday:true});
+        await addDoc(collection(db,'rooms/'+ref.id+'/messages'),{text:'🏠 Room "'+subject+'" created! Welcome, say hello 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+        await window._log('create','created room "'+subject+'" ('+code+')');
+        await updateDoc(doc(db,'users/'+CU.uid),{streak:increment(1)}).catch(()=>{});
+        window.closeRoomsModal();
+        window.openRoomChat(ref.id,subject,code,0);
+    }catch(e){ alert('Could not create room: '+e.message); }
+    finally{ btn.textContent='💬 Create & Open Chat'; btn.disabled=false; }
+};
+
+window.joinRoomModal = async function(){
+    const code=$('joinRoomCodeModal').value.trim().toUpperCase();
+    if(!code) return;
+    try{
+        const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code)));
+        if(snap.empty){
+            const inp=$('joinRoomCodeModal'); inp.style.borderColor='rgba(255,80,80,0.6)'; inp.placeholder='❌ Not found';
+            setTimeout(()=>{ inp.style.borderColor='rgba(255,255,255,0.1)'; inp.placeholder='Enter Room Code (e.g. ROOM-X7K2P)'; },2000); return;
+        }
+        const d=snap.docs[0], rid=d.id, r=d.data();
+        if(r.status==='ended'){ alert('⛔ This session has been ended by the host.'); return; }
+        if(CU){
+            await updateDoc(doc(db,'rooms',rid),{members:arrayUnion(CU.uid)});
+            await addDoc(collection(db,'rooms/'+rid+'/messages'),{text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+            await window._log('join','joined room "'+r.subject+'"');
+        }
+        $('joinRoomCodeModal').value='';
+        window.closeRoomsModal();
+        window.openRoomChat(rid,r.subject||'Study Room',r.code||code,0);
+    }catch(e){ alert('Join failed: '+e.message); }
+};
+
+// ══════════════════════════════════════════
+// XP / STREAKS MODAL
+// ══════════════════════════════════════════
+window.openXpModal = function(){
+    const overlay=$('xpModalOverlay'), modal=$('xpModal');
+    overlay.style.display='block'; modal.style.display='flex';
+    requestAnimationFrame(()=>{ modal.style.opacity='1'; modal.style.transform='translate(-50%,-50%) scale(1)'; });
+    // Populate goals from latest data
+    updateXpModalGoals(_latestGoals);
+    // Render streaks
+    if(window._streakSnap) renderStreakList(window._streakSnap);
+};
+
+window.closeXpModal = function(){
+    const modal=$('xpModal'), overlay=$('xpModalOverlay');
+    modal.style.opacity='0'; modal.style.transform='translate(-50%,-50%) scale(0.95)';
+    setTimeout(()=>{ modal.style.display='none'; overlay.style.display='none'; }, 200);
+};
+
+// ══════════════════════════════════════════
 // ROOM CHAT
-// ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 window.openRoomChat = async function(roomId, subject, code, emojiIdx){
     if(!CU){ alert('Please log in to chat.'); return; }
     activeRoomId = roomId;
@@ -949,7 +915,6 @@ window.openRoomChat = async function(roomId, subject, code, emojiIdx){
     $('rmEmoji').textContent=EMOJIS[emojiIdx%EMOJIS.length];
     $('rmSessionLink').href='session.html?room='+roomId;
 
-    // ── HOST CHECK: show End Session btn + host badge only for creator ──
     try {
         const roomSnap = await getDoc(doc(db,'rooms',roomId));
         const isHost = roomSnap.exists() && roomSnap.data().hostUid === CU.uid;
@@ -988,9 +953,7 @@ window.openRoomChat = async function(roomId, subject, code, emojiIdx){
         st('rmMoodPct',mood+'%'); $('rmMoodBar').style.width=mood+'%';
         $('rmMoodPct').style.color=mood>=80?'var(--green-glow)':mood>=60?'var(--orange-glow)':'#f87171';
 
-        // ── AUTO-CLOSE FOR ALL MEMBERS when host ends the session ──────
         if(r.status === 'ended'){
-            // Show final notice in chat before closing
             const msgs = $('rmMessages');
             if(msgs){
                 const notice = document.createElement('div');
@@ -1000,12 +963,8 @@ window.openRoomChat = async function(roomId, subject, code, emojiIdx){
                 msgs.appendChild(notice);
                 msgs.scrollTop = msgs.scrollHeight;
             }
-            // Non-hosts see the message then get closed after a short delay
             if(CU && r.hostUid !== CU.uid){
-                setTimeout(()=>{
-                    window.closeRoomChat();
-                    showSessionEndedToast(false);
-                }, 2500);
+                setTimeout(()=>{ window.closeRoomChat(); showSessionEndedToast(false); }, 2500);
             }
         }
     });
@@ -1059,128 +1018,39 @@ window.closeRoomChat = function(){
     if(unsubRoomMsgs){ unsubRoomMsgs(); unsubRoomMsgs=null; }
     if(unsubRoom){ unsubRoom(); unsubRoom=null; }
     activeRoomId=null;
-    // Reset host-only UI for next open
     const endBtn=$('rmEndSessionBtn'); if(endBtn) endBtn.style.display='none';
     const badge=$('rmHostBadge');      if(badge)  badge.style.display='none';
 };
 
-// ══════════════════════════════════════════════════════════════════════
-// END SESSION — HOST ONLY
-// Sets status:'ended' on the room doc.
-// All open onSnapshot listeners detect it and auto-close for every member.
-// ══════════════════════════════════════════════════════════════════════
 window.endSession = async function(){
     if(!activeRoomId || !CU){ return; }
-
-    // Re-verify host server-side (not just UI check)
     let roomData;
     try {
         const snap = await getDoc(doc(db,'rooms',activeRoomId));
         if(!snap.exists()){ window.closeRoomChat(); return; }
         roomData = snap.data();
     } catch(e){ console.error('Host verify failed:',e); return; }
-
-    if(roomData.hostUid !== CU.uid){
-        alert('⛔ Only the session host can end this session.');
-        return;
-    }
-    if(roomData.status === 'ended'){
-        alert('This session has already been ended.');
-        window.closeRoomChat(); return;
-    }
-
-    const ok = confirm(
-        '🛑 End session for everyone?\n\n' +
-        'This will close the room for all members immediately.\n' +
-        'This cannot be undone.'
-    );
+    if(roomData.hostUid !== CU.uid){ alert('⛔ Only the session host can end this session.'); return; }
+    if(roomData.status === 'ended'){ alert('This session has already been ended.'); window.closeRoomChat(); return; }
+    const ok = confirm('🛑 End session for everyone?\n\nThis will close the room for all members immediately.\nThis cannot be undone.');
     if(!ok) return;
-
     try {
-        // 1. Post a farewell system message so everyone sees it in chat
-        await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{
-            text: '🛑 The host ended this session. Thanks for studying together! 👋',
-            senderUid: CU.uid, senderName: 'System',
-            createdAt: serverTimestamp(), type: 'system'
-        });
-        // 2. Mark room as ended — triggers onSnapshot for ALL open members
-        await updateDoc(doc(db,'rooms',activeRoomId),{
-            status:   'ended',
-            endedAt:  serverTimestamp(),
-            endedBy:  CU.uid
-        });
-        await window._log('leave', 'ended session "' + (roomData.subject||'Room') + '" (host)');
-    } catch(e){
-        console.error('endSession failed:', e);
-        alert('Could not end session: ' + e.message);
-        return;
-    }
-
-    // Host closes immediately (their own listener fires too, but this is instant)
+        await addDoc(collection(db,'rooms/'+activeRoomId+'/messages'),{text:'🛑 The host ended this session. Thanks for studying together! 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
+        await updateDoc(doc(db,'rooms',activeRoomId),{status:'ended',endedAt:serverTimestamp(),endedBy:CU.uid});
+        await window._log('leave','ended session "' + (roomData.subject||'Room') + '" (host)');
+    } catch(e){ console.error('endSession failed:',e); alert('Could not end session: '+e.message); return; }
     window.closeRoomChat();
     showSessionEndedToast(true);
 };
 
-// Toast shown to host (isHost=true) and members (isHost=false)
 function showSessionEndedToast(isHost){
-    const existing=document.getElementById('_sessionEndToast');
-    if(existing) existing.remove();
-    const t=document.createElement('div');
-    t.id='_sessionEndToast';
-    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(0);'+
-        'background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(17,17,24,0.98));'+
-        'border:1px solid rgba(239,68,68,0.4);color:#f87171;'+
-        'padding:13px 28px;border-radius:14px;font-size:13px;font-weight:600;'+
-        'z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.8);pointer-events:none;';
+    const existing=document.getElementById('_sessionEndToast'); if(existing) existing.remove();
+    const t=document.createElement('div'); t.id='_sessionEndToast';
+    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(0);background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(17,17,24,0.98));border:1px solid rgba(239,68,68,0.4);color:#f87171;padding:13px 28px;border-radius:14px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.8);pointer-events:none;';
     t.textContent = isHost ? '🛑 You ended the session.' : '🛑 Host ended the session.';
     document.body.appendChild(t);
-    setTimeout(()=>{
-        t.style.transition='opacity 0.4s,transform 0.4s';
-        t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(30px)';
-        setTimeout(()=>t.remove(), 450);
-    }, 3500);
+    setTimeout(()=>{ t.style.transition='opacity 0.4s,transform 0.4s'; t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(30px)'; setTimeout(()=>t.remove(),450); },3500);
 }
-
-window.submitCreateRoom = async function(){
-    if(!CU){ alert('Please log in first.'); return; }
-    const subject=$('roomSubject').value.trim(), code=$('roomCode').value.trim(), max=parseInt($('roomMaxMembers').value)||4;
-    if(!subject){ alert('Enter a subject name.'); return; }
-    const btn=$('createRoomBtn'); btn.textContent='Creating…'; btn.disabled=true;
-    try{
-        const ref=doc(collection(db,'rooms'));
-        await setDoc(ref,{subject,code,hostUid:CU.uid,hostName:CU.displayName||CU.email,members:[CU.uid],maxMembers:max,mood:74,topic:'',status:'active',createdAt:serverTimestamp(),createdToday:true});
-        await addDoc(collection(db,'rooms/'+ref.id+'/messages'),{text:'🏠 Room "'+subject+'" created! Welcome, say hello 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
-        await window._log('create','created room "'+subject+'" ('+code+')');
-        await updateDoc(doc(db,'users/'+CU.uid),{streak:increment(1)}).catch(()=>{});
-        closeCreateRoom();
-        window.openRoomChat(ref.id,subject,code,0);
-    }catch(e){ alert('Could not create room: '+e.message); }
-    finally{ btn.textContent='💬 Create & Open Chat'; btn.disabled=false; }
-};
-
-window.joinRoom = async function(){
-    const code=$('joinRoomCode').value.trim().toUpperCase();
-    if(!code) return;
-    try{
-        const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code)));
-        if(snap.empty){
-            const inp=$('joinRoomCode'); inp.style.borderColor='rgba(255,80,80,0.6)'; inp.placeholder='❌ Not found';
-            setTimeout(()=>{ inp.style.borderColor='rgba(255,255,255,0.1)'; inp.placeholder='Enter Room Code (e.g. ROOM-X7K2P)'; },2000); return;
-        }
-        const d=snap.docs[0], rid=d.id, r=d.data();
-        if(r.status==='ended'){
-            alert('⛔ This session has been ended by the host and is no longer available.');
-            return;
-        }
-        if(CU){
-            await updateDoc(doc(db,'rooms',rid),{members:arrayUnion(CU.uid)});
-            await addDoc(collection(db,'rooms/'+rid+'/messages'),{text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined 👋',senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'});
-            await window._log('join','joined room "'+r.subject+'"');
-        }
-        $('joinRoomCode').value='';
-        window.openRoomChat(rid,r.subject||'Study Room',r.code||code,0);
-    }catch(e){ alert('Join failed: '+e.message); }
-};
 
 // ══════════════════════════════════════════
 // DM CHAT
@@ -1304,6 +1174,151 @@ function listenForIncomingCalls(uid){
     });
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// INVITATION SYSTEM
+// Firestore: invitations/{id} with fields:
+//   toUid, fromUid, fromName, fromColor,
+//   type ('room'|'study'|'match'), roomId, roomSubject, roomCode,
+//   status ('pending'|'accepted'|'declined'), createdAt
+// ══════════════════════════════════════════════════════════════════════
+const _shownInvites = new Set();
+const INVITE_TIMEOUT = 25000;
+
+function listenForInvitations(uid) {
+    const q = query(
+        collection(db,'invitations'),
+        where('toUid','==',uid),
+        where('status','==','pending')
+    );
+    onSnapshot(q, snap => {
+        snap.docChanges().forEach(change => {
+            if (change.type === 'added') {
+                const id = change.doc.id;
+                if (_shownInvites.has(id)) return;
+                _shownInvites.add(id);
+                showInviteToast(id, change.doc.data());
+            }
+        });
+    });
+}
+
+function showInviteToast(invId, inv) {
+    const stack = document.getElementById('inviteStack');
+    if (!stack) return;
+    // Max 3 visible — dismiss oldest if over
+    const existing = stack.querySelectorAll('.invite-toast');
+    if (existing.length >= 3) dismissInviteToast(existing[0], null);
+
+    const fromName = esc(inv.fromName || 'Someone');
+    const fromAv   = (inv.fromName || 'S')[0].toUpperCase();
+    const fromCol  = inv.fromColor || '#6a4dff';
+    const icon     = inv.type === 'room' ? '🏠' : inv.type === 'match' ? '🎯' : '📚';
+    const typeText = inv.type === 'room'
+        ? `join <strong style="color:#00c9a7;">${esc(inv.roomSubject||'Study Room')}</strong>`
+        : inv.type === 'match' ? 'be your <strong style="color:#f59e0b;">study match</strong>'
+        : 'study together';
+
+    const toast = document.createElement('div');
+    toast.className = 'invite-toast';
+    toast.dataset.invId = invId;
+    toast.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="invite-toast-av" style="background:${fromCol};">
+                ${fromAv}
+                <div style="position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-radius:50%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:8px;border:2px solid #0e0e1e;">${icon}</div>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:700;color:white;margin-bottom:2px;">${fromName} invited you</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;">Wants you to ${typeText}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                <button class="invite-accept-btn"
+                    onclick="acceptInvite('${invId}','${esc(String(inv.roomId||''))}','${esc(inv.roomSubject||'')}','${esc(inv.roomCode||'')}',this.closest('.invite-toast'))">
+                    ✓ Accept
+                </button>
+                <button class="invite-decline-btn"
+                    onclick="declineInvite('${invId}',this.closest('.invite-toast'))">
+                    ✕ Decline
+                </button>
+            </div>
+        </div>
+        <div class="invite-timer-bar" style="width:100%;"></div>`;
+
+    stack.appendChild(toast);
+    // Animate in
+    requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+    // Shrink timer bar
+    const bar = toast.querySelector('.invite-timer-bar');
+    bar.style.transition = `width ${INVITE_TIMEOUT}ms linear`;
+    requestAnimationFrame(()=>{ bar.style.width='0%'; });
+    // Auto-dismiss
+    toast._timer = setTimeout(()=>dismissInviteToast(toast,invId), INVITE_TIMEOUT);
+}
+
+function dismissInviteToast(toast, invId) {
+    if (!toast || !toast.parentNode) return;
+    clearTimeout(toast._timer);
+    toast.classList.add('dismiss');
+    setTimeout(()=>toast.remove(), 260);
+}
+
+window.acceptInvite = async function(invId, roomId, roomSubject, roomCode, toastEl) {
+    dismissInviteToast(toastEl, invId);
+    try { await updateDoc(doc(db,'invitations',invId),{status:'accepted',respondedAt:serverTimestamp()}); } catch(e){}
+    if (roomId && CU) {
+        try {
+            await updateDoc(doc(db,'rooms',roomId),{members:arrayUnion(CU.uid)});
+            await addDoc(collection(db,'rooms/'+roomId+'/messages'),{
+                text:(CU.displayName||CU.email?.split('@')[0]||'Someone')+' joined via invite 🎉',
+                senderUid:CU.uid,senderName:'System',createdAt:serverTimestamp(),type:'system'
+            });
+        } catch(e){}
+        window.openRoomChat(roomId, roomSubject||'Study Room', roomCode||roomId, 0);
+        await window._log('invite','accepted invite to room "'+roomSubject+'"');
+    }
+    _showQuickToast('✅ Invitation accepted!','#22c55e');
+};
+
+window.declineInvite = async function(invId, toastEl) {
+    dismissInviteToast(toastEl, invId);
+    try { await updateDoc(doc(db,'invitations',invId),{status:'declined',respondedAt:serverTimestamp()}); } catch(e){}
+    _showQuickToast('Invitation declined.','#64748b');
+};
+
+// Send an invite from current user to peerUid
+window.sendInvite = async function(peerUid, peerName, type, roomId, roomSubject, roomCode, btnEl) {
+    if (!CU) { alert('Please log in first.'); return; }
+    if (peerUid === CU.uid) return;
+    if (btnEl) { btnEl.textContent='Sent ✓'; btnEl.disabled=true; btnEl.style.opacity='0.55'; }
+    try {
+        await addDoc(collection(db,'invitations'),{
+            toUid:peerUid, fromUid:CU.uid,
+            fromName:CU.displayName||CU.email?.split('@')[0]||'Someone',
+            fromColor:pc(CU.uid), type:type||'study',
+            roomId:roomId||null, roomSubject:roomSubject||null, roomCode:roomCode||null,
+            status:'pending', createdAt:serverTimestamp()
+        });
+        await window._log('invite','sent a '+(type||'study')+' invite to '+peerName);
+        _showQuickToast('📩 Invite sent to '+esc(peerName)+'!','#6a4dff');
+    } catch(e) {
+        if(btnEl){btnEl.textContent='Invite';btnEl.disabled=false;btnEl.style.opacity='1';}
+    }
+};
+
+function _showQuickToast(msg, color) {
+    const t=document.createElement('div');
+    t.style.cssText=`position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+        background:#0e0e1e;border:1px solid ${color}55;color:white;
+        padding:10px 22px;border-radius:12px;font-size:13px;font-weight:600;
+        z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.7);pointer-events:none;
+        opacity:1;transition:opacity 0.35s,transform 0.35s;`;
+    t.innerHTML=`<span style="color:${color};">${msg}</span>`;
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(16px)';setTimeout(()=>t.remove(),360);},2800);
+}
+
+
+
 function showIncomingCall(callId,data){
     pendingCallData={callId,data};
     const av=$('incomingAvatar');
@@ -1426,11 +1441,12 @@ window.renderUsers = function(users){
                 <div class="s-name">${esc(u.name)}${u.matched?partnerBadge:''}</div>
                 <div class="s-meta">${esc(u.sub)} &nbsp;·&nbsp; <span style="color:rgba(128,179,255,0.7);">${u.match}% match</span></div>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
+            <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
                 ${isSelf
                     ?'<span style="font-size:11px;color:var(--muted);padding:6px 10px;">You</span>'
-                    :`<button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">💬 Chat</button>
-                      <button class="btn-vid" title="Start video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
+                    :`<button class="btn-invite" onclick="window.sendInvite('${u.uid}','${esc(u.name)}','study',null,null,null,this)">📩 Invite</button>
+                      <button class="btn-msg" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}')">💬</button>
+                      <button class="btn-vid" title="Video call" onclick="window.openChat('${u.uid}','${esc(u.name)}','${u.av}','${u.col}','${esc(u.sub)}');setTimeout(()=>window.startVideoCall(),400)">📹</button>`
                 }
             </div>
         </div>`;
@@ -1473,39 +1489,29 @@ function filterUsers(){
     const src=window._cst==='followers'?(window._sf||[]):(window._sw||[]);
     window.renderUsers(src.filter(u=>u.name.toLowerCase().includes(q)||u.sub.toLowerCase().includes(q)));
 }
-function openCreateRoom(){
-    const p=document.getElementById('createRoomPanel');
-    document.getElementById('roomCode').value='ROOM-'+Math.random().toString(36).substring(2,7).toUpperCase();
-    p.style.display=p.style.display==='none'?'block':'none';
-}
-function closeCreateRoom(){
-    document.getElementById('createRoomPanel').style.display='none';
-    document.getElementById('roomSubject').value='';
-}
-function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendDM();} }
-function autoResizeInput(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+
 document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
         closeSocialModal();
         if(typeof window.closeChatWindow==='function') window.closeChatWindow();
         if(typeof window.closeRoomChat==='function') window.closeRoomChat();
+        if(typeof window.closeRoomsModal==='function') window.closeRoomsModal();
+        if(typeof window.closeXpModal==='function') window.closeXpModal();
     }
 });
+function handleChatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendDM();} }
+function autoResizeInput(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
 </script>
 
 <script>
 fetch('profile.html').then(r=>r.text()).then(html=>{
     document.getElementById('profile-container').innerHTML=html;
-
-    // Logout
     const lb=document.getElementById('logout-btn');
     if(lb) lb.addEventListener('click',e=>{
         e.preventDefault();
         import("https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js")
             .then(({getAuth,signOut})=>signOut(getAuth()).then(()=>window.location.href='login.html'));
     });
-
-    // Dropdown
     const pb=document.getElementById('profile-btn');
     const pm=document.getElementById('profile-menu');
     if(pb&&pm){
@@ -1518,107 +1524,59 @@ fetch('profile.html').then(r=>r.text()).then(html=>{
                 pm.style.display='none';
         });
     }
-
-    // Theme
     const DARK={'--bg':'#07070d','--surface':'#0e0e18','--card':'#13131f','--border':'#1c1c2e','--text':'#e2e8f0','--muted':'#64748b','--dim':'#1e293b','--glow':'#8b5cf6','--teal-glow':'#22d3ee','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
     const LIGHT={'--bg':'#f4f5fa','--surface':'#ffffff','--card':'#ffffff','--border':'#e2e8f0','--text':'#0f172a','--muted':'#64748b','--dim':'#e2e8f0','--glow':'#7c3aed','--teal-glow':'#0ea5e9','--green-glow':'#10b981','--orange-glow':'#f59e0b','--accent':'#6d28d9'};
-
     window.applyTheme=function(mode){
         const vars=mode==='dark'?DARK:LIGHT;
         const root=document.documentElement;
         const body=document.body;
-
-        // 1. Set all CSS variables
         Object.keys(vars).forEach(k=>root.style.setProperty(k,vars[k]));
-
-        // 2. Set data-theme attribute for CSS selector rules
         root.setAttribute('data-theme', mode);
-
-        // 3. Force background/color directly on html + body (belt AND suspenders)
         root.style.setProperty('background', vars['--bg'], 'important');
         root.style.setProperty('color', vars['--text'], 'important');
         body.style.setProperty('background', vars['--bg'], 'important');
         body.style.setProperty('color', vars['--text'], 'important');
-
-        // 4. Directly paint all cards
         const isLight = mode==='light';
-        document.querySelectorAll('.kpi-card,.card,.subject-room-card,.room-live-card,.partner-chip,.activity-item').forEach(el=>{
+        document.querySelectorAll('.kpi-card,.card,.partner-chip').forEach(el=>{
             el.style.background = isLight ? '#ffffff' : '';
             el.style.borderColor = isLight ? '#e2e8f0' : '';
             el.style.color       = isLight ? '#0f172a' : '';
         });
-
-        // 5. Nav
         const nav=document.getElementById('main-nav');
         if(nav){
             nav.style.background=isLight?'rgba(255,255,255,0.92)':'rgba(7,7,13,0.85)';
             nav.style.borderBottomColor=isLight?'#e2e8f0':'rgba(255,255,255,0.06)';
         }
-
-        // 6. Nav links
         document.querySelectorAll('.nav-link').forEach(a=>{
             a.style.color=isLight?(a.classList.contains('active')?'#6d28d9':'#475569'):'';
         });
-
-        // 7. KPI values (colored numbers)
         document.querySelectorAll('.kpi-value').forEach(el=>{ el.style.color=''; });
-
-        // 8. Section tags
         document.querySelectorAll('.section-tag,.kpi-label,.kpi-delta').forEach(el=>{
             el.style.color = isLight ? '#64748b' : '';
         });
-
-        // 9. Toggle button active states
         const btnD=document.getElementById('btn-dark');
         const btnL=document.getElementById('btn-light');
         const lbl=document.getElementById('theme-row-label');
         if(btnD) btnD.classList.toggle('active',mode==='dark');
         if(btnL) btnL.classList.toggle('active',mode==='light');
         if(lbl)  lbl.textContent=isLight?'☀️ Theme':'🌙 Theme';
-
-        // 10. Persist
         localStorage.setItem('ss-theme',mode);
     };
-
     window.applyTheme(localStorage.getItem('ss-theme')||'dark');
-
 }).catch(e=>console.error('Profile load failed:',e));
 </script>
-<script>
-    const hamBtn = document.getElementById('hamBtn');
-    const mobDrawer = document.getElementById('mobDrawer');
-    hamBtn.addEventListener('click', () => {
-        hamBtn.classList.toggle('open');
-        mobDrawer.classList.toggle('open');
-    });
-    mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        hamBtn.classList.remove('open');
-        mobDrawer.classList.remove('open');
-    }));
-</script>
-<!-- Mobile-only: scroll to study rooms -->
-<button id="scrollToRoomsBtn"
-  onclick="document.getElementById('studyRoomsCard').scrollIntoView({behavior:'smooth',block:'start'})"
-  style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:500;
-    background:linear-gradient(135deg,#6a4dff,#4d94ff);border:none;color:white;font-size:13px;
-    font-weight:700;padding:11px 22px;border-radius:50px;cursor:pointer;
-    box-shadow:0 6px 24px rgba(106,77,255,0.45);white-space:nowrap;
-    transition:opacity 0.3s,transform 0.3s;">
-  🏠 Study Rooms ↓
-</button>
 
 <script>
-(function(){
-  var btn = document.getElementById('scrollToRoomsBtn');
-  var card = document.getElementById('studyRoomsCard');
-  if(!btn || !card) return;
-  window.addEventListener('scroll', function(){
-    var rect = card.getBoundingClientRect();
-    var visible = rect.top < window.innerHeight * 0.75;
-    btn.style.opacity = visible ? '0' : '1';
-    btn.style.pointerEvents = visible ? 'none' : 'auto';
-  }, { passive: true });
-})();
+const hamBtn = document.getElementById('hamBtn');
+const mobDrawer = document.getElementById('mobDrawer');
+hamBtn.addEventListener('click', () => {
+    hamBtn.classList.toggle('open');
+    mobDrawer.classList.toggle('open');
+});
+mobDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    hamBtn.classList.remove('open');
+    mobDrawer.classList.remove('open');
+}));
 </script>
 </body>
 </html>
